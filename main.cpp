@@ -24,14 +24,29 @@ public:
 		fstream f(filename);
 		
 		f >> i; n_jobs = i;
-		f >> j; n_machines = j; n_ops = i*j;
+		f >> j; n_machines = j; n_ops = i*j + 1;
 
 		cost.resize(n_jobs*n_machines + 1);
+		o_job.resize(n_jobs*n_machines + 1);
+		o_machine.resize(n_jobs*n_machines + 1);
 
 		for(i = 1; i < cost.size(); i++){
 			f >> c;
 			cost[i] = c;
+			o_job[i] = (i-1)/n_machines;
+			o_machine[i] = (i-1)%n_machines;
 		}
+	}
+
+	void print(){
+		cout << "\n" << "O -> jobs" << "\n";
+		for(int i=1; i<n_ops; i++)
+			cout << o_job[i] << " ";
+
+		cout << "\n" << "O -> machines" << "\n";
+		for(int i=1; i<n_ops; i++)
+			cout << o_machine[i] << " ";
+		cout << "\n";
 	}
 
 	friend class Solution;
@@ -60,11 +75,27 @@ class Solution {
 	void initGreedyJobs(){}
 	void initGreedyMachines(){}
 
+	void fill_heads(unsigned int op, vector<unsigned int>& heads, vector<unsigned int>& late_pred, int cont){
+		if(cont==instance.n_ops) return;
+		heads[op] = instance.cost[op] + instance.cost[late_pred[op]];
+		fill_heads(jobs_succ[op], heads, late_pred);
+		fill_heads(machines_succ[op], heads, late_pred, cont + 1);
+	}
+
 	void calc_makespan(){
 		makespan = 0;
-		int temp_makespan = 0, operation, operation_succ, _operation, queue_top = 0;
-		vector<unsigned int> degrees_in(instance.n_ops,0);
-		vector<unsigned int> op_queue;
+		int temp_makespan = 0, operation, operation_succ, _operation, queue_lookat = 0;
+		vector<unsigned int> degrees_in(instance.n_ops,0); //Graus de entrada por operacao
+		vector<unsigned int> op_queue; //Lista de operacoes
+		vector<unsigned int> late_pred(instance.n_ops); //Predecessores mais tardios
+		vector<unsigned int> heads(instance.n_ops);
+
+		heads[0] = 0;
+
+		for(int i=1; i<=instance.n_ops; i++)
+			late_pred[i] = max(instance.cost[jobs_pred[i]], instance.cost[machines_pred[i]]);
+		
+		fill_heads(0, heads, late_pred, 1);
 
 		for(int i = 1; i <= (instance.n_jobs > instance.n_machines ? instance.n_jobs: instance.n_machines); i++){
 			if(i <= instance.n_jobs && jobs_succ[i] > 0) degrees_in[i]++;
@@ -72,10 +103,10 @@ class Solution {
 			if(!degrees_in[i]) op_queue.push_back(i);
 		}
 
-		while(queue_top < op_queue.size()){
-			operation = op_queue(queue_top);
+		while(queue_lookat < op_queue.size()){
+			operation = op_queue[queue_lookat];
 
-			temp_makespan = partial_scheduling[operation] + instance.cost[operation];
+			temp_makespan = heads[operation] + instance.cost[operation];
 			if(temp_makespan > makespan){ 
 				makespan = temp_makespan;
 				_operation = operation;
@@ -86,9 +117,9 @@ class Solution {
 			if (operation_succ != DUMMY){
 				degrees_in[operation_succ]--;
 				if(!degrees_in[operation_succ]) op_queue.push_back(operation_succ);
-				if(partial_schedule[operation_succ] < temp_makespan){
-					partial_schedule[operation_succ] = temp_makespan;
-					prev[operation_succ] = operation; //??????
+				if(heads[operation_succ] < temp_makespan){
+					heads[operation_succ] = temp_makespan;
+					late_pred[operation_succ] = operation;
 				}
 			}
 
@@ -97,13 +128,13 @@ class Solution {
 			if (operation_succ != DUMMY){
 				degrees_in[operation_succ]--;
 				if(!degrees_in[operation_succ]) op_queue.push_back(operation_succ);
-				if(partial_schedule[operation_succ] < temp_makespan){
-					partial_schedule[operation_succ] = temp_makespan;
-					prev[operation_succ] = operation; //??????
+				if(heads[operation_succ] < temp_makespan){
+					heads[operation_succ] = temp_makespan;
+					late_pred[operation_succ] = operation;
 				}
 			}
 
-			queue_top++; //Proxima operacao da fila
+			queue_lookat++; //Proxima operacao da fila
 		}
 	}
 public:
@@ -117,7 +148,7 @@ public:
 		//Cria solucao inicial
 		init(init_method);
 		
-		calc_makespan();
+		//calc_makespan();
 	}
 
 	void init(int method){
@@ -135,10 +166,23 @@ public:
 				break;
 		}
 	}
+
+	void print(){
+		cout << "\nSucessores nos jobs:\n";
+		for(int i=0; i<=instance.n_jobs; i++) cout << jobs_succ[i] << " ";
+		cout << "\nPredecessores nos jobs:\n";
+		for(int i=0; i<=instance.n_jobs; i++) cout << jobs_pred[i] << " ";
+		cout << "\nSucessores nas maquinas:\n";
+		for(int i=0; i<=instance.n_machines; i++) cout << machines_succ[i] << " ";
+		cout << "\nPredecessores nas maquinas:\n";
+		for(int i=0; i<=instance.n_machines; i++) cout << machines_pred[i] << " ";
+		cout << "\n";
+	}
 };
 
 int main(){
-	Instance i("test");
+	Instance i("test");// i.print();
 	Solution s(i, RANDOM);
+	s.print();
 	return 0;
 }
