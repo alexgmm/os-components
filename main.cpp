@@ -16,14 +16,12 @@ using namespace std;
 void printv(vector<unsigned int>&v, int ini, string name){
 	cout << "\n" << name << "\n";
 	for(int i=ini; i<v.size(); i++) cout << v[i] << " ";
-	cout << "\n";
-}
+	cout << "\n";}
 
 void swap(vector<unsigned int>&v, int a, int b){
 	int c = v[a];
 	v[a] = v[b];
-	v[b] = c;
-}
+	v[b] = c;}
 
 class Instance {
 	vector<unsigned int> cost;
@@ -58,17 +56,16 @@ public:
 		for(int i=1; i<=n_ops; i++)
 			cout << i << ": " << cost[i] << "\n";
 		cout << "\n" << "O -> jobs" << "\n";
-		for(int i=1; i<n_ops; i++)
+		for(int i=1; i<=n_ops; i++)
 			cout << o_job[i] << " ";
 
 		cout << "\n" << "O -> machines" << "\n";
-		for(int i=1; i<n_ops; i++)
+		for(int i=1; i<=n_ops; i++)
 			cout << o_machine[i] << " ";
 		cout << "\n";
 	}
 
-	friend class Solution;
-};
+	friend class Solution;};
 
 class Solution {
 	vector<unsigned int> jobs_succ;
@@ -119,8 +116,7 @@ class Solution {
 		if(machines_succ[machines_succ.size()-1] == machines_succ.size()) 
 			swap(machines_succ, machines_succ.size()-1, 1);
 		//Gerando predecessores na máquinas
-		for(int i = 1; i<=machines_succ.size(); i++) machines_pred[machines_succ[i]] = i;
-	}
+		for(int i = 1; i<=machines_succ.size(); i++) machines_pred[machines_succ[i]] = i;}
 
 	void initGreedyJobs(){}
 	void initGreedyMachines(){}
@@ -141,13 +137,15 @@ class Solution {
 		vector<unsigned int> heads(instance.n_ops + 1);
 
 		heads[0] = 0;
-		for(int i=1; i<=instance.n_ops; i++){
-			late_pred[i] = max(instance.cost[jobs_pred[i]], instance.cost[machines_pred[i]]);
-		}
-			
-		
 		fill_heads(1, heads, late_pred, 1);
+		for(int i=1; i<=instance.n_ops; i++)
+			if(heads[machines_pred[i]] > heads[jobs_pred[i]]) 
+				late_pred[i] = machines_pred[i];
+			else late_pred[i] = jobs_pred[i];
+			//late_pred[i] = max(instance.cost[jobs_pred[i]], instance.cost[machines_pred[i]]);
 		
+		printv(heads, 1, "heads"); printv(late_pred, 1, "late_pred");
+
 		for(int i = 1; i <= (instance.n_jobs > instance.n_machines ? instance.n_jobs: instance.n_machines); i++){
 			if(i <= instance.n_jobs && jobs_succ[i] > 0) degrees_in[i]++;
 			if(i <= instance.n_machines && machines_succ[i] > 0) degrees_in[i]++;
