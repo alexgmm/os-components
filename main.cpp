@@ -220,9 +220,9 @@ public:
 		if(!DEBUG) return;
 		int ini = 1;
 		printv(jobs_succ, ini,"Sucessores nos jobs:");
-		//printv(jobs_pred, ini,"Predecessores nos jobs:");
+		printv(jobs_pred, ini,"Predecessores nos jobs:");
 		printv(machines_succ, ini,"Sucessores nas maquinas:");
-		//printv(machines_pred, ini,"Predecessores nas maquinas:");
+		printv(machines_pred, ini,"Predecessores nas maquinas:");
 		cout << "\nmakespan: " << makespan << "\n" ;
 	}
 };
