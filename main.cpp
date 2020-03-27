@@ -10,6 +10,7 @@
 #define GREEDY_MACHINES (2)
 #define DUMMY (0)
 #define DEBUG (1)
+#define br "\n"
 
 using namespace std;
 
@@ -28,8 +29,6 @@ class Instance {
 	vector<unsigned int> o_job;
 	vector<unsigned int> o_machine;
 	int n_jobs, n_machines, n_ops;
-
-	int array_index(int i, int j){ return i*n_machines + j + 1;}
 public:
 	Instance() {}
 	Instance (string filename){
@@ -64,91 +63,79 @@ public:
 			cout << o_machine[i] << " ";
 		cout << "\n";
 	}
-
+	
 	friend class Solution;};
 
 class Solution {
-	vector<unsigned int> jobs_succ;
-	vector<unsigned int> jobs_pred;
-	vector<unsigned int> machines_succ;
-	vector<unsigned int> machines_pred;
-	unsigned int makespan;
+	vector<unsigned int> j_succ;
+	vector<unsigned int> j_pred;
+	vector<unsigned int> m_succ;
+	vector<unsigned int> m_pred;
+	unsigned int makespan, n_machines, n_jobs, n_ops;
 	Instance instance;
 
+	// Numero/indice da operacao (j,m)
+	// Indice 0 e desconsiderado para todos os vetores
+	int op(int j, int m){ return (j-1)*n_machines + m;}
+
 	void initRandom(){ //Gera sol. inicial rand.
-		unsigned int index;
-		random_device rd;
-		mt19937 rng(rd());
-		uniform_int_distribution<unsigned int> uni(0,instance.n_ops-1);
-		vector<unsigned int> random(instance.n_ops);
+		vector<unsigned int> j_ord(n_jobs+1, 0),
+							 m_ord(n_machines+1, 0);
 
-		//Gerando sucessores nos jobs
-		iota(random.begin(), random.end(), 1);
-		srand(unsigned(time(0)));
-		random_shuffle(random.begin(), random.end());
+		//Gerando ordem dos jobs
+		iota(j_ord.begin()+1, j_ord.end(), 1);
+		srand(unsigned(time(NULL)));
+		random_shuffle(j_ord.begin()+1, j_ord.end());
+		printv(j_ord,1,"Ordem randomizada - jobs");
 
-		index = uni(rng);
-		random[index] = 0; //Operacao maximal = index+1
-		for(int i=1; i<jobs_succ.size(); i++){
-			if(random[i-1] == i) swap(random, i-1, random.size()-1);
-			jobs_succ[i] = random[i-1];
-		} 
+		//Gerando ordem nas maquinas
+		iota(m_ord.begin()+1, m_ord.end(), 1);
+		srand(unsigned(time(NULL)));
+		random_shuffle(m_ord.begin()+1, m_ord.end());
+		printv(m_ord,1,"Ordem randomizada - machines");
 
-		if(jobs_succ[jobs_succ.size()-1] == jobs_succ.size()) 
-			swap(jobs_succ, jobs_succ.size()-1, 1);
-		//Gerando predecessores nos jobs
-		for(int i = 1; i<=jobs_succ.size(); i++) jobs_pred[jobs_succ[i]] = i;
-
-
-		//Gerando sucessores nas maquinas
-		iota(random.begin(), random.end(), 1);
-		srand(unsigned(time(0)));
-		random_shuffle(random.begin(), random.end());
-
-		index = uni(rng);
-		random[index] = 0;
-
-		for(int i=1; i<machines_succ.size(); i++){
-			if(random[i-1] == i) swap(random, i-1, random.size()-1);
-			machines_succ[i] = random[i-1];
-		} 
-
-		if(machines_succ[machines_succ.size()-1] == machines_succ.size()) 
-			swap(machines_succ, machines_succ.size()-1, 1);
-		//Gerando predecessores na máquinas
-		for(int i = 1; i<=machines_succ.size(); i++) machines_pred[machines_succ[i]] = i;}
+		//Sucessores
+		for(int m=1; m<=n_machines; m++){
+			for(int j=1; j<=n_jobs; j++){
+				if(j!=1) m_pred[op(j,m)] = op(j_ord[j-1],m_ord[m]);
+				if(m!=1) j_pred[op(j,m)] = op(j_ord[j],m_ord[m-1]);
+				if(j<n_jobs) m_succ[op(j,m)] = op(j_ord[j+1],m_ord[m]);
+				if(m<n_machines) j_succ[op(j,m)] = op(j_ord[j],m_ord[m+1]);
+			}
+		}
+	}
 
 	void initGreedyJobs(){}
 	void initGreedyMachines(){}
 
 	void fill_heads(unsigned int op, vector<unsigned int>& heads, vector<unsigned int>& late_pred, int cont){
-		if(cont==instance.n_ops) return;
+		if(cont==n_ops) return;
 		heads[op] = instance.cost[op] + instance.cost[late_pred[op]];
-		fill_heads(jobs_succ[op], heads, late_pred, cont + 1);
-		fill_heads(machines_succ[op], heads, late_pred, cont + 1);
+		fill_heads(j_succ[op], heads, late_pred, cont + 1);
+		fill_heads(m_succ[op], heads, late_pred, cont + 1);
 	}
 
 	void calc_makespan(){
 		makespan = 0;
 		int temp_makespan = 0, operation, operation_succ, _operation, queue_lookat = 0;
-		vector<unsigned int> degrees_in(instance.n_ops,0); //Graus de entrada por operacao
+		vector<unsigned int> degrees_in(n_ops,0); //Graus de entrada por operacao
 		vector<unsigned int> op_queue; //Lista de operacoes
-		vector<unsigned int> late_pred(instance.n_ops); //Predecessores mais tardios
-		vector<unsigned int> heads(instance.n_ops + 1);
+		vector<unsigned int> late_pred(n_ops); //Predecessores mais tardios
+		vector<unsigned int> heads(n_ops + 1);
 
 		heads[0] = 0;
 		fill_heads(1, heads, late_pred, 1);
-		for(int i=1; i<=instance.n_ops; i++)
-			if(heads[machines_pred[i]] > heads[jobs_pred[i]]) 
-				late_pred[i] = machines_pred[i];
-			else late_pred[i] = jobs_pred[i];
+		for(int i=1; i<=n_ops; i++)
+			if(heads[m_pred[i]] > heads[j_pred[i]]) 
+				late_pred[i] = m_pred[i];
+			else late_pred[i] = j_pred[i];
 			//late_pred[i] = max(instance.cost[jobs_pred[i]], instance.cost[machines_pred[i]]);
 		
 		printv(heads, 1, "heads"); printv(late_pred, 1, "late_pred");
 
-		for(int i = 1; i <= (instance.n_jobs > instance.n_machines ? instance.n_jobs: instance.n_machines); i++){
-			if(i <= instance.n_jobs && jobs_succ[i] > 0) degrees_in[i]++;
-			if(i <= instance.n_machines && machines_succ[i] > 0) degrees_in[i]++;
+		for(int i = 1; i <= (n_jobs > n_machines ? n_jobs: n_machines); i++){
+			if(i <= n_jobs && j_succ[i] > 0) degrees_in[i]++;
+			if(i <= n_machines && m_succ[i] > 0) degrees_in[i]++;
 			if(!degrees_in[i]) op_queue.push_back(i);
 		}
 		
@@ -161,7 +148,7 @@ class Solution {
 				_operation = operation;
 			}
 
-			operation_succ = jobs_succ[operation];
+			operation_succ = j_succ[operation];
 
 			if (operation_succ != DUMMY){
 				degrees_in[operation_succ]--;
@@ -173,7 +160,7 @@ class Solution {
 			}
 
 
-			operation_succ = machines_succ[operation];
+			operation_succ = m_succ[operation];
 			if (operation_succ != DUMMY){
 				degrees_in[operation_succ]--;
 				if(!degrees_in[operation_succ]) op_queue.push_back(operation_succ);
@@ -190,14 +177,17 @@ public:
 	Solution () {}
 	Solution(Instance i, int init_method){
 		instance = i;
-		jobs_succ.resize(instance.n_ops + 1);
-		jobs_pred.resize(instance.n_ops + 1);
-		machines_succ.resize(instance.n_ops + 1);
-		machines_pred.resize(instance.n_ops + 1);
-		//Cria solucao inicial
+		n_ops = instance.n_ops;
+		n_jobs = instance.n_jobs;
+		n_machines = instance.n_machines;
+		j_succ.resize(n_ops+1);
+		j_pred.resize(n_ops+1);
+		m_succ.resize(n_ops+1);
+		m_pred.resize(n_ops+1);
+
 		init(init_method);
 		
-		calc_makespan();
+		//calc_makespan();
 	}
 
 	void init(int method){
@@ -219,16 +209,16 @@ public:
 	void print(){
 		if(!DEBUG) return;
 		int ini = 1;
-		printv(jobs_succ, ini,"Sucessores nos jobs:");
-		printv(jobs_pred, ini,"Predecessores nos jobs:");
-		printv(machines_succ, ini,"Sucessores nas maquinas:");
-		printv(machines_pred, ini,"Predecessores nas maquinas:");
-		cout << "\nmakespan: " << makespan << "\n" ;
+		printv(j_succ, ini,"Sucessores nos jobs:");
+		printv(j_pred, ini,"Predecessores nos jobs:");
+		printv(m_succ, ini,"Sucessores nas maquinas:");
+		printv(m_pred, ini,"Predecessores nas maquinas:");
+		//cout << "\nmakespan: " << makespan << "\n" ;
 	}
 };
 
 int main(){
-	Instance i("test2"); i.print();
+	Instance i("test2"); //i.print();
 	Solution s(i, RANDOM);
 	s.print();
 	return 0;
