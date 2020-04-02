@@ -16,13 +16,10 @@ using namespace std;
 
 void printv(vector<unsigned int>&v, int ini, string name){
 	cout << "\n" << name << "\n";
+	for(int i=ini; i<v.size(); i++) cout<<i<<" "; cout<<br;
+	for(int i=ini; i<v.size()-1; i++) cout<<"--"; cout<<br;
 	for(int i=ini; i<v.size(); i++) cout << v[i] << " ";
 	cout << "\n";}
-
-void swap(vector<unsigned int>&v, int a, int b){
-	int c = v[a];
-	v[a] = v[b];
-	v[b] = c;}
 
 class Instance {
 	vector<unsigned int> cost;
@@ -38,7 +35,7 @@ public:
 		f >> i; n_jobs = i;
 		f >> j; n_machines = j; n_ops = i*j;
 
-		cost.resize(n_jobs*n_machines + 1);
+		cost.resize(n_jobs*n_machines + 1, 0);
 		o_job.resize(n_jobs*n_machines + 1);
 		o_machine.resize(n_jobs*n_machines + 1);
 
@@ -70,7 +67,7 @@ class Solution {
 	vector<unsigned int> j_pred;
 	vector<unsigned int> m_succ;
 	vector<unsigned int> m_pred;
-	unsigned int makespan, n_machines, n_jobs, n_ops;
+	unsigned int makespan, n_machines, n_jobs, n_ops, _operation;
 	Instance instance;
 
 	// Numero/indice da operacao (j,m)
@@ -85,13 +82,13 @@ class Solution {
 		iota(j_ord.begin()+1, j_ord.end(), 1);
 		srand(unsigned(time(NULL)));
 		random_shuffle(j_ord.begin()+1, j_ord.end());
-		printv(j_ord,1,"Ordem randomizada - jobs");
+		//printv(j_ord,1,"Ordem randomizada - jobs");
 
 		//Gerando ordem nas maquinas
 		iota(m_ord.begin()+1, m_ord.end(), 1);
 		srand(unsigned(time(NULL)));
 		random_shuffle(m_ord.begin()+1, m_ord.end());
-		printv(m_ord,1,"Ordem randomizada - machines");
+		//printv(m_ord,1,"Ordem randomizada - machines");
 
 		unsigned int op_zero = op(j_ord[1], m_ord[1]);
 
@@ -114,13 +111,21 @@ class Solution {
 	void fill_heads(unsigned int op, vector<unsigned int>& heads, vector<unsigned int>& late_pred, int cont){
 		if(cont>n_ops) return;
 		heads[op] = instance.cost[op] + instance.cost[late_pred[op]];
+		if(heads[op] > heads[_operation]) _operation = op;
 		fill_heads(j_succ[op], heads, late_pred, cont + 1);
 		fill_heads(m_succ[op], heads, late_pred, cont + 1);
 	}
 
+	void print_q(vector<unsigned int> &s, int lookat){
+		cout<<br<<"Pilha:"<<br;
+		for(int i=s.size()-1; i>=0; i--){
+			cout<<"|"<<s[i]<<"|";
+			if(i==lookat) cout<<"<";
+			cout<<br;}}
+	
 	void calc_makespan(unsigned int op_zero){
 		makespan = 0;
-		int temp_makespan = 0, operation, operation_succ, _operation, queue_lookat = 0;
+		int temp_makespan = 0, operation, operation_succ, queue_lookat = 0;
 		vector<unsigned int> degrees_in(n_ops + 1,0); //Graus de entrada por operacao
 		vector<unsigned int> op_queue; //Lista de operacoes
 		vector<unsigned int> late_pred(n_ops + 1); //Predecessores mais tardios
@@ -132,19 +137,20 @@ class Solution {
 		
 		fill_heads(1, heads, late_pred, 1);
 
-		if(DEBUG){printv(heads, 1, "heads"); printv(late_pred, 1, "late_pred");}
+		//if(DEBUG){printv(heads, 1, "heads"); printv(late_pred, 1, "late_pred");}
 
-		for(int i = 1; i <= (n_jobs > n_machines ? n_jobs: n_machines); i++){
-			if(i <= n_jobs && j_pred[i] > 0) degrees_in[i]++;
-			if(i <= n_machines && m_pred[i] > 0) degrees_in[i]++;
-			if(!degrees_in[i]) op_queue.push_back(i);
+		for(int i = 1; i <= n_ops; i++){
+			if(j_pred[i]>0) {degrees_in[i]++; printv(degrees_in,1,"Gr entrada:");}
+			if(m_pred[i]>0) {degrees_in[i]++; printv(degrees_in,1,"Gr entrada:");}
+			if(degrees_in[i]==0) {op_queue.push_back(i); print_q(op_queue,queue_lookat);}
 		}
 		
+
 		while(queue_lookat < op_queue.size()){
 			operation = op_queue[queue_lookat];
-
 			temp_makespan = heads[operation] + instance.cost[operation];
-			if(temp_makespan > makespan){ 
+
+			if(temp_makespan > makespan){
 				makespan = temp_makespan;
 				_operation = operation;
 			}
@@ -152,19 +158,20 @@ class Solution {
 			operation_succ = j_succ[operation];
 
 			if (operation_succ != DUMMY){
-				degrees_in[operation_succ]--;
-				if(!degrees_in[operation_succ]) op_queue.push_back(operation_succ);
+				degrees_in[operation_succ]--;printv(degrees_in,1,"Gr entrada:");
+				if(!degrees_in[operation_succ]) 
+					op_queue.push_back(operation_succ);print_q(op_queue,queue_lookat);
 				if(heads[operation_succ] < temp_makespan){
 					heads[operation_succ] = temp_makespan;
 					late_pred[operation_succ] = operation;
 				}
 			}
 
-
 			operation_succ = m_succ[operation];
 			if (operation_succ != DUMMY){
-				degrees_in[operation_succ]--;
-				if(!degrees_in[operation_succ]) op_queue.push_back(operation_succ);
+				degrees_in[operation_succ]--;printv(degrees_in,1,"Gr entrada:");
+				if(!degrees_in[operation_succ]) 
+					op_queue.push_back(operation_succ);print_q(op_queue,queue_lookat);
 				if(heads[operation_succ] < temp_makespan){
 					heads[operation_succ] = temp_makespan;
 					late_pred[operation_succ] = operation;
@@ -178,6 +185,7 @@ public:
 	Solution () {}
 	Solution(Instance i, int init_method){
 		instance = i;
+		_operation = 0;
 		n_ops = instance.n_ops;
 		n_jobs = instance.n_jobs;
 		n_machines = instance.n_machines;
@@ -208,10 +216,10 @@ public:
 	void print(){
 		if(!DEBUG) return;
 		int ini = 1;
-		printv(j_succ, ini,"Sucessores nos jobs:");
+		/* printv(j_succ, ini,"Sucessores nos jobs:");
 		printv(j_pred, ini,"Predecessores nos jobs:");
 		printv(m_succ, ini,"Sucessores nas maquinas:");
-		printv(m_pred, ini,"Predecessores nas maquinas:");
+		printv(m_pred, ini,"Predecessores nas maquinas:"); */
 		cout << "\nmakespan: " << makespan << "\n" ;
 	}
 };
