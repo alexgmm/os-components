@@ -1,7 +1,4 @@
-#file : tai15_15_03.txt
-#Number of jobs numbers of machines
 15 15
-#processing times :
  73  23  64  59  19  67  63  48  98   5   4  56  31   4   9 
  92  33  89  65  39  24  63   5  18  64  18  28  23  26  82 
  60  52  90  94  18   7  32  70  64  43  18  17  22  37  80 

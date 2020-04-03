@@ -1,7 +1,4 @@
-#file : tai07_07_04.txt
-#Number of jobs numbers of machines
 7 7
-#processing times :
  50  43  77  36  98   4  77 
  41  48  56  82  78  32  30 
  69  21  62  65  77   6  37 

@@ -1,7 +1,4 @@
-#file : tai05_05_05.txt
-#Number of jobs numbers of machines
 5 5
-#processing times :
  58  33  86  92  28 
  52  48  59  85  75 
  78  46  80   5  91 
