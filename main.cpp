@@ -5,14 +5,26 @@
 #include <numeric> //iota
 #include <cstdlib> 
 #include <random>
+#include <map>
+
 #define RANDOM (0)
 #define GREEDY_JOBS (1)
 #define GREEDY_MACHINES (2)
 #define DUMMY (0)
-#define DEBUG (1)
 #define br "\n"
 
 using namespace std;
+
+class Files {
+public:
+	vector<string> path = {"inst/taillard/", "inst/brucker/", "inst/gueret-prins/"};
+	vector<vector<string>> names = {
+		{"tai10_10_09.txt", "tai04_04_02.txt", "tai20_20_06.txt", "tai07_07_08.txt", "tai04_04_04.txt", "tai10_10_04.txt", "tai05_05_09.txt", "tai04_04_06.txt", "tai10_10_03.txt", "tai10_10_07.txt", "tai07_07_05.txt", "tai20_20_09.txt", "tai15_15_08.txt", "tai05_05_01.txt", "tai15_15_04.txt", "tai04_04_09.txt", "tai05_05_04.txt", "tai15_15_01.txt", "tai15_15_03.txt", "tai15_15_07.txt", "tai10_10_10.txt", "tai20_20_07.txt", "tai05_05_10.txt", "tai10_10_06.txt", "tai20_20_08.txt", "tai05_05_06.txt", "tai05_05_05.txt", "tai15_15_10.txt", "tai04_04_08.txt", "tai05_05_08.txt", "tai07_07_07.txt", "tai20_20_05.txt", "tai20_20_01.txt", "tai04_04_03.txt", "tai15_15_02.txt", "tai15_15_06.txt", "tai05_05_02.txt", "tai04_04_10.txt", "tai15_15_09.txt", "tai20_20_10.txt", "tai07_07_10.txt", "tai04_04_07.txt", "tai20_20_02.txt", "tai07_07_04.txt", "tai04_04_05.txt", "tai05_05_03.txt", "tai07_07_02.txt", "tai10_10_01.txt", "tai05_05_07.txt", "tai07_07_01.txt", "tai10_10_08.txt", "tai20_20_04.txt", "tai10_10_05.txt", "tai20_20_03.txt", "tai15_15_05.txt", "tai07_07_06.txt", "tai10_10_02.txt", "tai07_07_03.txt", "tai07_07_09.txt", "tai04_04_01.txt"},
+		{"j4-per0-2", "j5-per10-1", "j3-per20-0", "j3-per0-2", "j7-per0-0", "j8-per10-2", "j5-per0-1", "j3-per0-1", "j5-per20-0", "j3-per20-1", "j8-per20-2", "j8-per0-1", "j5-per10-0", "j5-per0-0", "j4-per20-1", "j4-per10-0", "j8-per0-2", "j4-per10-2", "j8-per10-1", "j4-per0-1", "j4-per20-0", "j6-per10-0", "j6-per0-0", "j3-per20-2", "j6-per0-1", "j8-per20-1", "j6-per10-1", "j5-per20-2", "j8-per10-0", "j6-per20-1", "j3-per10-2", "j7-per0-1", "j4-per0-0", "j5-per20-1", "j7-per10-1", "j3-per10-1", "j3-per10-0", "j4-per10-1", "j5-per10-2", "j7-per10-0", "j5-per0-2", "j8-per20-0", "j4-per20-2", "j7-per20-1", "j6-per10-2", "j6-per20-0", "j6-per20-2", "j7-per20-2", "j6-per0-2", "j7-per0-2", "j7-per20-0", "j7-per10-2"},
+		{"GP06-01.txt", "GP04-08.txt", "GP06-09.txt", "GP06-03.txt", "GP10-06.txt", "GP03-08.txt", "GP04-07.txt", "GP10-07.txt", "GP10-03.txt", "GP07-04.txt", "GP09-05.txt", "GP06-04.txt", "GP09-04.txt", "GP10-02.txt", "GP07-06.txt", "GP04-04.txt", "GP04-05.txt", "GP10-09.txt", "GP08-09.txt", "GP06-10.txt", "GP08-08.txt", "GP05-07.txt", "GP09-03.txt", "GP05-10.txt", "GP10-01.txt", "GP07-07.txt", "GP10-10.txt", "GP03-10.txt", "GP04-10.txt", "GP07-01.txt", "GP05-05.txt", "GP09-01.txt", "GP10-08.txt", "GP07-08.txt", "GP05-02.txt", "GP05-06.txt", "GP05-08.txt", "GP08-06.txt", "GP03-04.txt", "GP08-07.txt", "GP04-01.txt", "GP10-05.txt", "GP09-02.txt", "GP03-05.txt", "GP10-04.txt", "GP03-09.txt", "GP05-09.txt", "GP07-10.txt", "GP06-05.txt", "GP04-09.txt", "GP08-03.txt", "GP03-06.txt", "GP05-04.txt", "GP03-02.txt", "GP03-03.txt", "GP05-03.txt", "GP04-03.txt", "GP03-07.txt", "GP08-05.txt", "GP03-01.txt", "GP08-02.txt", "GP09-08.txt", "GP05-01.txt", "GP08-01.txt", "GP06-07.txt", "GP04-06.txt", "GP07-05.txt", "GP08-10.txt", "GP09-09.txt", "GP04-02.txt", "GP07-09.txt", "GP08-04.txt", "GP07-03.txt", "GP06-08.txt", "GP07-02.txt", "GP06-02.txt", "GP06-06.txt", "GP09-06.txt", "GP09-10.txt", "GP09-07.txt"}
+	};
+	Files (){}
+};
 
 void printv(vector<unsigned int>&v, int ini, string name){
 	cout << "\n" << name << "\n";
@@ -31,7 +43,8 @@ public:
 	Instance (string filename){
 		int i, j, c;
 		fstream f(filename);
-		
+		if(f.fail()) cout <<br<<"Erro ao abrir "<<filename;
+
 		f >> i; n_jobs = i;
 		f >> j; n_machines = j; n_ops = i*j;
 
@@ -45,6 +58,8 @@ public:
 			o_job[i] = (i-1)/n_machines + 1;
 			o_machine[i] = (i-1)%n_machines + 1;
 		}
+
+		f.close();
 	}
 
 	void print(){
@@ -74,10 +89,25 @@ class Solution {
 	// Indice 0 e desconsiderado para todos os vetores
 	int op(int j, int m){ return (j-1)*n_mach + m;}
 
+	void init(int method){
+		switch(method){
+			case RANDOM:
+				initRandom();
+				break;
+			case GREEDY_JOBS:
+				initGreedyJobs();
+				break;
+			case GREEDY_MACHINES:
+				initGreedyJobs();
+				break;
+			default:
+				break;}}
+
+
 	void initRandom(){ //Gera sol. inicial rand.
 		vector<unsigned int> j_ord(n_jobs+1, 0),
 							 m_ord(n_mach+1, 0);
-
+							 
 		//Gerando ordem dos jobs
 		iota(j_ord.begin()+1, j_ord.end(), 1);
 		srand(unsigned(time(NULL)));
@@ -105,10 +135,7 @@ class Solution {
 		printv(j_succ, ini,"Sucessores nos jobs:");
 		printv(j_pred, ini,"Predecessores nos jobs:");
 		printv(m_succ, ini,"Sucessores nas maquinas:");
-		printv(m_pred, ini,"Predecessores nas maquinas:"); */
-
-		calc_makespan();
-	}
+		printv(m_pred, ini,"Predecessores nas maquinas:"); */}
 
 	void initGreedyJobs(){}
 	void initGreedyMachines(){}
@@ -122,9 +149,22 @@ class Solution {
 	
 		if(heads[op] > heads[last]) last = op;
 		fill_heads(j_succ[op], heads, late_pred, cont + 1);
-		fill_heads(m_succ[op], heads, late_pred, cont + 1);
-	}
+		fill_heads(m_succ[op], heads, late_pred, cont + 1);}
+public:
+	Solution () {}
+	Solution(Instance i, int init_method){
+		instance = i;
+		last = 0;
+		makespan = 0;
+		n_ops = instance.n_ops;
+		n_jobs = instance.n_jobs;
+		n_mach = instance.n_machines;
+		j_succ.resize(n_ops+1);
+		j_pred.resize(n_ops+1);
+		m_succ.resize(n_ops+1);
+		m_pred.resize(n_ops+1);
 
+		init(init_method);}
 	void print_q(vector<unsigned int> &s, int lookat){
 		cout<<br<<"Pilha:"<<br;
 		for(int i=s.size()-1; i>=0; i--){
@@ -132,7 +172,7 @@ class Solution {
 			if(i==lookat) cout<<"<";
 			cout<<br;}}
 	
-	void calc_makespan(){
+	int calc_makespan(){
 		makespan = 0;
 		int temp_makespan = 0, op, op_succ, q_lookat = 0, q_pushed = 0;
 		vector<unsigned int> degrees_in(n_ops + 1,0); //Graus de entrada por operacao
@@ -143,10 +183,7 @@ class Solution {
 		for(int i=1; i<=n_ops; i++)
 			if(m_pred[i] > j_pred[i]) late_pred[i] = m_pred[i];
 			else late_pred[i] = j_pred[i];
-
-		fill_heads(first, heads, late_pred, 1);
-
-		//if(DEBUG){printv(heads, 1, "heads"); printv(late_pred, 1, "late_pred");}
+		fill_heads(first, heads, late_pred, 1);	printv(heads, 1, "heads"); printv(late_pred, 1, "late_pred");
 
 		for(int i = 1; i <= n_ops; i++){
 			if(j_pred[i]>0) degrees_in[i]++;
@@ -189,48 +226,30 @@ class Solution {
 				}
 			}
 		}
+		return makespan;
 	}
-public:
-	Solution () {}
-	Solution(Instance i, int init_method){
-		instance = i;
-		last = 0;
-		n_ops = instance.n_ops;
-		n_jobs = instance.n_jobs;
-		n_mach = instance.n_machines;
-		j_succ.resize(n_ops+1);
-		j_pred.resize(n_ops+1);
-		m_succ.resize(n_ops+1);
-		m_pred.resize(n_ops+1);
-
-		init(init_method);
-	}
-
-	void init(int method){
-		switch(method){
-			case RANDOM:
-				initRandom();
-				break;
-			case GREEDY_JOBS:
-				initGreedyJobs();
-				break;
-			case GREEDY_MACHINES:
-				initGreedyJobs();
-				break;
-			default:
-				break;
-		}
-	}
-
+	
 	void print(){
-		if(!DEBUG) return;
 		cout << "\nmakespan: " << makespan << "\n" ;}
 };
 
 int main(){
-	Instance i("test2"); //i.print();
+	/* Files f;
+	string name;
+	for(int i=0; i<f.path.size(); i++){
+		cout<<br<<"###"<<f.path[i]<<"###"<<br;
+		for(int j=0; j<f.names[i].size(); j++){
+			string fp = f.path[i],
+				   fn = f.names[i][j];
+			Instance i(fp + fn);
+			Solution s(i, RANDOM);
+			cout<<fn<<":"<<s.makespan<<br;
+		}
+	} */
+
+	Instance i("inst/taillard/tai20_20_01.txt"); //i.print();
 	Solution s(i, RANDOM);
-	s.print();
+	cout << s.calc_makespan();
 	return 0;
 }
 //Otimizar a ordem nas maquinas:
