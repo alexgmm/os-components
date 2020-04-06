@@ -173,6 +173,7 @@ public:
 			cout<<br;}}
 	
 	int calc_makespan(){
+		cout << "calc_makespan()";
 		makespan = 0;
 		int temp_makespan = 0, op, op_succ, q_lookat = 0, q_pushed = 0;
 		vector<unsigned int> degrees_in(n_ops + 1,0); //Graus de entrada por operacao
@@ -183,13 +184,13 @@ public:
 		for(int i=1; i<=n_ops; i++)
 			if(m_pred[i] > j_pred[i]) late_pred[i] = m_pred[i];
 			else late_pred[i] = j_pred[i];
-		fill_heads(first, heads, late_pred, 1);	printv(heads, 1, "heads"); printv(late_pred, 1, "late_pred");
+			
+		fill_heads(first, heads, late_pred, 1);	//printv(heads, 1, "heads"); printv(late_pred, 1, "late_pred");
 
 		for(int i = 1; i <= n_ops; i++){
 			if(j_pred[i]>0) degrees_in[i]++;
 			if(m_pred[i]>0) degrees_in[i]++;
-			if(degrees_in[i]==0) op_queue[q_pushed++] = i;
-		}
+			if(degrees_in[i]==0) op_queue[q_pushed++] = i;}
 		
 
 		while(q_lookat < q_pushed){
@@ -228,9 +229,6 @@ public:
 		}
 		return makespan;
 	}
-	
-	void print(){
-		cout << "\nmakespan: " << makespan << "\n" ;}
 };
 
 int main(){
@@ -247,7 +245,10 @@ int main(){
 		}
 	} */
 
-	Instance i("inst/taillard/tai20_20_01.txt"); //i.print();
+	//Funciona
+	//Instance i("inst/taillard/tai04_04_03.txt");
+	//Nao funciona
+	Instance i("inst/taillard/tai20_20_01.txt");
 	Solution s(i, RANDOM);
 	cout << s.calc_makespan();
 	return 0;
