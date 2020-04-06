@@ -173,7 +173,7 @@ public:
 			cout<<br;}}
 	
 	int calc_makespan(){
-		cout << "calc_makespan()";
+		cout << "calc_makespan()"<<br;
 		makespan = 0;
 		int temp_makespan = 0, op, op_succ, q_lookat = 0, q_pushed = 0;
 		vector<unsigned int> degrees_in(n_ops + 1,0); //Graus de entrada por operacao
@@ -248,9 +248,9 @@ int main(){
 	//Funciona
 	//Instance i("inst/taillard/tai04_04_03.txt");
 	//Nao funciona
-	Instance i("inst/taillard/tai20_20_01.txt");
+	Instance i("inst/taillard/tai04_04_01.txt"); i.print();
 	Solution s(i, RANDOM);
-	cout << s.calc_makespan();
+	cout <<br<< s.calc_makespan()<<br;
 	return 0;
 }
 //Otimizar a ordem nas maquinas:
