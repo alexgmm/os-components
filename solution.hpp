@@ -105,8 +105,7 @@ class Solution {
 			j_ord[i] = best_job;
 		}
 
-		fill_ord(j_ord, m_ord);
-	}
+		fill_ord(j_ord, m_ord);}
 	void initGreedyMachines(){
 		vector<unsigned int> j_ord(n_jobs+1, 0),
 							 m_ord(n_mach+1, 0),
@@ -143,8 +142,7 @@ class Solution {
 			m_ord[i] = best_mach;
 		}
 
-		fill_ord(j_ord, m_ord);
-	}
+		fill_ord(j_ord, m_ord);}
     void print_q(vector<unsigned int> &s, int lookat){
 		cout<<br<<"Pilha:"<<br;
 		for(int i=s.size()-1; i>=0; i--){
