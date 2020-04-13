@@ -41,7 +41,6 @@ void test(int init_method){
 	ofstream out(out_name);
 
 	for(int i=0; i<f.path.size(); i++){
-		out << f.path[i] << br;
 		for(int j=0; j<f.names[i].size(); j++){
 			string fp = f.path[i],
 				   fn = f.names[i][j];
@@ -51,7 +50,8 @@ void test(int init_method){
                 Solution s(i, init_method);
                 media += s.calc_makespan();
             }
-			out << fn << "," << media/NLOOPS << br;
+			//cout << media <<br;
+			out << fn << "," << (int) media/NLOOPS << br;
 		}
 	}
 	out.close();

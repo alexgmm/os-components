@@ -50,78 +50,58 @@ class Solution {
 				break;
 			default:
 				break;}}
-
-	void initRandom(){ //Gera sol. inicial rand.
+	void fill_vec_random(vector<unsigned int> &v){
+		iota(v.begin()+1, v.end(), 1);
+		srand(unsigned(time(NULL)));
+		random_shuffle(v.begin()+1,v.end());}
+	void initRandom(){
 		vector<unsigned int> j_ord(n_jobs+1, 0),
 							 m_ord(n_mach+1, 0);
 							 
-		//Gerando ordem dos jobs
-		iota(j_ord.begin()+1, j_ord.end(), 1);
-		srand(unsigned(time(NULL)));
-		random_shuffle(j_ord.begin()+1, j_ord.end());
-		//printv(j_ord,1,"Ordem randomizada - jobs");
-
-		//Gerando ordem nas maquinas
-		iota(m_ord.begin()+1, m_ord.end(), 1);
-		srand(unsigned(time(NULL)));
-		random_shuffle(m_ord.begin()+1, m_ord.end());
-		//printv(m_ord,1,"Ordem randomizada - machines");
-	
+		fill_vec_random(j_ord);//printv(j_ord,1,"Ordem randomizada - jobs");
+		fill_vec_random(m_ord);//printv(m_ord,1,"Ordem randomizada - machines");
 		fill_ord(j_ord, m_ord);}
 
 	void initGreedyJobs(){
-		vector<unsigned int> j_ord(n_jobs+1, 0),
-							 m_ord(n_mach+1, 0),
-							 j_used(n_jobs+1, 0);
-
-		iota(m_ord.begin()+1, m_ord.end(), 1);
-		srand(unsigned(time(NULL)));
-		random_shuffle(m_ord.begin()+1, m_ord.end());
-
+		vector<unsigned int> j_ord(n_jobs+1, 0), m_ord(n_mach+1, 0), j_used(n_jobs+1, 0);
 		unsigned int temp_n_j, temp_first, best_job, best_mkspn, mkspn;
+		fill_vec_random(m_ord);
 
-		for(int i = n_jobs; i>0; i--){
-			temp_n_j = n_jobs - i + 1;
+		for(int i = n_jobs; i>0; i--){ //cout<<br<<"i="<<i;
+			temp_n_j = n_jobs - i + 1; //cout<<br<<"temp_n_j="<<temp_n_j;
 			best_mkspn = 999999;
-			for(int j = n_jobs; j>=i; j--){
-				if(j_used[j] == 1) continue;
+			for(int j = n_jobs; j>0; j--){ if(j_used[j] == 1) continue;
 
-				j_ord[i] = j;
+				j_ord[i] = j; //print_ord(j_ord,m_ord);
 				for(int m = n_mach; m>0; m--){
 					if(j>1) m_pred[op(j_ord[j],m_ord[m])] = op(j_ord[j-1],m_ord[m]);
 					if(m>1) j_pred[op(j_ord[j],m_ord[m])] = op(j_ord[j],m_ord[m-1]);
 					if(j<temp_n_j) m_succ[op(j_ord[j],m_ord[m])] = op(j_ord[j+1],m_ord[m]);
 					if(m<n_mach) j_succ[op(j_ord[j],m_ord[m])] = op(j_ord[j],m_ord[m+1]);
 				}
-				temp_first = op(j,m_ord[1]);
+				temp_first = op(j,m_ord[1]); //cout<<br<<"temp_first="<<temp_first;
 				Solution s(j_succ, j_pred, m_succ, m_pred, n_mach, temp_n_j, temp_n_j*n_mach,temp_first,instance);
-				mkspn = s.calc_makespan();
-				if(mkspn < best_mkspn){
-					best_job = j;
-					best_mkspn = mkspn;
-					j_used[j] = 1;
+				mkspn = s.calc_makespan(); //cout<<br<<"makespan obtido="<<mkspn;
+
+				if(mkspn < best_mkspn){ 
+					best_job = j; 
+					best_mkspn = mkspn; //cout<<br<<"new makespan="<<best_mkspn;
+					j_used[j] = 1; 
 				}
 			}
 			j_ord[i] = best_job;
 		}
-
-		fill_ord(j_ord, m_ord);}
+		fill_ord(j_ord, m_ord);
+	}
 	void initGreedyMachines(){
-		vector<unsigned int> j_ord(n_jobs+1, 0),
-							 m_ord(n_mach+1, 0),
-							 m_used(n_mach+1, 0);
-
-		iota(j_ord.begin()+1, j_ord.end(), 1);
-		srand(unsigned(time(NULL)));
-		random_shuffle(j_ord.begin()+1, j_ord.end());
-
+		vector<unsigned int> j_ord(n_jobs+1, 0), m_ord(n_mach+1, 0), m_used(n_mach+1, 0);
 		unsigned int temp_n_m, temp_first, best_mach, best_mkspn, mkspn;
+		fill_vec_random(j_ord); //printv(j_ord,1,"j_ord");
 
 		for(int i = n_mach; i>0; i--){
 			temp_n_m = n_mach - i + 1;
 			best_mkspn = 999999;
-			for(int m = n_mach; m>=i; m--){
-				if(m_used[m] == 1) continue;
+			for(int m = n_mach; m>0; m--){ if(m_used[m] == 1) continue;
 
 				m_ord[i] = m;
 				for(int j = n_jobs; j>0; j--){
@@ -133,16 +113,22 @@ class Solution {
 				temp_first = op(j_ord[1],m);
 				Solution s(j_succ, j_pred, m_succ, m_pred, temp_n_m, n_jobs, n_jobs*temp_n_m,temp_first,instance);
 				mkspn = s.calc_makespan();
-				if(mkspn < best_mkspn){
-					best_mach = m;
-					best_mkspn = mkspn;
-					m_used[m] = 1;
-				}
+				if(mkspn < best_mkspn){ best_mach = m; best_mkspn = mkspn; m_used[m] = 1; }
 			}
 			m_ord[i] = best_mach;
 		}
+		fill_ord(j_ord, m_ord);
+	}
+	void print_ord(vector<unsigned int> &j, vector<unsigned int> &m){
+		cout<<br;
+		for(int i=1; i<j.size(); i++){
+			for(int k=1; k<m.size(); k++){
+				if(j[i]!=0 && m[k]!=0) cout<<op(j[i],m[k])<<" ";
+				else cout<<0<<" ";
 
-		fill_ord(j_ord, m_ord);}
+			}
+			cout<<br;
+		}}
     void print_q(vector<unsigned int> &s, int lookat){
 		cout<<br<<"Pilha:"<<br;
 		for(int i=s.size()-1; i>=0; i--){
@@ -188,7 +174,7 @@ public:
 	
 	int calc_makespan(){
 		makespan = 0;
-		int temp_makespan = 0, op, op_succ, q_lookat = 0, q_pushed = 0;
+		int temp_makespan = 0, op, q_lookat = 0, q_pushed = 0;
 		vector<unsigned int> degrees_in(n_ops + 1,0); //Graus de entrada por operacao
 		vector<unsigned int> op_queue(n_ops); //Lista de operacoes
 		vector<unsigned int> late_pred(n_ops + 1); //Predecessores mais tardios
@@ -200,7 +186,6 @@ public:
 			else late_pred[i] = j_pred[i];
 
 		fill_heads(first, heads, late_pred, 1, visited);//printv(heads, 1, "heads"); printv(late_pred, 1, "late_pred");
-
         for(int i = 1; i <= n_ops; i++){
 			if(j_pred[i]>0) degrees_in[i]++;
 			if(m_pred[i]>0) degrees_in[i]++;
@@ -209,33 +194,25 @@ public:
 
 		while(q_lookat < q_pushed){
 			op = op_queue[q_lookat++];
-			//cout<<br<<"op = "<<op<<br<<"op.heads = "<<heads[op]<<br<<"op.cost = "<<instance.cost[op]<<br;
 			temp_makespan = heads[op] + instance.cost[op];
+			//cout<<br<<"op = "<<op<<br<<"op.heads = "<<heads[op]<<br<<"op.cost = "<<instance.cost[op]<<br;
 
 			if(temp_makespan > makespan){
-				//cout <<br<< "makespan = "<<makespan<<br;
-				makespan = temp_makespan; //cout <<br<< "makespan atu = "<<makespan<<br;
-				last = op;}
+				makespan = temp_makespan;
+				last = op;
+			}
 
-			op_succ = j_succ[op];
-			if (op_succ != DUMMY){
-				degrees_in[op_succ]--;//printv(degrees_in,1,"Gr entrada:");
-				if(degrees_in[op_succ] == 0) op_queue[q_pushed++] = op_succ;//print_q(op_queue,q_lookat);
-				if(heads[op_succ] < temp_makespan){
-					heads[op_succ] = temp_makespan;
-					late_pred[op_succ] = op;
+			for(int op_succ : { j_succ[op], m_succ[op] }){
+				if (op_succ != DUMMY){
+					degrees_in[op_succ]--;//printv(degrees_in,1,"Gr entrada:");
+					if(degrees_in[op_succ] == 0) op_queue[q_pushed++] = op_succ;//print_q(op_queue,q_lookat);
+					if(heads[op_succ] < temp_makespan){
+						heads[op_succ] = temp_makespan;
+						late_pred[op_succ] = op;
+					}
 				}
 			}
 
-			op_succ = m_succ[op];
-			if (op_succ != DUMMY){
-				degrees_in[op_succ]--;//printv(degrees_in,1,"Gr entrada:");
-				if(degrees_in[op_succ] == 0) op_queue[q_pushed++] = op_succ;//print_q(op_queue,q_lookat);
-				if(heads[op_succ] < temp_makespan){
-					heads[op_succ] = temp_makespan;
-					late_pred[op_succ] = op;
-				}
-			}
 		}
 		return makespan;}
 };
