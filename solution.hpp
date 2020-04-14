@@ -10,10 +10,7 @@
 using namespace std;
 
 class Solution {
-	vector<unsigned int> j_succ;
-	vector<unsigned int> j_pred;
-	vector<unsigned int> m_succ;
-	vector<unsigned int> m_pred;
+	vector<unsigned int> j_succ, j_pred, m_succ, m_pred, late_pred;
 	unsigned int makespan, n_mach, n_jobs, n_ops, last, first;
 	Instance instance;
 
@@ -117,8 +114,7 @@ class Solution {
 			}
 			m_ord[i] = best_mach;
 		}
-		fill_ord(j_ord, m_ord);
-	}
+		fill_ord(j_ord, m_ord);}
 	void print_ord(vector<unsigned int> &j, vector<unsigned int> &m){
 		cout<<br;
 		for(int i=1; i<j.size(); i++){
@@ -135,7 +131,7 @@ class Solution {
 			cout<<"|"<<s[i]<<"|";
 			if(i==lookat) cout<<"<";
 			cout<<br;}}
-	void fill_heads(unsigned int op, vector<unsigned int>& heads, vector<unsigned int>& late_pred, int cont, vector<unsigned int>& visited){
+	void fill_heads(unsigned int op, vector<unsigned int>& heads, int cont, vector<unsigned int>& visited){
 		if(cont>n_ops || op == 0 || visited[op] == 1) return;
 		//cout<<br<<"fill_heads.op "<<op;
 		if(op != first)	
@@ -144,8 +140,8 @@ class Solution {
 	
 		if(heads[op] > heads[last]) last = op;
         visited[op] = 1;
-		fill_heads(j_succ[op], heads, late_pred, cont + 1, visited);
-		fill_heads(m_succ[op], heads, late_pred, cont + 1, visited);}
+		fill_heads(j_succ[op], heads, cont + 1, visited);
+		fill_heads(m_succ[op], heads, cont + 1, visited);}
 public:
 	Solution () {}
 	Solution(vector<unsigned int> j_s, vector<unsigned int>j_p, vector<unsigned int> m_s, vector<unsigned int> m_p,
@@ -157,7 +153,15 @@ public:
 		n_mach = n_m;
 		n_jobs = n_j;
 		first = f;
-		instance = i;}
+		instance = i;
+		last = 0;
+		n_ops = n_o;
+		late_pred.resize(n_ops+1);
+
+		for(int i=1; i<=n_ops; i++)
+			if(m_pred[i] > j_pred[i]) late_pred[i] = m_pred[i];
+			else late_pred[i] = j_pred[i];
+	}
 	Solution(Instance i, int init_method){
 		instance = i;
 		last = 0;
@@ -169,23 +173,24 @@ public:
 		j_pred.resize(n_ops+1);
 		m_succ.resize(n_ops+1);
 		m_pred.resize(n_ops+1);
+		late_pred.resize(n_ops+1);
 
-		init(init_method);}
+		init(init_method);
+
+		for(int i=1; i<=n_ops; i++)
+			if(m_pred[i] > j_pred[i]) late_pred[i] = m_pred[i];
+			else late_pred[i] = j_pred[i];
+		}
 	
 	int calc_makespan(){
 		makespan = 0;
 		int temp_makespan = 0, op, q_lookat = 0, q_pushed = 0;
 		vector<unsigned int> degrees_in(n_ops + 1,0); //Graus de entrada por operacao
 		vector<unsigned int> op_queue(n_ops); //Lista de operacoes
-		vector<unsigned int> late_pred(n_ops + 1); //Predecessores mais tardios
 		vector<unsigned int> heads(n_ops + 1, 0);
         vector<unsigned int> visited(n_ops + 1, 0);
 
-		for(int i=1; i<=n_ops; i++)
-			if(m_pred[i] > j_pred[i]) late_pred[i] = m_pred[i];
-			else late_pred[i] = j_pred[i];
-
-		fill_heads(first, heads, late_pred, 1, visited);//printv(heads, 1, "heads"); printv(late_pred, 1, "late_pred");
+		fill_heads(first, heads, 1, visited);//printv(heads, 1, "heads"); printv(late_pred, 1, "late_pred");
         for(int i = 1; i <= n_ops; i++){
 			if(j_pred[i]>0) degrees_in[i]++;
 			if(m_pred[i]>0) degrees_in[i]++;
@@ -214,7 +219,10 @@ public:
 			}
 
 		}
-		return makespan;}
+		return makespan;
+	}
+
+	friend class Heuristics;
 };
 
 #endif

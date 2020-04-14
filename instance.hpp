@@ -63,6 +63,7 @@ public:
 			cout << o_machine[i] << " ";
 		cout << "\n";}
 	
-	friend class Solution;};
+	friend class Solution;
+	friend class Heuristics;};
 
 #endif
