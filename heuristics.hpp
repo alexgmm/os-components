@@ -1,8 +1,8 @@
 #ifndef HEURISTICS_HPP
 #define HEURISTICS_HPP
-#define N_ITER 100
-#define ALPHA 0.8
-#define T_MIN 0.0001
+#define N_ITER 50
+#define ALPHA 0.7
+#define T_MIN 0.001
 #define SW1J 1
 #define SW1M 2
 #define SW2J 3
@@ -15,8 +15,10 @@
 #define SH2M 10
 #define SH3J 11
 #define SH3M 12
+#define SA 1
+#define IG 2
+#define TS 3
 
-#include <random>
 #include "solution.hpp"
 
 using namespace std;
@@ -24,107 +26,59 @@ using namespace std;
 class Heuristics {
     Solution solution;
 
-    int randint(int ini, int end){
-        random_device dev;
-        mt19937 rng(dev());
-        uniform_int_distribution<mt19937::result_type> dist6(ini,end);
-
-        return dist6(rng);}
-    void swap(unsigned int op1, unsigned int op2){
-        if(op1 == solution.first) solution.first = op2;
-        else if(op2 == solution.first) solution.first = op1;
-
-		solution.j_succ[solution.j_pred[op1]] = op2;
-		solution.m_succ[solution.m_pred[op1]] = op2;
-		solution.j_pred[solution.j_succ[op1]] = op2;
-		solution.m_pred[solution.m_succ[op1]] = op2;
-
-		solution.j_succ[solution.j_pred[op2]] = op1;
-		solution.m_succ[solution.m_pred[op2]] = op1;
-		solution.j_pred[solution.j_succ[op2]] = op1;
-		solution.m_pred[solution.m_succ[op2]] = op1;
-
-		unsigned int a1 = solution.j_pred[op1],
-					 a2 = solution.j_succ[op1], 
-					 a3 = solution.m_pred[op1], 
-					 a4 = solution.m_succ[op1];
-
-		solution.j_pred[op1] = solution.j_pred[op2];
-		solution.j_succ[op1] = solution.j_succ[op2];
-		solution.m_pred[op1] = solution.m_pred[op2];
-		solution.m_succ[op1] = solution.m_succ[op2];
-
-		solution.j_pred[op2] = a1;
-		solution.j_succ[op2] = a2;
-		solution.m_pred[op2] = a3;
-		solution.m_succ[op2] = a4;}
-	vector<unsigned int> crit_path(){
-		vector<unsigned int> p;
-		unsigned int op = solution.last;
-
-		while(op > 0){
-			p.push_back(op);
-			op = solution.late_pred[op];
-		}
-		reverse(p.begin(),p.end());
-		return p;}
 	
-    void blocks_j(vector<unsigned int> p, vector<unsigned int> &b_begin, vector<unsigned int> &b_end){
-        b_begin.push_back(p[0]);
-        for(int i=0; i<p.size()-1; i++){
-            if(solution.instance.o_job[p[i]] != solution.instance.o_job[p[i+1]]){
-                b_end.push_back(i);
-                b_begin.push_back(i+1);
-            }
-        }
-        b_end.push_back(p[p.size()-1]);}
-    void blocks_m(vector<unsigned int> p, vector<unsigned int> &b_begin, vector<unsigned int> &b_end){
-        int n = 0;
-        b_begin.push_back(p[0]);
-        for(int i=0; i<p.size()-1; i++){
-            if((solution.instance.o_machine[p[i]] != solution.instance.o_machine[p[i+1]]) || n > 1){
-                b_end.push_back(i);
-                b_begin.push_back(i+1);
-                n = 0;
-            } else n++;
-        }
-        b_end.push_back(p[p.size()-1]);}
+    
     void sw1j(){}
     void sw1m(){}
+    //swap em operacoes de mesmo bloco critico (job)
     void sw2j(){
-        vector<unsigned int> b_begin, b_end, p = crit_path();
-        blocks_j(p,b_begin, b_end);
+        vector<unsigned> b_begin, b_end, p = solution.crit_path();
+        solution.blocks_j(p,b_begin, b_end);
+        //Selecao de um bloco critico aleatorio
         int i = randint(0,b_begin.size()-1), j = b_end[i]; //Indices de comeco e fim de um bloco
-        i = b_begin[i];
+        i = b_begin[i]; cout << i <<" "<< j<<br;
+        //Selecao de operacoes dentro desse bloco
         int a = randint(i,j), b = randint(i,j);
         while(a==b) b = randint(i,j);
-        swap(p[a], p[b]);
-    }
+        swap(p[a], p[b]);}
+    //swap em operacoes de mesmo bloco critico (maquina)
     void sw2m(){
-        vector<unsigned int> b_begin, b_end, p = crit_path();
-        blocks_m(p,b_begin, b_end);
+        vector<unsigned> b_begin, b_end, p = solution.crit_path();
+        solution.blocks_m(p,b_begin, b_end);
         int i = randint(0,b_begin.size()-1), j = b_end[i];
         i = b_begin[i];
         int a = randint(i,j), b = randint(i,j);
         while(a==b) b = randint(i,j);
-        swap(p[a], p[b]);
-    }
+        swap(p[a], p[b]);}
     void sw3j(){
-        vector<unsigned int> b_begin, b_end, p = crit_path();
-        blocks_j(p,b_begin, b_end);
+        vector<unsigned> b_begin, b_end, p = solution.crit_path();
+        solution.blocks_j(p,b_begin, b_end);
         int i = randint(0,b_begin.size()-1);
-        swap(p[b_begin[i]], p[b_begin[i] + 1]);
-    }
+        solution.swap(p[b_begin[i]], p[b_begin[i] + 1]);}
     void sw3m(){
-        vector<unsigned int> b_begin, b_end, p = crit_path();
-        blocks_m(p,b_begin, b_end);
+        vector<unsigned> b_begin, b_end, p = solution.crit_path();
+        solution.blocks_m(p,b_begin, b_end);
         int i = randint(0,b_begin.size()-1);
-        swap(p[b_begin[i]], p[b_begin[i] + 1]);
+        solution.swap(p[b_begin[i]], p[b_begin[i] + 1]);
     }
     void sh1j(){}
     void sh1m(){}
-    void sh2j(){}
-    void sh2m(){}
+    //shift na primeira operacao de um bloco critico (job)
+    void sh2j(){
+        vector<unsigned> b_begin, b_end, p = solution.crit_path();
+        solution.blocks_j(p,b_begin, b_end);
+        int i = randint(0,b_begin.size()-1), j = b_end[i];
+        i = b_begin[i];
+        solution.shift(i,p,j);
+    }
+    //shift na primeira operacao de um bloco critico (maquina)
+    void sh2m(){
+        vector<unsigned> b_begin, b_end, p = solution.crit_path();
+        solution.blocks_m(p,b_begin, b_end);
+        int i = randint(0,b_begin.size()-1), j = b_end[i];
+        i = b_begin[i];
+        solution.shift(i,p,j);
+    }
     void sh3j(){}
     void sh3m(){}
     void apply(int oper){
@@ -174,7 +128,7 @@ public:
         solution = s;
     }
 
-    void sa(int oper){
+    int sa(int oper){
         int makespan = solution.calc_makespan(), temp_makespan;
         float t = 1;
         while(t > T_MIN){
@@ -186,8 +140,9 @@ public:
                 if(temp_makespan <= makespan || exp((makespan - temp_makespan)/t) > ((float) randint(1,1000))/1000) 
                     makespan = temp_makespan;
             }
-            t = t*ALPHA;
+            t = t*ALPHA; cout << br << "t=" << t;
         }
+        return makespan;
     }
 
     void ig(){}

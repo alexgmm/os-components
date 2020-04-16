@@ -1,11 +1,12 @@
 #ifndef TESTS_HPP
 #define TESTS_HPP
-#define NLOOPS 20
+#define NLOOPS 200
 
 #include <iostream>
 #include <vector>
 #include "solution.hpp"
 #include "instance.hpp"
+#include "heuristics.hpp"
 
 using namespace std;
 
@@ -19,6 +20,52 @@ public:
 	};
 	Files (){}
 };
+void test_h(){
+	Files f;   
+    float media;
+	ofstream out("results/r.csv");
+	vector<string> ops = {"sw1j","sw1m","sw2j","sw2m","sw3j","sw3m","sh1j","sh1m","sh2j","sh2m","sh3j","sh3m"},
+				   heur = {"SA"},
+				   inis = {"RAN","GRM"};
+
+	out << "file,";
+	for(string i: inis){
+		for(string h: heur){
+			for(string o: ops){
+				out<<i<<"x"<<h<<"x"<<o<<",";
+			}
+		}
+	}
+
+	out << br;
+				
+
+	for(int i=0; i<f.path.size(); i++){
+		for(int j=0; j<f.names[i].size(); j++){
+			string fp = f.path[i],
+				   fn = f.names[i][j];
+			out << fn << ",";
+
+			for(int i=0; i<inis.size(); i++){
+				for(int j=0; j<heur.size(); j++){
+					for(int k=0; k<ops.size(); k++){
+						media = 0.0;
+						for(int l=0; l<NLOOPS; l++){
+							Instance in(fp + fn);
+							Solution s(in, i);
+							Heuristics h(s);
+							media += h.sa(k+1);	
+						}
+						out << media/NLOOPS << ",";
+					}
+				}
+			}
+			out << br;
+
+		}
+	} 
+	out.close();
+}
 
 void test(int init_method){
     Files f;   
@@ -44,7 +91,7 @@ void test(int init_method){
 		for(int j=0; j<f.names[i].size(); j++){
 			string fp = f.path[i],
 				   fn = f.names[i][j];
-
+			media = 0.0;
             for(int l=0; l<NLOOPS; l++){
                 Instance i(fp + fn);
                 Solution s(i, init_method);
@@ -56,5 +103,7 @@ void test(int init_method){
 	}
 	out.close();
 }
+
+
 
 #endif

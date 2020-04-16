@@ -6,14 +6,14 @@
 #include <fstream>
 
 #define RANDOM (0)
-#define GREEDY_JOBS (1)
-#define GREEDY_MACHINES (2)
+#define GREEDY_MACHINES (1)
+#define GREEDY_JOBS (2)
 #define DUMMY (0)
 #define br "\n"
 
 using namespace std;
 
-void printv(vector<unsigned int>&v, int ini, string name){
+void printv(vector<unsigned>&v, int ini, string name){
 	cout << "\n" << name << "\n";
 	for(int i=ini; i<v.size(); i++) cout<<i<<" "; cout<<br;
 	for(int i=ini; i<v.size()-1; i++) cout<<"--"; cout<<br;
@@ -22,9 +22,9 @@ void printv(vector<unsigned int>&v, int ini, string name){
 
 
 class Instance {
-	vector<unsigned int> cost;
-	vector<unsigned int> o_job;
-	vector<unsigned int> o_machine;
+	vector<unsigned> cost;
+	vector<unsigned> o_job;
+	vector<unsigned> o_machine;
 	int n_jobs, n_machines, n_ops;
 public:
 	Instance() {}

@@ -15,11 +15,18 @@ int main(){
 
 	//test(RANDOM);
 	//test(GREEDY_JOBS);
-	//test(GREEDY_MACHINES);
+	test(GREEDY_MACHINES);
 
-	Instance i("inst/taillard/tai10_10_01.txt");
+	/* Instance i("inst/taillard/tai10_10_01.txt");
 	Solution s(i,RANDOM);
 	Heuristics h(s);
-	h.sa(3);
+	h.sa(3); */
+
+	/* Instance i("test");
+	Solution s(i, RANDOM);
+	s.print();
+	s.swap(1,4);
+	s.print(); */
+	//s.print_o();
 	return 0;
 }
