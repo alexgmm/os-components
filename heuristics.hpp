@@ -133,7 +133,8 @@ public:
         float t = 1;
         while(t > T_MIN){
             for(int i=0; i<N_ITER; i++){
-                Solution temp(solution.j_succ, solution.j_pred, solution.m_succ, solution.m_pred, solution.n_mach, solution.n_jobs, solution.n_ops, solution.first, solution.instance);
+                vector<vector<unsigned>> g = { solution.j_succ, solution.j_pred, solution.m_succ, solution.m_pred };
+                Solution temp(g, solution.n_mach, solution.n_jobs, solution.n_ops, solution.first, solution.instance);
                 apply(oper);
                 temp_makespan = temp.calc_makespan();
 

@@ -1,6 +1,6 @@
 #ifndef TESTS_HPP
 #define TESTS_HPP
-#define NLOOPS 200
+#define NLOOPS 50
 
 #include <iostream>
 #include <vector>
