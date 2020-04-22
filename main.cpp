@@ -1,32 +1,28 @@
 #include <iostream>
 #include <vector>
-#include "instance.hpp"
-#include "solution.hpp"
-#include "tests.hpp"
-#include "heuristics.hpp"
+#include "src/instance.hpp"
+#include "src/solution.hpp"
+#include "src/tests.hpp"
+#include "src/heuristics.hpp"
 
 using namespace std;
 
 int main(){
-	Instance i("test"); //i.print();
-	Solution s(i, GREEDY_JOBS);
-	int m = s.calc_makespan();
-	cout <<br<<"makespan:"<<m <<br;
-
-	//test(RANDOM);
 	//test(GREEDY_JOBS);
-	//test(GREEDY_MACHINES);
 
-	/* Instance i("inst/taillard/tai04_04_01.txt");
-	Solution s(i,GREEDY_MACHINES);
-	Heuristics h(s);
-	h.sa(3); */
-
+	//Instance i("inst/taillard/tai04_04_01.txt");
 	/* Instance i("test");
+	Solution s(i,GREEDY_JOBS);
+	cout << br << s.calc_makespan() << br; */
+
+	test_op(RANDOM, SA, SW3J);
+	test_op(RANDOM, SA, SW3M);
+
+	/* Instance i("inst/taillard/tai10_10_01.txt");
 	Solution s(i, RANDOM);
-	s.print();
-	s.swap(1,4);
-	s.print(); */
+	Heuristics h(s);
+	h.sa(SW2M); */
 	//s.print_o();
 	return 0;
+
 }
