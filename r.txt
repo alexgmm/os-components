@@ -1,0 +1,2010 @@
+
+Sucessores nos jobs:
+0 3 1 0 6 4 0 9 7 
+
+Predecessores nos jobs:
+3 0 2 6 0 5 9 0 8 
+
+Sucessores nas maquinas:
+0 0 0 7 8 9 1 2 3 
+
+Predecessores nas maquinas:
+7 8 9 0 0 0 4 5 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+swapSucc(1)
+
+Sucessores nos jobs:
+0 3 1 0 6 4 0 9 7 
+
+Predecessores nos jobs:
+3 0 2 6 0 5 9 0 8 
+
+Sucessores nas maquinas:
+0 0 0 7 8 9 1 2 3 
+
+Predecessores nas maquinas:
+7 8 9 0 0 0 4 5 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+MAKESPAN: 275
+
+swapPred(4)
+
+swapJ(4,6)
+
+Sucessores nos jobs:
+0 3 1 6 4 0 0 9 7 
+
+Predecessores nos jobs:
+3 0 2 5 0 4 9 0 8 
+
+Sucessores nas maquinas:
+0 0 0 7 8 9 1 2 3 
+
+Predecessores nas maquinas:
+7 8 9 0 0 0 4 5 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+MAKESPAN: 275
+
+swapSucc(5)
+
+swapJ(5,4)
+
+swapM(5,8)
+
+Sucessores nos jobs:
+0 3 1 5 6 0 0 9 7 
+
+Predecessores nos jobs:
+3 0 2 0 4 5 9 0 8 
+
+Sucessores nas maquinas:
+0 0 0 7 2 9 1 5 3 
+
+Predecessores nas maquinas:
+7 5 9 0 8 0 4 0 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 294
+
+swapSucc(9)
+
+swapJ(9,7)
+
+swapM(9,3)
+
+Sucessores nos jobs:
+0 3 1 5 6 0 9 7 0 
+
+Predecessores nos jobs:
+3 0 2 0 4 5 8 0 7 
+
+Sucessores nas maquinas:
+0 0 9 7 2 3 1 5 0 
+
+Predecessores nas maquinas:
+7 5 6 0 8 0 4 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 250
+
+swapSucc(4)
+
+swapJ(4,5)
+
+swapM(4,7)
+
+Sucessores nos jobs:
+0 3 1 6 4 0 9 7 0 
+
+Predecessores nos jobs:
+3 0 2 5 0 4 8 0 7 
+
+Sucessores nas maquinas:
+0 0 9 1 2 3 4 5 0 
+
+Predecessores nas maquinas:
+4 5 6 7 8 0 0 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+MAKESPAN: 252
+
+swapPred(8)
+
+Sucessores nos jobs:
+0 3 1 6 4 0 9 7 0 
+
+Predecessores nos jobs:
+3 0 2 5 0 4 8 0 7 
+
+Sucessores nas maquinas:
+0 0 9 1 2 3 4 5 0 
+
+Predecessores nas maquinas:
+4 5 6 7 8 0 0 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+MAKESPAN: 252
+
+swapSucc(6)
+
+swapM(6,3)
+
+Sucessores nos jobs:
+0 3 1 6 4 0 9 7 0 
+
+Predecessores nos jobs:
+3 0 2 5 0 4 8 0 7 
+
+Sucessores nas maquinas:
+0 0 6 1 2 9 4 5 0 
+
+Predecessores nas maquinas:
+4 5 0 7 8 3 0 0 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+MAKESPAN: 259
+
+swapSucc(8)
+
+swapJ(8,7)
+
+swapM(8,5)
+
+Sucessores nos jobs:
+0 3 1 6 4 0 8 9 0 
+
+Predecessores nos jobs:
+3 0 2 5 0 4 0 7 8 
+
+Sucessores nas maquinas:
+0 0 6 1 8 9 4 2 0 
+
+Predecessores nas maquinas:
+4 8 0 7 0 3 0 5 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+MAKESPAN: 259
+
+swapPred(1)
+
+swapJ(1,3)
+
+swapM(1,4)
+
+Sucessores nos jobs:
+3 1 0 6 4 0 8 9 0 
+
+Predecessores nos jobs:
+2 0 1 5 0 4 0 7 8 
+
+Sucessores nas maquinas:
+4 0 6 0 8 9 1 2 0 
+
+Predecessores nas maquinas:
+7 8 0 1 0 3 0 5 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+MAKESPAN: 293
+
+swapPred(1)
+
+swapJ(1,2)
+
+swapM(1,7)
+
+Sucessores nos jobs:
+2 3 0 6 4 0 8 9 0 
+
+Predecessores nos jobs:
+0 1 2 5 0 4 0 7 8 
+
+Sucessores nas maquinas:
+7 0 6 0 8 9 4 2 0 
+
+Predecessores nas maquinas:
+0 8 0 7 0 3 1 5 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+MAKESPAN: 259
+
+swapPred(2)
+
+swapJ(2,1)
+
+swapM(2,8)
+
+Sucessores nos jobs:
+3 1 0 6 4 0 8 9 0 
+
+Predecessores nos jobs:
+2 0 1 5 0 4 0 7 8 
+
+Sucessores nas maquinas:
+7 8 6 0 2 9 4 0 0 
+
+Predecessores nas maquinas:
+0 5 0 7 0 3 1 2 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+MAKESPAN: 290
+
+swapPred(1)
+
+swapJ(1,2)
+
+Sucessores nos jobs:
+2 3 0 6 4 0 8 9 0 
+
+Predecessores nos jobs:
+0 1 2 5 0 4 0 7 8 
+
+Sucessores nas maquinas:
+7 8 6 0 2 9 4 0 0 
+
+Predecessores nas maquinas:
+0 5 0 7 0 3 1 2 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+MAKESPAN: 202
+
+swapPred(9)
+
+swapJ(9,8)
+
+swapM(9,6)
+
+Sucessores nos jobs:
+2 3 0 6 4 0 9 0 8 
+
+Predecessores nos jobs:
+0 1 2 5 0 4 0 9 7 
+
+Sucessores nas maquinas:
+7 8 9 0 2 0 4 0 6 
+
+Predecessores nas maquinas:
+0 5 0 7 0 9 1 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+MAKESPAN: 240
+
+swapPred(8)
+
+swapJ(8,9)
+
+swapM(8,2)
+
+Sucessores nos jobs:
+2 3 0 6 4 0 8 9 0 
+
+Predecessores nos jobs:
+0 1 2 5 0 4 0 7 8 
+
+Sucessores nas maquinas:
+7 0 9 0 8 0 4 2 6 
+
+Predecessores nas maquinas:
+0 8 0 7 0 9 1 5 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+MAKESPAN: 259
+
+swapSucc(7)
+
+swapJ(7,8)
+
+swapM(7,4)
+
+Sucessores nos jobs:
+2 3 0 6 4 0 9 7 0 
+
+Predecessores nos jobs:
+0 1 2 5 0 4 8 0 7 
+
+Sucessores nas maquinas:
+4 0 9 7 8 0 0 2 6 
+
+Predecessores nas maquinas:
+0 8 0 1 0 9 4 5 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 5
+
+MAKESPAN: 260
+
+swapSucc(5)
+
+swapJ(5,4)
+
+swapM(5,8)
+
+Sucessores nos jobs:
+2 3 0 5 6 0 9 7 0 
+
+Predecessores nos jobs:
+0 1 2 0 4 5 8 0 7 
+
+Sucessores nas maquinas:
+4 0 9 7 2 0 0 5 6 
+
+Predecessores nas maquinas:
+0 5 0 1 8 9 4 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 259
+
+swapSucc(5)
+
+swapJ(5,6)
+
+swapM(5,2)
+
+Sucessores nos jobs:
+2 3 0 6 0 5 9 7 0 
+
+Predecessores nos jobs:
+0 1 2 0 6 4 8 0 7 
+
+Sucessores nas maquinas:
+4 5 9 7 0 0 0 2 6 
+
+Predecessores nas maquinas:
+0 8 0 1 2 9 4 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 260
+
+swapSucc(6)
+
+swapJ(6,5)
+
+Sucessores nos jobs:
+2 3 0 5 6 0 9 7 0 
+
+Predecessores nos jobs:
+0 1 2 0 4 5 8 0 7 
+
+Sucessores nas maquinas:
+4 5 9 7 0 0 0 2 6 
+
+Predecessores nas maquinas:
+0 8 0 1 2 9 4 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 193
+
+swapPred(6)
+
+swapJ(6,5)
+
+swapM(6,9)
+
+Sucessores nos jobs:
+2 3 0 6 0 5 9 7 0 
+
+Predecessores nos jobs:
+0 1 2 0 6 4 8 0 7 
+
+Sucessores nas maquinas:
+4 5 6 7 0 9 0 2 0 
+
+Predecessores nas maquinas:
+0 8 0 1 2 3 4 0 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 231
+
+swapSucc(2)
+
+swapJ(2,3)
+
+swapM(2,5)
+
+Sucessores nos jobs:
+3 0 2 6 0 5 9 7 0 
+
+Predecessores nos jobs:
+0 3 1 0 6 4 8 0 7 
+
+Sucessores nas maquinas:
+4 0 6 7 2 9 0 5 0 
+
+Predecessores nas maquinas:
+0 5 0 1 8 3 4 0 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 195
+
+swapSucc(4)
+
+swapJ(4,6)
+
+swapM(4,7)
+
+Sucessores nos jobs:
+3 0 2 5 0 4 9 7 0 
+
+Predecessores nos jobs:
+0 3 1 6 4 0 8 0 7 
+
+Sucessores nas maquinas:
+7 0 6 0 2 9 4 5 0 
+
+Predecessores nas maquinas:
+0 5 0 7 8 3 1 0 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 230
+
+swapSucc(6)
+
+swapJ(6,4)
+
+swapM(6,9)
+
+Sucessores nos jobs:
+3 0 2 6 0 5 9 7 0 
+
+Predecessores nos jobs:
+0 3 1 0 6 4 8 0 7 
+
+Sucessores nas maquinas:
+7 0 9 0 2 0 4 5 6 
+
+Predecessores nas maquinas:
+0 5 0 7 8 9 1 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 275
+
+swapPred(9)
+
+swapJ(9,7)
+
+swapM(9,3)
+
+Sucessores nos jobs:
+3 0 2 6 0 5 0 9 7 
+
+Predecessores nos jobs:
+0 3 1 0 6 4 9 0 8 
+
+Sucessores nas maquinas:
+7 0 6 0 2 0 4 5 3 
+
+Predecessores nas maquinas:
+0 5 9 7 8 3 1 0 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 277
+
+swapSucc(7)
+
+swapM(7,4)
+
+Sucessores nos jobs:
+3 0 2 6 0 5 0 9 7 
+
+Predecessores nos jobs:
+0 3 1 0 6 4 9 0 8 
+
+Sucessores nas maquinas:
+4 0 6 7 2 0 0 5 3 
+
+Predecessores nas maquinas:
+0 5 9 1 8 3 4 0 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 259
+
+swapPred(3)
+
+swapJ(3,1)
+
+swapM(3,9)
+
+Sucessores nos jobs:
+2 0 1 6 0 5 0 9 7 
+
+Predecessores nos jobs:
+3 1 0 0 6 4 9 0 8 
+
+Sucessores nas maquinas:
+4 0 9 7 2 0 0 5 6 
+
+Predecessores nas maquinas:
+0 5 0 1 8 9 4 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 221
+
+swapPred(2)
+
+swapJ(2,1)
+
+swapM(2,5)
+
+Sucessores nos jobs:
+0 1 2 6 0 5 0 9 7 
+
+Predecessores nos jobs:
+2 3 0 0 6 4 9 0 8 
+
+Sucessores nas maquinas:
+4 5 9 7 0 0 0 2 6 
+
+Predecessores nas maquinas:
+0 8 0 1 2 9 4 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 229
+
+swapPred(8)
+
+Sucessores nos jobs:
+0 1 2 6 0 5 0 9 7 
+
+Predecessores nos jobs:
+2 3 0 0 6 4 9 0 8 
+
+Sucessores nas maquinas:
+4 5 9 7 0 0 0 2 6 
+
+Predecessores nas maquinas:
+0 8 0 1 2 9 4 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 229
+
+swapSucc(2)
+
+swapJ(2,1)
+
+swapM(2,5)
+
+Sucessores nos jobs:
+2 0 1 6 0 5 0 9 7 
+
+Predecessores nos jobs:
+3 1 0 0 6 4 9 0 8 
+
+Sucessores nas maquinas:
+4 0 9 7 2 0 0 5 6 
+
+Predecessores nas maquinas:
+0 5 0 1 8 9 4 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 221
+
+swapSucc(1)
+
+swapJ(1,2)
+
+swapM(1,4)
+
+Sucessores nos jobs:
+0 1 2 6 0 5 0 9 7 
+
+Predecessores nos jobs:
+2 3 0 0 6 4 9 0 8 
+
+Sucessores nas maquinas:
+7 0 9 1 2 0 0 5 6 
+
+Predecessores nas maquinas:
+4 5 0 0 8 9 1 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 309
+
+swapSucc(1)
+
+swapM(1,7)
+
+Sucessores nos jobs:
+0 1 2 6 0 5 0 9 7 
+
+Predecessores nos jobs:
+2 3 0 0 6 4 9 0 8 
+
+Sucessores nas maquinas:
+0 0 9 7 2 0 1 5 6 
+
+Predecessores nas maquinas:
+7 5 0 0 8 9 4 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 255
+
+swapPred(7)
+
+swapJ(7,9)
+
+swapM(7,4)
+
+Sucessores nos jobs:
+0 1 2 6 0 5 9 7 0 
+
+Predecessores nos jobs:
+2 3 0 0 6 4 8 0 7 
+
+Sucessores nas maquinas:
+0 0 9 1 2 0 4 5 6 
+
+Predecessores nas maquinas:
+4 5 0 7 8 9 0 0 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 309
+
+swapSucc(8)
+
+swapJ(8,7)
+
+swapM(8,5)
+
+Sucessores nos jobs:
+0 1 2 6 0 5 8 9 0 
+
+Predecessores nos jobs:
+2 3 0 0 6 4 0 7 8 
+
+Sucessores nas maquinas:
+0 0 9 1 8 0 4 2 6 
+
+Predecessores nas maquinas:
+4 8 0 7 0 9 0 5 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 56
+
+swapSucc(9)
+
+swapM(9,6)
+
+Sucessores nos jobs:
+0 1 2 6 0 5 8 9 0 
+
+Predecessores nos jobs:
+2 3 0 0 6 4 0 7 8 
+
+Sucessores nas maquinas:
+0 0 6 1 8 9 4 2 0 
+
+Predecessores nas maquinas:
+4 8 0 7 0 3 0 5 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 283
+
+swapPred(7)
+
+Sucessores nos jobs:
+0 1 2 6 0 5 8 9 0 
+
+Predecessores nos jobs:
+2 3 0 0 6 4 0 7 8 
+
+Sucessores nas maquinas:
+0 0 6 1 8 9 4 2 0 
+
+Predecessores nas maquinas:
+4 8 0 7 0 3 0 5 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 283
+
+swapPred(1)
+
+swapJ(1,2)
+
+swapM(1,4)
+
+Sucessores nos jobs:
+2 0 1 6 0 5 8 9 0 
+
+Predecessores nos jobs:
+3 1 0 0 6 4 0 7 8 
+
+Sucessores nas maquinas:
+4 0 6 0 8 9 1 2 0 
+
+Predecessores nas maquinas:
+7 8 0 1 0 3 0 5 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 296
+
+swapPred(2)
+
+swapJ(2,1)
+
+swapM(2,8)
+
+Sucessores nos jobs:
+0 1 2 6 0 5 8 9 0 
+
+Predecessores nos jobs:
+2 3 0 0 6 4 0 7 8 
+
+Sucessores nas maquinas:
+4 8 6 0 2 9 1 0 0 
+
+Predecessores nas maquinas:
+7 5 0 1 0 3 0 2 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 54
+
+swapSucc(6)
+
+swapJ(6,5)
+
+swapM(6,9)
+
+Sucessores nos jobs:
+0 1 2 5 6 0 8 9 0 
+
+Predecessores nos jobs:
+2 3 0 0 4 5 0 7 8 
+
+Sucessores nas maquinas:
+4 8 9 0 2 0 1 0 6 
+
+Predecessores nas maquinas:
+7 5 0 1 0 9 0 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 54
+
+swapSucc(5)
+
+swapJ(5,6)
+
+swapM(5,2)
+
+Sucessores nos jobs:
+0 1 2 6 0 5 8 9 0 
+
+Predecessores nos jobs:
+2 3 0 0 6 4 0 7 8 
+
+Sucessores nas maquinas:
+4 5 9 0 8 0 1 0 6 
+
+Predecessores nas maquinas:
+7 0 0 1 2 9 0 5 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 90
+
+swapSucc(6)
+
+swapJ(6,5)
+
+Sucessores nos jobs:
+0 1 2 5 6 0 8 9 0 
+
+Predecessores nos jobs:
+2 3 0 0 4 5 0 7 8 
+
+Sucessores nas maquinas:
+4 5 9 0 8 0 1 0 6 
+
+Predecessores nas maquinas:
+7 0 0 1 2 9 0 5 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 296
+
+swapPred(1)
+
+swapJ(1,2)
+
+swapM(1,7)
+
+Sucessores nos jobs:
+2 0 1 5 6 0 8 9 0 
+
+Predecessores nos jobs:
+3 1 0 0 4 5 0 7 8 
+
+Sucessores nas maquinas:
+7 5 9 0 8 0 4 0 6 
+
+Predecessores nas maquinas:
+0 0 0 7 2 9 1 5 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 334
+
+swapPred(5)
+
+swapJ(5,4)
+
+swapM(5,2)
+
+Sucessores nos jobs:
+2 0 1 6 4 0 8 9 0 
+
+Predecessores nos jobs:
+3 1 0 5 0 4 0 7 8 
+
+Sucessores nas maquinas:
+7 8 9 0 2 0 4 0 6 
+
+Predecessores nas maquinas:
+0 5 0 7 0 9 1 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 243
+
+swapSucc(1)
+
+swapJ(1,2)
+
+swapM(1,7)
+
+Sucessores nos jobs:
+0 1 2 6 4 0 8 9 0 
+
+Predecessores nos jobs:
+2 3 0 5 0 4 0 7 8 
+
+Sucessores nas maquinas:
+4 8 9 0 2 0 1 0 6 
+
+Predecessores nas maquinas:
+7 5 0 1 0 9 0 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 221
+
+swapSucc(7)
+
+swapJ(7,8)
+
+swapM(7,1)
+
+Sucessores nos jobs:
+0 1 2 6 4 0 9 7 0 
+
+Predecessores nos jobs:
+2 3 0 5 0 4 8 0 7 
+
+Sucessores nas maquinas:
+7 8 9 0 2 0 4 0 6 
+
+Predecessores nas maquinas:
+0 5 0 7 0 9 1 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 275
+
+swapSucc(7)
+
+swapJ(7,9)
+
+swapM(7,4)
+
+Sucessores nos jobs:
+0 1 2 6 4 0 0 9 7 
+
+Predecessores nos jobs:
+2 3 0 5 0 4 9 0 8 
+
+Sucessores nas maquinas:
+4 8 9 7 2 0 0 0 6 
+
+Predecessores nas maquinas:
+0 5 0 1 0 9 4 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 256
+
+swapSucc(9)
+
+swapJ(9,7)
+
+swapM(9,6)
+
+Sucessores nos jobs:
+0 1 2 6 4 0 9 7 0 
+
+Predecessores nos jobs:
+2 3 0 5 0 4 8 0 7 
+
+Sucessores nas maquinas:
+4 8 6 7 2 9 0 0 0 
+
+Predecessores nas maquinas:
+0 5 0 1 0 3 4 2 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 4
+
+MAKESPAN: 256
+
+swapSucc(4)
+
+swapJ(4,6)
+
+swapM(4,7)
+
+Sucessores nos jobs:
+0 1 2 0 6 4 9 7 0 
+
+Predecessores nos jobs:
+2 3 0 6 0 5 8 0 7 
+
+Sucessores nas maquinas:
+7 8 6 0 2 9 4 0 0 
+
+Predecessores nas maquinas:
+0 5 0 7 0 3 1 2 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 256
+
+swapPred(8)
+
+swapM(8,2)
+
+Sucessores nos jobs:
+0 1 2 0 6 4 9 7 0 
+
+Predecessores nos jobs:
+2 3 0 6 0 5 8 0 7 
+
+Sucessores nas maquinas:
+7 0 6 0 8 9 4 2 0 
+
+Predecessores nas maquinas:
+0 8 0 7 0 3 1 5 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 290
+
+swapSucc(8)
+
+swapJ(8,7)
+
+swapM(8,2)
+
+Sucessores nos jobs:
+0 1 2 0 6 4 8 9 0 
+
+Predecessores nos jobs:
+2 3 0 6 0 5 0 7 8 
+
+Sucessores nas maquinas:
+7 8 6 0 2 9 4 0 0 
+
+Predecessores nas maquinas:
+0 5 0 7 0 3 1 2 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 290
+
+swapPred(3)
+
+Sucessores nos jobs:
+0 1 2 0 6 4 8 9 0 
+
+Predecessores nos jobs:
+2 3 0 6 0 5 0 7 8 
+
+Sucessores nas maquinas:
+7 8 6 0 2 9 4 0 0 
+
+Predecessores nas maquinas:
+0 5 0 7 0 3 1 2 6 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 290
+
+swapPred(9)
+
+swapJ(9,8)
+
+swapM(9,6)
+
+Sucessores nos jobs:
+0 1 2 0 6 4 9 0 8 
+
+Predecessores nos jobs:
+2 3 0 6 0 5 0 9 7 
+
+Sucessores nas maquinas:
+7 8 9 0 2 0 4 0 6 
+
+Predecessores nas maquinas:
+0 5 0 7 0 9 1 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 290
+
+swapSucc(7)
+
+swapJ(7,9)
+
+swapM(7,4)
+
+Sucessores nos jobs:
+0 1 2 0 6 4 8 0 7 
+
+Predecessores nos jobs:
+2 3 0 6 0 5 9 7 0 
+
+Sucessores nas maquinas:
+4 8 9 7 2 0 0 0 6 
+
+Predecessores nas maquinas:
+0 5 0 1 0 9 4 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 264
+
+swapPred(9)
+
+swapM(9,3)
+
+Sucessores nos jobs:
+0 1 2 0 6 4 8 0 7 
+
+Predecessores nos jobs:
+2 3 0 6 0 5 9 7 0 
+
+Sucessores nas maquinas:
+4 8 6 7 2 0 0 0 3 
+
+Predecessores nas maquinas:
+0 5 9 1 0 3 4 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 264
+
+swapPred(4)
+
+swapJ(4,6)
+
+swapM(4,1)
+
+Sucessores nos jobs:
+0 1 2 6 4 0 8 0 7 
+
+Predecessores nos jobs:
+2 3 0 5 0 4 9 7 0 
+
+Sucessores nas maquinas:
+7 8 6 1 2 0 0 0 3 
+
+Predecessores nas maquinas:
+4 5 9 0 0 3 1 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 262
+
+swapPred(8)
+
+swapJ(8,7)
+
+swapM(8,2)
+
+Sucessores nos jobs:
+0 1 2 6 4 0 0 7 8 
+
+Predecessores nos jobs:
+2 3 0 5 0 4 8 9 0 
+
+Sucessores nas maquinas:
+7 0 6 1 8 0 0 2 3 
+
+Predecessores nas maquinas:
+4 8 9 0 0 3 1 5 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 262
+
+swapSucc(6)
+
+Sucessores nos jobs:
+0 1 2 6 4 0 0 7 8 
+
+Predecessores nos jobs:
+2 3 0 5 0 4 8 9 0 
+
+Sucessores nas maquinas:
+7 0 6 1 8 0 0 2 3 
+
+Predecessores nas maquinas:
+4 8 9 0 0 3 1 5 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 262
+
+swapPred(2)
+
+swapJ(2,3)
+
+swapM(2,8)
+
+Sucessores nos jobs:
+0 3 1 6 4 0 0 7 8 
+
+Predecessores nos jobs:
+3 0 2 5 0 4 8 9 0 
+
+Sucessores nas maquinas:
+7 8 6 1 2 0 0 0 3 
+
+Predecessores nas maquinas:
+4 5 9 0 0 3 1 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 230
+
+swapSucc(6)
+
+Sucessores nos jobs:
+0 3 1 6 4 0 0 7 8 
+
+Predecessores nos jobs:
+3 0 2 5 0 4 8 9 0 
+
+Sucessores nas maquinas:
+7 8 6 1 2 0 0 0 3 
+
+Predecessores nas maquinas:
+4 5 9 0 0 3 1 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 230
+
+swapSucc(9)
+
+swapJ(9,8)
+
+swapM(9,3)
+
+Sucessores nos jobs:
+0 3 1 6 4 0 0 9 7 
+
+Predecessores nos jobs:
+3 0 2 5 0 4 9 0 8 
+
+Sucessores nas maquinas:
+7 8 9 1 2 0 0 0 6 
+
+Predecessores nas maquinas:
+4 5 0 0 0 9 1 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 256
+
+swapPred(1)
+
+swapJ(1,3)
+
+swapM(1,4)
+
+Sucessores nos jobs:
+3 1 0 6 4 0 0 9 7 
+
+Predecessores nos jobs:
+2 0 1 5 0 4 9 0 8 
+
+Sucessores nas maquinas:
+4 8 9 7 2 0 0 0 6 
+
+Predecessores nas maquinas:
+0 5 0 1 0 9 4 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 258
+
+swapPred(8)
+
+swapM(8,2)
+
+Sucessores nos jobs:
+3 1 0 6 4 0 0 9 7 
+
+Predecessores nos jobs:
+2 0 1 5 0 4 9 0 8 
+
+Sucessores nas maquinas:
+4 0 9 7 8 0 0 2 6 
+
+Predecessores nas maquinas:
+0 8 0 1 0 9 4 5 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 328
+
+swapSucc(6)
+
+Sucessores nos jobs:
+3 1 0 6 4 0 0 9 7 
+
+Predecessores nos jobs:
+2 0 1 5 0 4 9 0 8 
+
+Sucessores nas maquinas:
+4 0 9 7 8 0 0 2 6 
+
+Predecessores nas maquinas:
+0 8 0 1 0 9 4 5 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 328
+
+swapPred(7)
+
+swapJ(7,9)
+
+swapM(7,4)
+
+Sucessores nos jobs:
+3 1 0 6 4 0 9 7 0 
+
+Predecessores nos jobs:
+2 0 1 5 0 4 8 0 7 
+
+Sucessores nas maquinas:
+7 0 9 0 8 0 4 2 6 
+
+Predecessores nas maquinas:
+0 8 0 7 0 9 1 5 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 309
+
+swapPred(2)
+
+swapM(2,8)
+
+Sucessores nos jobs:
+3 1 0 6 4 0 9 7 0 
+
+Predecessores nos jobs:
+2 0 1 5 0 4 8 0 7 
+
+Sucessores nas maquinas:
+7 8 9 0 2 0 4 0 6 
+
+Predecessores nas maquinas:
+0 5 0 7 0 9 1 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 275
+
+swapSucc(6)
+
+Sucessores nos jobs:
+3 1 0 6 4 0 9 7 0 
+
+Predecessores nos jobs:
+2 0 1 5 0 4 8 0 7 
+
+Sucessores nas maquinas:
+7 8 9 0 2 0 4 0 6 
+
+Predecessores nas maquinas:
+0 5 0 7 0 9 1 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 275
+
+swapSucc(6)
+
+Sucessores nos jobs:
+3 1 0 6 4 0 9 7 0 
+
+Predecessores nos jobs:
+2 0 1 5 0 4 8 0 7 
+
+Sucessores nas maquinas:
+7 8 9 0 2 0 4 0 6 
+
+Predecessores nas maquinas:
+0 5 0 7 0 9 1 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 275
+
+swapSucc(5)
+
+swapJ(5,4)
+
+swapM(5,2)
+
+Sucessores nos jobs:
+3 1 0 5 6 0 9 7 0 
+
+Predecessores nos jobs:
+2 0 1 0 4 5 8 0 7 
+
+Sucessores nas maquinas:
+7 5 9 0 8 0 4 0 6 
+
+Predecessores nas maquinas:
+0 0 0 7 2 9 1 5 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 87
+
+swapSucc(6)
+
+Sucessores nos jobs:
+3 1 0 5 6 0 9 7 0 
+
+Predecessores nos jobs:
+2 0 1 0 4 5 8 0 7 
+
+Sucessores nas maquinas:
+7 5 9 0 8 0 4 0 6 
+
+Predecessores nas maquinas:
+0 0 0 7 2 9 1 5 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 87
+
+swapSucc(2)
+
+swapJ(2,1)
+
+swapM(2,5)
+
+Sucessores nos jobs:
+2 3 0 5 6 0 9 7 0 
+
+Predecessores nos jobs:
+0 1 2 0 4 5 8 0 7 
+
+Sucessores nas maquinas:
+7 8 9 0 2 0 4 0 6 
+
+Predecessores nas maquinas:
+0 5 0 7 0 9 1 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 34
+
+swapSucc(6)
+
+Sucessores nos jobs:
+2 3 0 5 6 0 9 7 0 
+
+Predecessores nos jobs:
+0 1 2 0 4 5 8 0 7 
+
+Sucessores nas maquinas:
+7 8 9 0 2 0 4 0 6 
+
+Predecessores nas maquinas:
+0 5 0 7 0 9 1 2 3 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 34
+
+swapPred(9)
+
+swapJ(9,7)
+
+swapM(9,3)
+
+Sucessores nos jobs:
+2 3 0 5 6 0 0 9 7 
+
+Predecessores nos jobs:
+0 1 2 0 4 5 9 0 8 
+
+Sucessores nas maquinas:
+7 8 6 0 2 0 4 0 3 
+
+Predecessores nas maquinas:
+0 5 9 7 0 3 1 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 34
+
+swapSucc(3)
+
+swapM(3,6)
+
+Sucessores nos jobs:
+2 3 0 5 6 0 0 9 7 
+
+Predecessores nos jobs:
+0 1 2 0 4 5 9 0 8 
+
+Sucessores nas maquinas:
+7 8 0 0 2 3 4 0 6 
+
+Predecessores nas maquinas:
+0 5 6 7 0 9 1 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 34
+
+swapSucc(5)
+
+swapJ(5,6)
+
+swapM(5,2)
+
+Sucessores nos jobs:
+2 3 0 6 0 5 0 9 7 
+
+Predecessores nos jobs:
+0 1 2 0 6 4 9 0 8 
+
+Sucessores nas maquinas:
+7 5 0 0 8 3 4 0 6 
+
+Predecessores nas maquinas:
+0 0 6 7 2 9 1 5 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 49
+
+swapSucc(3)
+
+Sucessores nos jobs:
+2 3 0 6 0 5 0 9 7 
+
+Predecessores nos jobs:
+0 1 2 0 6 4 9 0 8 
+
+Sucessores nas maquinas:
+7 5 0 0 8 3 4 0 6 
+
+Predecessores nas maquinas:
+0 0 6 7 2 9 1 5 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 49
+
+swapPred(5)
+
+swapJ(5,6)
+
+swapM(5,2)
+
+Sucessores nos jobs:
+2 3 0 5 6 0 0 9 7 
+
+Predecessores nos jobs:
+0 1 2 0 4 5 9 0 8 
+
+Sucessores nas maquinas:
+7 8 0 0 2 3 4 0 6 
+
+Predecessores nas maquinas:
+0 5 6 7 0 9 1 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 34
+
+swapPred(5)
+
+swapJ(5,4)
+
+Sucessores nos jobs:
+2 3 0 6 4 0 0 9 7 
+
+Predecessores nos jobs:
+0 1 2 5 0 4 9 0 8 
+
+Sucessores nas maquinas:
+7 8 0 0 2 3 4 0 6 
+
+Predecessores nas maquinas:
+0 5 6 7 0 9 1 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 315
+
+swapPred(3)
+
+swapJ(3,2)
+
+swapM(3,6)
+
+Sucessores nos jobs:
+3 0 2 6 4 0 0 9 7 
+
+Predecessores nos jobs:
+0 3 1 5 0 4 9 0 8 
+
+Sucessores nas maquinas:
+7 8 6 0 2 0 4 0 3 
+
+Predecessores nas maquinas:
+0 5 9 7 0 3 1 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 89
+
+swapPred(4)
+
+swapJ(4,5)
+
+swapM(4,7)
+
+Sucessores nos jobs:
+3 0 2 5 6 0 0 9 7 
+
+Predecessores nos jobs:
+0 3 1 0 4 5 9 0 8 
+
+Sucessores nas maquinas:
+4 8 6 7 2 0 0 0 3 
+
+Predecessores nas maquinas:
+0 5 9 1 0 3 4 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 125
+
+swapSucc(3)
+
+swapJ(3,2)
+
+swapM(3,6)
+
+Sucessores nos jobs:
+2 3 0 5 6 0 0 9 7 
+
+Predecessores nos jobs:
+0 1 2 0 4 5 9 0 8 
+
+Sucessores nas maquinas:
+4 8 0 7 2 3 0 0 6 
+
+Predecessores nas maquinas:
+0 5 6 1 0 9 4 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 295
+
+swapSucc(4)
+
+swapJ(4,5)
+
+swapM(4,7)
+
+Sucessores nos jobs:
+2 3 0 6 4 0 0 9 7 
+
+Predecessores nos jobs:
+0 1 2 5 0 4 9 0 8 
+
+Sucessores nas maquinas:
+7 8 0 0 2 3 4 0 6 
+
+Predecessores nas maquinas:
+0 5 6 7 0 9 1 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 315
+
+swapPred(7)
+
+swapJ(7,9)
+
+swapM(7,1)
+
+Sucessores nos jobs:
+2 3 0 6 4 0 9 7 0 
+
+Predecessores nos jobs:
+0 1 2 5 0 4 8 0 7 
+
+Sucessores nas maquinas:
+4 8 0 0 2 3 1 0 6 
+
+Predecessores nas maquinas:
+7 5 6 1 0 9 0 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 89
+
+swapPred(9)
+
+swapJ(9,7)
+
+Sucessores nos jobs:
+2 3 0 6 4 0 0 9 7 
+
+Predecessores nos jobs:
+0 1 2 5 0 4 9 0 8 
+
+Sucessores nas maquinas:
+4 8 0 0 2 3 1 0 6 
+
+Predecessores nas maquinas:
+7 5 6 1 0 9 0 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 89
+
+swapPred(3)
+
+swapJ(3,2)
+
+swapM(3,6)
+
+Sucessores nos jobs:
+3 0 2 6 4 0 0 9 7 
+
+Predecessores nos jobs:
+0 3 1 5 0 4 9 0 8 
+
+Sucessores nas maquinas:
+4 8 6 0 2 0 1 0 3 
+
+Predecessores nas maquinas:
+7 5 9 1 0 3 0 2 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 89
+
+swapPred(2)
+
+swapJ(2,3)
+
+swapM(2,5)
+
+Sucessores nos jobs:
+2 3 0 6 4 0 0 9 7 
+
+Predecessores nos jobs:
+0 1 2 5 0 4 9 0 8 
+
+Sucessores nas maquinas:
+4 5 6 0 8 0 1 0 3 
+
+Predecessores nas maquinas:
+7 0 9 1 2 3 0 5 0 
+
+custo
+34 15 38 2 89 19 54 70 28 
+
+first 6
+
+MAKESPAN: 0

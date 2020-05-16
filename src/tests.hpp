@@ -1,12 +1,13 @@
 #ifndef TESTS_HPP
 #define TESTS_HPP
-#define NLOOPS 20
+#define NLOOPS 1000
 
 #include <iostream>
 #include <vector>
 #include "solution.hpp"
 #include "instance.hpp"
 #include "heuristics.hpp"
+#include <map>
 
 using namespace std;
 
@@ -64,44 +65,7 @@ void test_h(){
 void test_op(int init, int heu, int oper){
 	Files f;   
     float media;
-	ofstream out("results/" + to_string(init) + "x" + to_string(heu) + "x" + to_string(oper) + ".csv");
-
-	for(int i=0; i<f.path.size(); i++){
-		for(int j=0; j<f.names[i].size(); j++){
-			string fp = f.path[i],
-				   fn = f.names[i][j];
-			media = 0.0;
-            for(int l=0; l<NLOOPS; l++){
-                Instance i(fp + fn);
-                Solution s(i, init);
-				Heuristics h(s);
-				//cout << fn << " loop " << l << br; 
-				media += h.solve(heu, oper);
-            }
-			out << fn << "," << (int) media/NLOOPS << br;
-		}
-	}
-	out.close();
-}
-
-void test(int init_method){
-    Files f;   
-    float media = 0.0, v;
-	string out_name;
-
-	switch(init_method){
-			case RANDOM:
-				out_name = "results/init_random.csv";
-				break;
-			case GREEDY_JOBS:
-				out_name = "results/init_greedy_jobs.csv";
-				break;
-			case GREEDY_MACHINES:
-				out_name = "results/init_greedy_machines.csv";
-				break;
-			default:
-				break;}
-
+	string out_name = "results/" + name_initializer[init] + "x" + name_heuristic[heu] + "x" + name_operator[oper] + ".csv" ;
 	ofstream out(out_name);
 
 	for(int i=0; i<f.path.size(); i++){
@@ -109,16 +73,54 @@ void test(int init_method){
 			string fp = f.path[i],
 				   fn = f.names[i][j];
 			media = 0.0;
+            Instance i(fp + fn);
+			cout << fn << br;
             for(int l=0; l<NLOOPS; l++){
-                Instance i(fp + fn);
-                Solution s(i, init_method);
-				v = 0.0;
-				while(v==0.0)
-                	v = s.calc_makespan();
-				media+=v;
+                Solution s(i, init);
+				Heuristics h(s.copySolution());
+				//cout << fn << " loop " << l << br; 
+				unsigned v = h.solve(heu, oper);
+				if(!v){
+					cout << br << fn << br;
+					cout << "ANTES\n";
+					s.print();
+					s.print_o();
+					cout << "\nDEPOIS\n";
+					h.solution.print_o();
+				}
+				media += v;
             }
-			//cout << media <<br;
 			out << fn << "," << (int) media/NLOOPS << br;
+		}
+	}
+	out.close();
+}
+
+float execute(string filename, unsigned method){
+	Instance i(filename);
+	Solution s(i, method);
+	float v = 0.0;
+	while(v==0.0)
+        v = s.calcMakespan();
+	return v;
+}
+
+void testInit(){
+    Files f;   
+    float mediaRandom, mediaGM, mediaGJ, v;
+	ofstream out("results/init.csv");
+
+	for(int i=0; i<f.path.size(); i++){
+		for(int j=0; j<f.names[i].size(); j++){
+			string fp = f.path[i],
+				   fn = f.names[i][j];
+			mediaGJ = .0; mediaGM = .0; mediaRandom = .0;
+            for(int l=0; l<NLOOPS; l++){
+                mediaRandom += execute(fp+fn, RANDOM);
+				mediaGM += execute(fp+fn, GREEDY_MACHINES);
+				mediaGJ += execute(fp+fn,GREEDY_JOBS);
+            }
+			out << fn << "," << mediaRandom/NLOOPS << "," << mediaGM/NLOOPS << "," << mediaGJ/NLOOPS << br;
 		}
 	}
 	out.close();

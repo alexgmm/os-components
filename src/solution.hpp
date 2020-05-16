@@ -7,481 +7,415 @@
 #include <numeric> //iota
 #include <assert.h>
 #include "instance.hpp"
+#include "neighborhood.hpp"
 
 using namespace std;
 
 class Solution {
-	vector<unsigned> j_succ, j_pred, m_succ, m_pred;
-	unsigned makespan, n_mach, n_jobs, n_ops, last, first;
+public:
+	vector<unsigned> sJ, pJ, sM, pM;
+	unsigned makespan = 0, nM, nJ, nO, last, first;
 	Instance instance;
+	bool partial;
 
-	// Numero/indice da operacao (j,m)
-	// Indice 0 e desconsiderado para todos os vetores
-	bool same_job(unsigned op1, unsigned op2){ return instance.o_job[op1] == instance.o_job[op2]; }
-	bool same_mach(unsigned op1, unsigned op2){ return instance.o_machine[op1] == instance.o_machine[op2]; }
-	void shift(unsigned pos_op, vector<unsigned> &p, int end_b){
-        int pos = randint(pos_op,end_b);
-        for(pos_op; pos_op < pos; pos_op++)
-            swap(p[pos_op], p[pos_op + 1]);
-	}
-	void swap(unsigned op1, unsigned op2){
-		//valid_op(op1); valid_op(op2);
-        /* unsigned prev;
-		unsigned post;
-
-		if (same_job(op1, op2)) {
-			//JOB swap
-			assert(j_succ[op1] == op2);
-			assert(j_pred[op2] == op1);
-			prev = j_pred[op1];
-			post = j_succ[op2];
-			//forward
-			if (prev != 0)
-				j_succ[prev] = op2;
-			j_succ[op1] = post;
-			j_succ[op2] = op1;
-			//backward
-			j_pred[op1] = op2;
-			j_pred[op2] = prev;
-			if (post != 0)	j_pred[post] = op1;
-		}
-		else {
-			assert(same_mach(op1,op2));
-			//MACH swap
-			assert(m_succ[op1] == op2);
-			assert(m_pred[op2] == op1);
-			prev = m_pred[op1];
-			post = m_succ[op2];
-			//forward
-			if (prev != 0)
-				m_succ[prev] = op2;
-			m_succ[op1] = post;
-			m_succ[op2] = op1;
-			//backward
-			m_pred[op1] = op2;
-			m_pred[op2] = prev;
-			if (post != 0)	m_pred[post] = op1;
-		} */
-
-	    if(op1 == first) first = op2;
-        else if(op2 == first) first = op1;
-		unsigned js1=j_succ[op1], jp1=j_pred[op1], ms1=m_succ[op1], mp1=m_pred[op1],
-				js2=j_succ[op2], jp2=j_pred[op2], ms2=m_succ[op2], mp2=m_pred[op2];
-	
-		if(jp1) j_succ[jp1] = op2; if(mp1) m_succ[mp1] = op2; 
-		if(jp2) j_succ[jp2] = op1; if(mp2) m_succ[mp2] = op1;
-		if(js1) j_pred[js1] = op2; if(ms1) m_pred[ms1] = op2;
-		if(js2) j_pred[js2] = op1; if(ms2) m_pred[ms2] = op1;
-		if(j_succ[op1]==op2){
-			j_succ[op1] = js2;
-			j_succ[op2] = op1;
-			j_pred[op1] = op2;
-			j_pred[op2] = jp1;
-		} else if(j_succ[op2]==op1){
-			j_succ[op1] = op2;
-			j_succ[op2] = js1;
-			j_pred[op1] = jp2;
-			j_pred[op2] = op1;
-		} else {
-			j_succ[op1] = js2;
-			j_succ[op2] = js1;
-			j_pred[op1] = jp2;
-			j_pred[op2] = jp1; //valid_schedule();
-		}
-		if(m_succ[op1]==op2){
-			m_succ[op1] = ms2;
-			m_succ[op2] = op1;
-			m_pred[op1] = op2;
-			m_pred[op2] = mp1;
-		} else if(m_succ[op2]==op1){
-			m_succ[op1] = op2;
-			m_succ[op2] = ms1;
-			m_pred[op1] = mp2;
-			m_pred[op2] = op1;
-		} else {
-			m_succ[op1] = ms2;
-			m_succ[op2] = ms1;
-			m_pred[op1] = mp2;
-			m_pred[op2] = mp1;
-		}
-
-	}
-	int op(int j, int m){
-		assert(j>0);
+	bool sameJob(unsigned op1, unsigned op2){ return instance.o_job[op1] == instance.o_job[op2]; }
+	bool sameMach(unsigned op1, unsigned op2){ return instance.o_machine[op1] == instance.o_machine[op2]; }
+	unsigned op(unsigned j, unsigned m){
+		if(j==0 || m==0) return 0;
+		assert(j>=0);
 		assert(m>=0);
-		return (j-1)*n_mach + m;	}
+		return (j-1)*nM + m;	
+	}
+	bool adjJob (unsigned op1, unsigned op2){ return pJ[op1] == op2 || pJ[op2] == op1; }
+	bool adjMach(unsigned op1, unsigned op2){ return pM[op1] == op2 || pM[op2] == op1; }
 	
-	bool adj_job (unsigned op1, unsigned op2){ return j_pred[op1] == op2 || j_pred[op2] == op1; }
-	bool adj_mach(unsigned op1, unsigned op2){ return m_pred[op1] == op2 || m_pred[op2] == op1; }
-	void fill_ord(vector<unsigned> &j_ord, vector<unsigned> &m_ord){
+	/////////////////////////////////////////////////////////////////////////
+	//////// MÉTODOS DE INICIALIZAÇÃO E AUXILIARES //////////////////////////
+	/////////////////////////////////////////////////////////////////////////
+
+	void initRandom(){
+		vector<unsigned> j_ord(nJ+1, 0),
+						 m_ord(nM+1, 0);
+							 
+		fillVecRandom(j_ord);//printv(j_ord,1,"Ordem randomizada - jobs");
+		fillVecRandom(m_ord);//printv(m_ord,1,"Ordem randomizada - machines");
+		fillOrd(j_ord, m_ord);
+	}
+
+	void initGreedyJobs(){
+		vector<unsigned> oJ(nJ+1,0), oM(nM+1,0), used(nJ+1,0);
+		unsigned bestJob, bestMakespan, tempMakespan;
+		fillVecRandom(oM);
+		for(int i = nJ; i>0; i--){
+			partial = true;
+			bestMakespan = 999999;
+			for(int j = nJ; j>=1; j--){ 
+				if(used[j]) continue;
+
+				oJ[i] = j;
+				for(int m = nM; m>0; m--){
+					if(oJ[j-1]) pM[op(oJ[j],oM[m])] = op(oJ[j-1],oM[m]);
+					if(oM[m-1]) pJ[op(oJ[j],oM[m])] = op(oJ[j],oM[m-1]);
+					if(j<nJ) sM[op(oJ[j],oM[m])] = op(oJ[j+1],oM[m]);
+					if(m<nM) sJ[op(oJ[j],oM[m])] = op(oJ[j],oM[m+1]);
+				}
+				first = op(j,oM[1]);
+				tempMakespan = calcMakespan();
+				if(tempMakespan < bestMakespan){
+					bestJob = j; 
+					bestMakespan = tempMakespan; 
+				}
+			}
+			oJ[i] = bestJob;
+			used[bestJob]++;
+		}
+		partial = false;
+		makespan = bestMakespan;
+		fillOrd(oJ, oM);	
+	}
+
+	void initGreedyMachines(){
+		vector<unsigned> oJ(nJ+1, 0), oM(nM+1, 0), used(nM+1, 0);
+		unsigned bestMach, bestMakespan, tempMakespan;
+		fillVecRandom(oJ);
+		for(int i = nM; i>0; i--){
+			partial = true;
+			bestMakespan = 999999;
+			for(int m = nM; m>=1; m--){	
+				if(used[m]) continue;
+
+				oM[i] = m;
+				for(int j = nJ; j>0; j--){
+					if(oJ[j-1]) pM[op(oJ[j],oM[m])] = op(oJ[j-1],oM[m]);
+					if(oM[m-1]) pJ[op(oJ[j],oM[m])] = op(oJ[j],oM[m-1]);
+					if(j<nJ) sM[op(oJ[j],oM[m])] = op(oJ[j+1],oM[m]);
+					if(m<nM) sJ[op(oJ[j],oM[m])] = op(oJ[j],oM[m+1]);
+				}
+				first = op(oJ[1],m);
+				tempMakespan = calcMakespan();
+				if(tempMakespan < bestMakespan){ 
+					bestMach = m; 
+					bestMakespan = tempMakespan;
+				}
+			}
+			oM[i] = bestMach;
+			used[bestMach]++;
+		}
+		partial = false;
+		makespan = bestMakespan;
+		fillOrd(oJ, oM);	
+	}
+	
+	void initTest(){
+		first = 2;
+
+		pJ = { 0, 4, 0, 5, 0, 2, 1, 0, 7, 8 };
+		sJ = { 0, 6, 5, 0, 1, 3, 0, 8, 9, 0 };
+		pM = { 0, 5, 0, 0, 2, 0, 3, 4, 1, 6 };
+		sM = { 0, 8, 4, 6, 7, 1, 9, 0, 0, 0 };
+	}
+	void fillOrd(vector<unsigned> &j_ord, vector<unsigned> &m_ord){
 		first = op(j_ord[1], m_ord[1]);
 
-		for(int m=1; m<=n_mach; m++){
-			for(int j=1; j<=n_jobs; j++){ 
-				if(j>1) m_pred[op(j_ord[j],m_ord[m])] = op(j_ord[j-1],m_ord[m]);
-				if(m>1) j_pred[op(j_ord[j],m_ord[m])] = op(j_ord[j],m_ord[m-1]);
-				if(j<n_jobs) m_succ[op(j_ord[j],m_ord[m])] = op(j_ord[j+1],m_ord[m]);
-				if(m<n_mach) j_succ[op(j_ord[j],m_ord[m])] = op(j_ord[j],m_ord[m+1]);
+		for(int m=1; m<=nM; m++){
+			for(int j=1; j<=nJ; j++){ 
+				if(j>1) pM[op(j_ord[j],m_ord[m])] = op(j_ord[j-1],m_ord[m]);
+				if(m>1) pJ[op(j_ord[j],m_ord[m])] = op(j_ord[j],m_ord[m-1]);
+				if(j<nJ) sM[op(j_ord[j],m_ord[m])] = op(j_ord[j+1],m_ord[m]);
+				if(m<nM) sJ[op(j_ord[j],m_ord[m])] = op(j_ord[j],m_ord[m+1]);
 			}
-		}}
+		}
+	}
+
 	void init(int method){
 		switch(method){
 			case RANDOM:
-				init_random();
+				initRandom();
 				break;
 			case GREEDY_JOBS:
-				init_greedy_jobs();
+				initGreedyJobs();
 				break;
 			case GREEDY_MACHINES:
-				init_greedy_machines();
+				initGreedyMachines();
 				break;
 			default:
-				break;}}
-	void fill_vec_random(vector<unsigned> &v){
+				initTest();
+				break;
+		}
+	}
+	void fillVecRandom(vector<unsigned> &v){
 		iota(v.begin()+1, v.end(), 1);
 		srand(unsigned(time(NULL)));
-		random_shuffle(v.begin()+1,v.end());}
-	void init_random(){
-		vector<unsigned> j_ord(n_jobs+1, 0),
-							 m_ord(n_mach+1, 0);
-							 
-		fill_vec_random(j_ord);//printv(j_ord,1,"Ordem randomizada - jobs");
-		fill_vec_random(m_ord);//printv(m_ord,1,"Ordem randomizada - machines");
-		fill_ord(j_ord, m_ord);}
+		random_shuffle(v.begin()+1,v.end());
+	}
 
-	void init_greedy_jobs(){
-		vector<unsigned int> j_ord(n_jobs+1,0), m_ord(n_mach+1,0), used(n_jobs+1,0);
-		unsigned int temp_n_j, temp_first, best_j, best_ms, ms;
-		fill_vec_random(m_ord);
-		for(int i = n_jobs; i>0; i--){
-			temp_n_j = n_jobs - i + 1;
-			best_ms = 999999;
-			for(int j = n_jobs; j>=1; j--){ if(used[j]) continue;
+	/////////////////////////////////////////////////////////////////////////
+	//////// AUXILIARES PARA CÁLCULO DE MAKESPAN ////////////////////////////
+	/////////////////////////////////////////////////////////////////////////
 
-				j_ord[i] = j;
-				for(int m = n_mach; m>0; m--){
-					if(j>1 && j_ord[j-1] > 0) m_pred[op(j_ord[j],m_ord[m])] = op(j_ord[j-1],m_ord[m]);
-					if(m>1) j_pred[op(j_ord[j],m_ord[m])] = op(j_ord[j],m_ord[m-1]);
-					if(j<temp_n_j) m_succ[op(j_ord[j],m_ord[m])] = op(j_ord[j+1],m_ord[m]);
-					if(m<n_mach) j_succ[op(j_ord[j],m_ord[m])] = op(j_ord[j],m_ord[m+1]);
+	void findDegrees(vector<unsigned> &deg, vector<unsigned> &queue, unsigned &pushed){
+		if(partial){
+			for(unsigned i = 1; i <= nO; i++){
+				if(!pJ[i] && !pM[i] && i!= first) continue;
+				 
+				if(pJ[i]>0) deg[i]++;
+				if(pM[i]>0) deg[i]++;
+				if(deg[i]==0){
+					queue[pushed++] = i;
 				}
-				temp_first = op(j,m_ord[1]);
-				vector<vector<unsigned>> g  = { j_succ, j_pred, m_succ, m_pred };
-				Solution s(g, n_mach, temp_n_j, temp_n_j*n_mach,temp_first,instance);
-				ms = s.calc_makespan();
-				if(ms < best_ms){ best_j = j; best_ms = ms; used[j]++; }
 			}
-			j_ord[i] = best_j;
 		}
-		makespan = best_ms;
-		fill_ord(j_ord, m_ord);	}
-	void init_greedy_machines(){
-		vector<unsigned int> j_ord(n_jobs+1, 0), m_ord(n_mach+1, 0), used(n_mach+1, 0);
-		unsigned int temp_n_m, temp_first, best_m, best_ms, ms;
-		fill_vec_random(j_ord);
-		for(int i = n_mach; i>0; i--){
-			temp_n_m = n_mach - i + 1;
-			best_ms = 999999;
-			for(int m = n_mach; m>=1; m--){	if(used[m]) continue;
 
-				m_ord[i] = m;
-				for(int j = n_jobs; j>0; j--){
-					if(j>1) m_pred[op(j_ord[j],m_ord[m])] = op(j_ord[j-1],m_ord[m]);
-					if(m>1) j_pred[op(j_ord[j],m_ord[m])] = op(j_ord[j],m_ord[m-1]);
-					if(j<n_jobs) m_succ[op(j_ord[j],m_ord[m])] = op(j_ord[j+1],m_ord[m]);
-					if(m<temp_n_m) j_succ[op(j_ord[j],m_ord[m])] = op(j_ord[j],m_ord[m+1]);
-				}
-				temp_first = op(j_ord[1],m);
-				vector<vector<unsigned>> g  = { j_succ, j_pred, m_succ, m_pred };
-				Solution s(g, n_mach, temp_n_m, n_jobs*temp_n_m,temp_first,instance);
-				ms = s.calc_makespan();
-				if(ms < best_ms){ best_m = m; best_ms = ms; used[m]++; }
+		for(unsigned i = 1; i <= nO; i++){
+			if(pJ[i]>0) deg[i]++;
+			if(pM[i]>0) deg[i]++;
+			if(deg[i]==0){
+				queue[pushed++] = i;
 			}
-			m_ord[i] = best_m;
 		}
-		makespan = best_ms;
-		fill_ord(j_ord, m_ord);	}
-	
-	void fill_heads(unsigned op, vector<unsigned>& heads, int cont, vector<unsigned>& visited){
-		//if(op > n_ops) cout << br << "op " << op << br;
-		assert(op >=0);
-		//assert(op <= n_jobs*n_jobs && op <= n_mach*n_mach);
-		if(cont>n_ops || op == 0 || visited[op] == 1) return;
-		//cout<<br<<"fill_heads.op "<<op; printv(j_pred,1,"j_pred"); printv(m_pred,1,"m_pred");
+	}
+	void fillHeads(unsigned op, vector<unsigned>& heads, int cont, vector<unsigned>& visited){
+		validOp(op);
+
 		if(op != first)	
-			heads[op] = max(heads[j_pred[op]] + instance.cost[j_pred[op]],
-							heads[m_pred[op]] + instance.cost[m_pred[op]]);
+			heads[op] = max(heads[pJ[op]] + instance.cost[pJ[op]],
+							heads[pM[op]] + instance.cost[pM[op]]);
 	
 		if(heads[op] > heads[last]) last = op;
+
         visited[op] = 1;
-		fill_heads(j_succ[op], heads, cont + 1, visited);
-		fill_heads(m_succ[op], heads, cont + 1, visited);}
 
-
-	vector<unsigned> crit_path(){
-		assert(last <= n_ops);
-		vector<unsigned> late_pred = fill_late_pred(), p;
-		unsigned op = last;
-
-		while(op > 0){
-			p.push_back(op);
-			op = late_pred[op];
+		if(cont < nO){
+			if(sJ[op] != DUMMY && visited[sJ[op]] == 0)
+				fillHeads(sJ[op], heads, cont + 1, visited);
+			if(sM[op] != DUMMY && visited[sM[op]] == 0)
+				fillHeads(sM[op], heads, cont + 1, visited);
 		}
-		reverse(p.begin(),p.end());
-		return p;	}
-
-	void blocks_j(vector<unsigned> p, vector<unsigned> &b_begin, vector<unsigned> &b_end){
-		int block_size = 0;
-        b_begin.push_back(0);
-        for(int i=0; i<p.size()-1; i++){
-            if(instance.o_job[p[i]] != instance.o_job[p[i+1]] && block_size > 1){
-                b_end.push_back(i);
-                b_begin.push_back(i+1);
-				block_size = 0;
-            } else block_size++;
-        }
-        b_end.push_back(p.size()-1);
-		if(b_begin[b_begin.size()-1] == b_end[b_end.size()-1]){
-			b_begin.pop_back();
-			b_end.pop_back();
-		}		
 	}
-
-    void blocks_m(vector<unsigned> p, vector<unsigned> &b_begin, vector<unsigned> &b_end){
-        int block_size = 0;
-        b_begin.push_back(0);
-        for(int i=0; i<p.size()-1; i++){
-            if((instance.o_machine[p[i]] != instance.o_machine[p[i+1]]) && block_size > 1){
-                b_end.push_back(i);
-                b_begin.push_back(i+1);
-                block_size = 0;
-            } else block_size++;
-        }
-        b_end.push_back(p.size()-1);
-		if(b_begin[b_begin.size()-1] == b_end[b_end.size()-1]){
-			b_begin.pop_back();
-			b_end.pop_back();
-		}	
+	vector<unsigned> getLatestPred(){
+		vector<unsigned> late_pred(nO+1, 0);
+		for(int i=1; i<=nO; i++){
+			if(instance.cost[pM[i]] > instance.cost[pJ[i]]) late_pred[i] = pM[i];
+			else late_pred[i] = pJ[i];
+		}
+		return late_pred;	
 	}
-
-	vector<unsigned> fill_late_pred(){
-		vector<unsigned> late_pred(n_ops+1, 0);
-		for(int i=1; i<=n_ops; i++)
-			if(instance.cost[m_pred[i]] > instance.cost[j_pred[i]]) late_pred[i] = m_pred[i];
-			else late_pred[i] = j_pred[i];
-		return late_pred;	}
-
-	void sw1j(){} void sw1m(){}
-    //swap em operacoes de mesmo bloco critico (job)
-    void sw2j(){
-        vector<unsigned> b_begin, b_end, p = crit_path(); assert(p.size()>0);
-		//Indice de um bloco que comeca em b_begin[index] e termina em b_end[index]
-		int index;
-
-        blocks_j(p,b_begin, b_end);
-		if(b_begin.size() < 1) return;
-        //Selecao de um bloco critico aleatorio
-		(b_begin.size() == 1) ? index = 0 : index = randint(0,b_begin.size()-1);
-        
-		int j = b_end[index],i = b_begin[index]; //Indices de comeco e fim de um bloco
-        //Selecao de operacoes dentro desse bloco; a, b sao indices caminho critico
-        int a = randint(i,j), b = randint(i,j);
-        while(a==b) b = randint(i,j); 
-		assert(a>=0); assert(b<=p.size()-1);
-        swap(p[a], p[b]);
+	vector<unsigned> getHeads(){
+		vector<unsigned> heads(nO + 1, 0), visited(nO + 1, 0);
+		if(first < 1 || !partial && first > nO)
+			error("First invalido: " + to_string(first));
+		fillHeads(first, heads, 1, visited); //printv(heads, 1, "heads");
+		return heads;	
 	}
-	//swap em operacoes de mesmo bloco critico (maquina)
-    void sw2m(){
-		vector<unsigned> b_begin, b_end, p = crit_path(); assert(p.size()>0);
-		int index;
-
-        blocks_m(p,b_begin, b_end);
-		if(b_begin.size() < 1) return;
-		(b_begin.size() == 1) ? index = 0 : index = randint(0,b_begin.size()-1);
-        
-		int j = b_end[index],i = b_begin[index]; 
-        int a = randint(i,j), b = randint(i,j);
-        while(a==b) b = randint(i,j); 
-		assert(a>=0); assert(b<=p.size()-1);
-        swap(p[a], p[b]);
-	} 
-	void sw3j(){
-		vector<unsigned> b_begin, b_end, p = crit_path(); assert(p.size()>0);
-		int index;
-
-        blocks_j(p,b_begin, b_end);
-		if(b_begin.size() < 1) return;
-		(b_begin.size() == 1) ? index = 0 : index = randint(0,b_begin.size()-1); 
-        swap(p[index], p[index+ 1]);
-	}
-	void sw3m(){
-		vector<unsigned> b_begin, b_end, p = crit_path(); assert(p.size()>0);
-		int index;
-
-        blocks_m(p,b_begin, b_end);
-		if(b_begin.size() < 1) return;
-		(b_begin.size() == 1) ? index = 0 : index = randint(0,b_begin.size()-1); 
-        swap(p[index], p[index+ 1]);
-	} 
-	void sh1j(){} void sh1m(){}  void sh2j(){} void sh2m(){} void sh3j(){} void sh3m(){}
-
-	vector<unsigned> get_heads(){
-		vector<unsigned> heads(n_ops + 1, 0), visited(n_ops + 1, 0);
-		assert(first <= n_ops);
-		assert(first >= 1);
-		fill_heads(first, heads, 1, visited);
-		return heads;	}
 public:
 	Solution () {}
 	Solution(Instance i, int init_method){
 		instance = i;
 		last = 0;
 		makespan = 0;
-		n_ops = instance.n_ops;
-		n_jobs = instance.n_jobs;
-		n_mach = instance.n_machines;
-		j_succ.resize(n_ops+1,0);
-		j_pred.resize(n_ops+1,0);
-		m_succ.resize(n_ops+1,0);
-		m_pred.resize(n_ops+1,0);
-		init(init_method);	}
-	
-	Solution(vector<vector<unsigned>> g, unsigned n_m, unsigned n_j, unsigned n_o, unsigned f, Instance i){
-		j_succ = g[0];
-		j_pred = g[1];
-		m_succ = g[2];
-		m_pred = g[3];
-		n_mach = n_m;
-		n_jobs = n_j;
-		first = f;
-		instance = i;
-		last = 0;
-		n_ops = n_o;	}
-
-	int calc_makespan(){ 
-		//valid_schedule();
-		//print_o();
+		partial = false;
+		nO = instance.n_ops;
+		nJ = instance.n_jobs;
+		nM = instance.n_machines;
+		sJ.resize(nO+1,0);
+		pJ.resize(nO+1,0);
+		sM.resize(nO+1,0);
+		pM.resize(nO+1,0);
+		init(init_method);
+	}
+	int calcMakespan(){
 		makespan = 0;
-		int temp_makespan = 0, op, q_lookat = 0, q_pushed = 0;
-		vector<unsigned> degrees_in(n_ops + 1,0), op_queue(n_ops), heads = get_heads(), late_pred = fill_late_pred(); 
+		unsigned temp_makespan = 0, op, lookat = 0, pushed = 0;
+		vector<unsigned> queue(nO),
+						 deg(nO + 1,0), 
+						 heads = getHeads(), 
+						 latePred = getLatestPred(); 
 
-        for(int i = 1; i <= n_ops; i++){
-			if(j_pred[i]>0) degrees_in[i]++;
-			if(m_pred[i]>0) degrees_in[i]++;
-			if(degrees_in[i]==0) op_queue[q_pushed++] = i;}
-		
+        findDegrees(deg, queue, pushed);
 
-		while(q_lookat < q_pushed){
-			op = op_queue[q_lookat++];
+		// Ciclo
+		if(pushed == 0) return -1;
+
+		while(lookat < pushed){
+			op = queue[lookat++];
 			temp_makespan = heads[op] + instance.cost[op];
-			//cout<<br<<"op = "<<op<<br<<"op.heads = "<<heads[op]<<br<<"op.cost = "<<instance.cost[op]<<br;
 
 			if(temp_makespan > makespan){
 				makespan = temp_makespan;
 				last = op;
 			}
 
-			for(int op_succ : { j_succ[op], m_succ[op] }){
-				if (op_succ != DUMMY){
-					degrees_in[op_succ]--;//printv(degrees_in,1,"Gr entrada:");
-					if(degrees_in[op_succ] == 0) op_queue[q_pushed++] = op_succ;//print_q(op_queue,q_lookat);
-					if(heads[op_succ] < temp_makespan){
-						heads[op_succ] = temp_makespan;
-						late_pred[op_succ] = op;
+			for(unsigned succ : { sJ[op], sM[op] }){
+				if (succ != DUMMY){
+					deg[succ]--;
+					if(deg[succ] == 0) queue[pushed++] = succ;
+					if(heads[succ] < temp_makespan){
+						heads[succ] = temp_makespan;
+						latePred[succ] = op;
 					}
 				}
 			}
 
 		}
-		return makespan;	}
-
-    void apply(int oper){
-        switch (oper){
-            case SW1J:
-                sw1j();
-                break;
-            case SW1M:
-                sw1m();
-                break;
-            case SW2J:
-                sw2j();
-                break;
-            case SW2M:
-                sw2m();
-                break;
-            case SW3J:
-                sw3j();
-                break;
-            case SW3M:
-                sw3m();
-                break;
-            case SH1J:
-                sh1j();
-                break;
-            case SH1M:
-                sh1m();
-                break;
-            case SH2J:
-                sh2j();
-                break;
-            case SH2M:
-                sh2m();
-                break;
-            case SH3J:
-                sh3j();
-                break;
-            case SH3M:
-                sh3m();
-                break;
-            default:
-                break;
-        }}	
-
-	void print_o(){
-		int ini = 0;
-		printv(j_succ, ini,"Sucessores nos jobs:");
-		printv(j_pred, ini,"Predecessores nos jobs:");
-		printv(m_succ, ini,"Sucessores nas maquinas:");
-		printv(m_pred, ini,"Predecessores nas maquinas:");
-	} 
-	Solution copy_solution(){
-		//valid_schedule();
+		return makespan;	
+	}
+	Solution copySolution(){
 		Solution s;
-		s.n_ops = n_ops;
-		s.n_jobs = n_jobs;
-		s.n_mach = n_mach;
-		s.j_pred = j_pred;
-		s.j_succ = j_succ;
-		s.m_pred = m_pred;
-		s.m_succ = m_succ;
+		s.nO = nO;
+		s.nJ = nJ;
+		s.nM = nM;
+		s.pJ = pJ;
+		s.sJ = sJ;
+		s.pM = pM;
+		s.sM = sM;
 		s.first = first;
 		s.last = last;
 		s.instance = instance;
-		//s.valid_schedule();
 		return s;
 	}
+	Solution getNeighbor(unsigned oper){
+		Solution c = copySolution();
+		Neighborhood n = Neighborhood(c);
 
-	void valid_schedule(){
-		/* int no_pred_m = 0, no_pred_j = 0, no_succ_m = 0, no_succ_j = 0;
-		for(int i=1; i<=n_jobs; i++){
-			if(m_pred[i] == 0) no_pred_m++;
-			if(m_succ[i] == 0) no_succ_m++;
-			if(j_pred[i] == 0) no_pred_j++;
-			if(j_succ[i] == 0) no_succ_j++;
+		switch (oper){
+		case SWAP_ALL:
+			n.swapAll();
+			break;
+		case SWAP_CRITICAL:
+			n.swapCritical();
+			break;
+		case SWAP_CRITICAL_EDGE:
+			n.swapCriticalEdge();
+			break;
+		default:
+			break;
 		}
-		assert(no_pred_m==n_mach);
-		assert(no_pred_j==n_jobs);
-		assert(no_succ_m==n_mach);
-		assert(no_succ_j==n_jobs); */
-		assert(*max_element(j_pred.begin(), j_pred.end()) <= n_ops); assert(*min_element(j_pred.begin(), j_pred.end()) == 0);
-		assert(*max_element(j_succ.begin(), j_succ.end()) <= n_ops); assert(*min_element(j_succ.begin(), j_succ.end()) == 0);
-		assert(*max_element(m_pred.begin(), m_pred.end()) <= n_ops); assert(*min_element(m_pred.begin(), m_pred.end()) == 0);
-		assert(*max_element(m_succ.begin(), m_succ.end()) <= n_ops); assert(*min_element(m_succ.begin(), m_succ.end()) == 0);
-		
+		return n.getSolution();
+	}
+	/////////////////////////////////////////////////////////////////////////
+	//////// DEBUG //////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////
+
+	void print_o(){
+		cout << br << "======================================" << br;
+		int ini = 1;
+		printv(sJ, ini,"Sucessores nos jobs:");
+		printv(pJ, ini,"Predecessores nos jobs:");
+		printv(sM, ini,"Sucessores nas maquinas:");
+		printv(pM, ini,"Predecessores nas maquinas:");
+		printv(instance.cost,1,"custo");
+		printl("first",first);
+		cout << br << "======================================" << br;
 	}
 
-	void valid_op(unsigned op){
-		assert(op <= n_jobs*n_jobs && op <= n_mach*n_mach);
+	unsigned checkSequence(unsigned op, vector<unsigned> &v){
+		if(op == DUMMY) return 0;
+		return 1 + checkSequence(v[op], v);
+	}
+
+	void validSchedule(){
+		unsigned noPredM = 0, noPredJ = 0, noSuccM = 0, noSuccJ = 0;
+
+		// First tem predecessores?
+		if(pM[first] != DUMMY || pJ[first] != DUMMY){
+			print_o();
+			error("First possui predecessor(es)");
+		}
+
+		// DUMMY tem predecessor ou sucessor?
+		if(pJ[0]) error("j_pred[0] != 0");
+		if(sJ[0]) error("j_succ[0] != 0");
+		if(pM[0]) error("m_pred[0] != 0");
+		if(pJ[0]) error("m_succ[0] != 0");
+
+		// 
+		for(int i = 1; i < nO + 1; i++){
+			if(pJ[i] == i) error("j_pred[i] == i");
+			if(sJ[i] == i) error("j_succ[i] == i");
+			if(pJ[i] == 0) {
+				if(checkSequence(i, sJ) != nJ){
+					printv(sJ,1,"INCORRETO: j_succ");
+					error("Sequencia comecada em " + to_string(i) + " incorreta!");
+				}
+				noPredJ++;
+			}
+			if(sJ[i] == 0) {
+				if(checkSequence(i, pJ) != nJ){
+					printv(pJ,1,"INCORRETO: j_pred");
+					error("Sequencia terminada em " + to_string(i) + " incorreta!");
+				}
+				noSuccJ++;
+			}
+			if(pM[i] == i) error("m_pred[i] == i");
+			if(sM[i] == i) error("m_succ[i] == i");
+			if(pM[i] == 0) {
+				if(checkSequence(i, sM) != nM){
+					printv(sM,1,"INCORRETO: m_succ");
+					error("Sequencia comecada em " + to_string(i) + " incorreta!");
+				}
+				noPredM++;
+			}
+			if(sM[i] == 0){
+				if(checkSequence(i, pM) != nJ){
+					printv(pM,1,"INCORRETO: m_pred");
+					error("Sequencia terminada em " + to_string(i) + " incorreta!");
+				}
+				noSuccM++;
+			}
+
+		}
+
+		if(noPredJ > nJ){
+			printv(pJ, 1, "j_pred");
+			error("Muitas ops sem predecessores em job");
+		}
+
+		if(noPredM > nM){
+			printv(pM, 1, "m_pred");
+			error("Muitas ops sem predecessores em mach");
+		}
+
+		if(noSuccJ > nJ){
+			printv(sJ, 1, "j_succ");
+			error("Muitas ops sem sucessores em job");
+		}
+
+		if(noSuccM > nM){
+			printv(sM, 1, "m_succ");
+			error("Muitas ops sem sucessores em mach");
+		}
+	}
+
+	void validOp(unsigned op){
+		if(!partial)
+			assert(op <= nJ*nJ && op <= nM*nM); 
+		assert( op > 0 ); 
+	}
+
+	void print(){
+		unsigned op = first, op1;
+
+		cout << br;
+		for(unsigned j=1; j<=nJ; j++){
+			if(op == first) cout << "(" << op << ") ";
+			else cout << " " << op << "  ";
+			op1 = op;
+			for(unsigned m=2; m<=nM; m++){
+				op1 = sJ[op1];
+				if(op==last) cout << "[" << op1 << "] ";
+				else cout << op1 << "  ";
+			}
+			cout << br;
+			op = sM[op];
+		}
+		cout << br;
+
+		/* if(makespan == 0) calcMakespan();
+		cout << br << "makespan = " << makespan << br;
+
+		printv(instance.cost, 1, "Custo");
+		printl("first:",first);
+		printl("last:",last); */
 	}
 	friend class Heuristics;
 };

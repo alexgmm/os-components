@@ -10,32 +10,20 @@
 #define RANDOM 0
 #define GREEDY_MACHINES 1
 #define GREEDY_JOBS 2
+#define TEST 3
 #define DUMMY (0)
 #define br "\n"
 #define SA 0
 #define IG 1
 #define TS 2
-#define SW1J 0
-#define SW1M 1
-#define SW2J 2
-#define SW2M 3
-#define SW3J 4
-#define SW3M 5
-#define SH1J 6
-#define SH1M 7
-#define SH2J 8
-#define SH2M 9
-#define SH3J 10
-#define SH3M 11
 
 using namespace std;
 
 vector<string> name_initializer = { "ran", "grm", "grj"};
 vector<string> name_heuristic = { "SA", "IG", "TS"};
-vector<string> name_operator = { "SW1J", "SW1M", "SW2J", "SW2M", "SW3J", "SW3M", "SH1J", "SH1M", "SH2J", "SH2M", "SH3J", "SH3M" };
+vector<string> name_operator = { "swapAll", "swapCritical", "swapEdges" };
 
 int randint(int ini, int end){
-	assert(ini != end);
 	assert(ini >= 0);
 	assert(end > ini);
     return ini + (rand() % (end - ini + 1));
@@ -43,11 +31,15 @@ int randint(int ini, int end){
 
 void printv(vector<unsigned>&v, int ini, string name){
 	cout << "\n" << name << "\n";
-	for(int i=ini; i<v.size(); i++) cout<<i<<" "; cout<<br;
-	for(int i=ini; i<v.size()-1; i++) cout<<"--"; cout<<br;
+	/* for(int i=ini; i<v.size(); i++) cout<<i<<" "; cout<<br;
+	for(int i=ini; i<v.size()-1; i++) cout<<"--"; cout<<br; */
 	for(int i=ini; i<v.size(); i++) cout << v[i] << " ";
-	cout << "\n";}
+	cout << "\n";
+}
 
+void error(string e){ cout << br << "ERRO: " << e << br; exit(0); }
+
+void printl(string s, unsigned v){ cout << br << s << " " << v << br; }
 
 class Instance {
 	vector<unsigned> cost;
@@ -92,6 +84,8 @@ public:
 		cout << "\n";}
 	
 	friend class Solution;
-	friend class Heuristics;};
+	friend class Heuristics;
+	friend class Neighborhood;
+};
 
 #endif
