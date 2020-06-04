@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <assert.h>
 
+#define INVALID 0
 #define RANDOM 0
 #define GREEDY_MACHINES 1
 #define GREEDY_JOBS 2
@@ -16,6 +17,7 @@
 #define SA 0
 #define IG 1
 #define TS 2
+#define UMAX 4294967295
 
 using namespace std;
 
@@ -36,8 +38,6 @@ void printv(vector<unsigned>&v, int ini, string name){
 	for(int i=ini; i<v.size(); i++) cout << v[i] << " ";
 	cout << "\n";
 }
-
-void error(string e){ cout << br << "ERRO: " << e << br; exit(0); }
 
 void printl(string s, unsigned v){ cout << br << s << " " << v << br; }
 

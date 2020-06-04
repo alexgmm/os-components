@@ -21,7 +21,7 @@ public:
 	};
 	Files (){}
 };
-void test_h(){
+/* void test_h(){
 	Files f;   
     float media;
 	ofstream out("results/r.csv");
@@ -61,7 +61,7 @@ void test_h(){
 	} 
 	out.close();
 }
-
+ */
 void test_op(int init, int heu, int oper){
 	Files f;   
     float media;
@@ -84,9 +84,9 @@ void test_op(int init, int heu, int oper){
 					cout << br << fn << br;
 					cout << "ANTES\n";
 					s.print();
-					s.print_o();
+					s.print();
 					cout << "\nDEPOIS\n";
-					h.solution.print_o();
+					h.getSolution().print();
 				}
 				media += v;
             }
