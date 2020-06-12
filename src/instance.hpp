@@ -45,10 +45,12 @@ class Instance {
 	vector<unsigned> cost;
 	vector<unsigned> o_job;
 	vector<unsigned> o_machine;
+	string src;
 	int n_jobs, n_machines, n_ops;
 public:
 	Instance() {}
 	Instance (string filename){
+		src = filename;
 		int i, j, c;
 		fstream f(filename);
 		if(f.fail()) cout <<br<<"Erro ao abrir "<<filename;

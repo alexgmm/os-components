@@ -26,19 +26,21 @@ class Heuristics {
     Solution solution;
 
     unsigned sa(unsigned oper){
-        unsigned makespan = solution.calcMakespan(), tempMakespan;
+        unsigned makespan = solution.calcMakespan();
+        int tempMakespan;
         assert(makespan > 0);
         double t = 1;
         Solution tempS;
         while(t > T_MIN){
             for(unsigned i=0; i<N_ITER; i++){
                 tempMakespan = -1;
-                while (tempMakespan < 0){
+                while (tempMakespan <= 0){
                     tempS  = Neighborhood::getNeighbor(oper, solution);
                     tempMakespan = tempS.calcMakespan();
                 }
 
                 if(tempMakespan < makespan || accept(t, tempMakespan, makespan)) {
+                    /* cout << br << makespan << br; */
                     solution = tempS.copySolution();
                     makespan = tempMakespan; 
                 }
@@ -59,9 +61,8 @@ class Heuristics {
             neighbors = n.getNeighborhood(oper);
 
             for(Neighbor neighbor: neighbors){
-                //cout << neighbor.getValue() << br;
+                cout << neighbor.getValue() << br;
                 if(neighbor.getValue() < incumbent.getMakespan() && neighbor.isLegal()){
-                    cout<<br<<neighbor.getValue()<<br;
                     incumbent = neighbor.getSolution().copySolution();
                 }
             }

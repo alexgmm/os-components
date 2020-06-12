@@ -13,11 +13,14 @@ string t20 = "inst/taillard/tai20_20_01.txt";
 
 int main(){
 	srand(0);
-	Instance i(t4);
-	Solution s(i, GREEDY_JOBS);
-	cout << s.calcMakespan() << br;
-	Heuristics h(s); 
-	cout << h.solve(TS, SWAP_CRITICAL_EDGE) << br;
+	Instance i(t);
+	Solution s(i, TEST);
+	s.print();
+	/* Neighborhood n(s);
+	n.swapJ(4,5);
+	n.getSolution().print(); */
+	/* Heuristics h(s); 
+	cout << h.solve(TS, SWAP_CRITICAL) << br; */
 	/* Instance i("test2");
 	Solution s(i, TEST);
 	Neighborhood n(s);
