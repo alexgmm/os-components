@@ -15,7 +15,7 @@ using namespace std;
 class Solution {
 public:
 	vector<unsigned> sJ, pJ, sM, pM;
-	unsigned nM, nJ, nO, last, first;//, tsirf;
+	unsigned nM, nJ, nO, last, first;
 	int makespan = 0;
 	Instance instance;
 	bool partial;
@@ -74,62 +74,42 @@ public:
 		return p;	
 	}
 	void blocksJ(vector<unsigned> &begins, vector<unsigned> &ends){
-		vector<unsigned> p = critical();
-		int block_size = 0;
-        begins.push_back(0);
-        for(int i=0; i<p.size()-1; i++){
-			if (instance.o_job[p[i]] != instance.o_job[p[i + 1]]){
-				if (block_size > 1){
-					ends.push_back(i);
-					begins.push_back(i + 1);
-				}
-				block_size = 0;
+		vector<unsigned> p = critical(), blocksBegins, blocksEnds;
+		blocksBegins.push_back(0);
+		for(unsigned i=1; i<p.size(); i++){
+			if(!sameJob(p[i],p[i-1])){
+				if(p[i]==first) blocksBegins.push_back(i+1);
+				else blocksBegins.push_back(i);
+				blocksEnds.push_back(i-1);
 			}
-			else
-				block_size++;
-        }
-        ends.push_back(p.size()-1);
-		if(begins[begins.size()-1] == ends[ends.size()-1]){
-			begins.pop_back();
-			ends.pop_back();
 		}
-		if(begins[0] - ends[0] < 2){
-			reverse(begins.begin(), begins.end());
-			begins.pop_back();
-			reverse(begins.begin(), begins.end());
-			reverse(ends.begin(), ends.end());
-			ends.pop_back();
-			reverse(ends.begin(), ends.end());
+		blocksEnds.push_back(p.size()-1);
+
+		for(unsigned i=0; i<blocksBegins.size(); i++){
+			if(blocksEnds[i] - blocksBegins[i] > 0){
+				begins.push_back(blocksBegins[i]);
+				ends.push_back(blocksEnds[i]);
+			}
 		}
 	}
-    void blocksM(vector<unsigned> &begins, vector<unsigned> &ends){
-		vector<unsigned> p = critical();
-        int block_size = 0;
-        begins.push_back(0);
-        for(int i=0; i<p.size()-1; i++){
-			if (instance.o_machine[p[i]] != instance.o_machine[p[i + 1]]){
-				if (block_size > 1){
-					ends.push_back(i);
-					begins.push_back(i + 1);
-				}
-				block_size = 0;
+	void blocksM(vector<unsigned> &begins, vector<unsigned> &ends){
+		vector<unsigned> p = critical(), blocksBegins, blocksEnds;
+		blocksBegins.push_back(0);
+		for(unsigned i=1; i<p.size(); i++){
+			if(!sameMach(p[i],p[i-1])){
+				if(p[i]==first) blocksBegins.push_back(i+1);
+				else blocksBegins.push_back(i);
+				blocksEnds.push_back(i-1);
 			}
-			else
-				block_size++;
-        }
-        ends.push_back(p.size()-1);
-		if(begins[begins.size()-1] == ends[ends.size()-1]){
-			begins.pop_back();
-			ends.pop_back();
 		}
-		if(begins[0] - ends[0] < 2){
-			reverse(begins.begin(), begins.end());
-			begins.pop_back();
-			reverse(begins.begin(), begins.end());
-			reverse(ends.begin(), ends.end());
-			ends.pop_back();
-			reverse(ends.begin(), ends.end());
-		}	
+		blocksEnds.push_back(p.size()-1);
+
+		for(unsigned i=0; i<blocksBegins.size(); i++){
+			if(blocksEnds[i] - blocksBegins[i] > 0){
+				begins.push_back(blocksBegins[i]);
+				ends.push_back(blocksEnds[i]);
+			}
+		}
 	}
 	/////////////////////////////////////////////////////////////////////////
 	//////// MÉTODOS DE INICIALIZAÇÃO E AUXILIARES //////////////////////////
@@ -193,7 +173,7 @@ public:
 				if(tempMakespan < bestMakespan){ 
 					bestMach = m; 
 					bestMakespan = tempMakespan;
-				}
+				} 
 			}
 			oM[i] = bestMach;
 			used[bestMach]++;
@@ -208,7 +188,7 @@ public:
 		sJ = { 0, 2, 3, 0, 5, 6, 0, 8, 9, 0 };
 		pM = { 0, 0, 0, 0, 1, 2, 3, 4, 5, 6 };
 		sM = { 0, 4, 5, 6, 7, 8, 9, 0, 0, 0 };
-		instance.cost = { 0, 5, 1, 1, 5, 1, 1, 5, 5, 5 };
+		instance.cost = { 0, 5, 5, 5, 1, 1, 5, 1, 1, 5 };
 	}
 	void fillOrd(vector<unsigned> &j_ord, vector<unsigned> &m_ord){
 		first = op(j_ord[1], m_ord[1]);
@@ -602,6 +582,88 @@ class Neighborhood {
 	/////////////////////////////////////////////////////////////////////////
 	//////// GERAÇÃO DE VIZINHANÇA COMPLETA /////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
+
+	bool shiftJ(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd){
+		bool legal = true;
+		unsigned lastOp = p[idxEnd];
+		for(unsigned i=idxEnd; i>idxBegin; i--)
+				legal = legal && swapJ(lastOp,p[i-1]);
+		return legal;
+	}
+	bool shiftM(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd){
+		bool legal = true;
+		unsigned lastOp = p[idxEnd];
+		for(unsigned i=idxEnd; i>idxBegin; i--)
+				legal = legal && swapM(lastOp,p[i-1]);
+		return legal;
+	}
+	Solution shiftOne(){
+		vector<unsigned> b, e, p = sol.critical();
+
+		if(randint(0,1)==SHIFT_J){
+			sol.blocksJ(b,e);
+
+			unsigned chosenBlock = (b.size()==1) ? 0 : randint(0, b.size()-1);
+			unsigned idxBegin = b[chosenBlock], idxEnd = e[chosenBlock];
+			idxEnd = ( idxEnd-idxBegin>1? randint(idxBegin + 1, idxEnd): idxEnd );
+			shiftJ(p, idxBegin, idxEnd);
+		}
+		else { 
+			sol.blocksM(b,e);
+
+			unsigned chosenBlock = (b.size()==1) ? 0 : randint(0, b.size()-1);
+			unsigned idxBegin = b[chosenBlock], idxEnd = e[chosenBlock];
+			idxEnd = ( idxEnd-idxBegin>1? randint(idxBegin + 1, idxEnd): idxEnd );
+			shiftM(p, idxBegin, idxEnd);
+		}
+
+		Solution s = sol.copySolution();
+		restore();
+		return s;
+	}
+
+	vector<Neighbor> shiftAll(){
+		unsigned idxBegin, idxEnd;
+		vector<Neighbor> neighbors;
+		vector<unsigned> p = sol.critical(), bJ, bM, eJ, eM;
+		sol.blocksJ(bJ, eJ);
+		sol.blocksM(bM, eM);
+		bool legal;
+		unsigned value;
+
+		for (unsigned pos = 0; pos < bJ.size(); pos++){
+			idxBegin = bJ[pos];
+			idxEnd = eJ[pos];
+			while (idxEnd > idxBegin){
+				legal = shiftJ(p, idxBegin, idxEnd);
+				value = sol.getMakespan();
+				if(value){
+					Neighbor n(sol.copySolution(), value, legal);
+					neighbors.push_back(n);
+				}
+				restore();
+				idxEnd--;
+			}
+		}
+
+		for (unsigned pos = 0; pos < bJ.size(); pos++){
+			idxBegin = bM[pos];
+			idxEnd = eM[pos];
+			while (idxEnd > idxBegin){
+				legal = shiftM(p, idxBegin, idxEnd);
+				value = sol.getMakespan();
+				if(value){
+					Neighbor n(sol.copySolution(), value, legal);
+					neighbors.push_back(n);
+				}
+				restore();
+				idxEnd--;
+			}
+		}
+
+		return neighbors;
+	}
+
 	bool legal(unsigned op1, unsigned op2){
 		if(CURRENT_ITER - TABU_DURATION > tabu[op1][op2] || tabu[op1][op2] == 0)
 			return true;
@@ -714,7 +776,7 @@ public:
 			tabu[i].resize(s.nO + 1, 0);
 	}
 
-    void restore(){ sol = previous.copySolution(); }
+	void restore(){ sol = previous.copySolution(); }
 	void setSolution(Solution s){ sol = s.copySolution(); previous = s.copySolution(); }
 
 	/////////////////////////////////////////////////////////////////////////
@@ -735,29 +797,34 @@ public:
 		case SWAP_CRITICAL_EDGE:
 			neighbors = swapCriticalEdgeNeighbors();
 			break;
+		case SHIFT_CRITICAL:
+			return shiftOne();
 		default:
 			break;
 		}
 		return neighbors[randint(0,neighbors.size()-1)].getSolution();
 	}
 	bool isLast(unsigned op){ return sol.sJ[op] == DUMMY && sol.sM[op] == DUMMY; }
-    vector<Neighbor> getNeighborhood(int oper){
-        switch (oper){
-        case SWAP_ALL:
-            return swapAllNeighbors();
-            break;
+	vector<Neighbor> getNeighborhood(int oper){
+		switch (oper){
+		case SWAP_ALL:
+			return swapAllNeighbors();
+			break;
 		case SWAP_CRITICAL:
 			return swapCriticalNeighbors();
 			break;
 		case SWAP_CRITICAL_EDGE:
 			return swapCriticalEdgeNeighbors();
 			break;
-        default:
-            break;
-        }
-    }
+		case SHIFT_CRITICAL:
+			return shiftAll();
+			break;
+		default:
+			break;
+		}
+	}
 
-    static Solution getNeighbor(unsigned oper, Solution& s){
+	static Solution getNeighbor(unsigned oper, Solution& s){
 		Solution copied = s.copySolution(), selected;
 		vector<Neighbor> neighbors;
 		Neighborhood n = Neighborhood(copied);

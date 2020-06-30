@@ -61,7 +61,7 @@ class Heuristics {
             neighbors = n.getNeighborhood(oper);
 
             for(Neighbor neighbor: neighbors){
-                cout << neighbor.getValue() << br;
+                //cout << neighbor.getValue() << br;
                 if(neighbor.getValue() < incumbent.getMakespan() && neighbor.isLegal()){
                     incumbent = neighbor.getSolution().copySolution();
                 }
