@@ -2,17 +2,17 @@
 #define HEURISTICS_HPP
 
 unsigned N_ITER_TS = 100;
-unsigned N_ITER = 125;
-double ALPHA = 0.5;
-double T_MIN = 0.0001;
+unsigned N_ITER_SA = 404;
+double ALPHA = 0.0777;
+double T_MIN = 0.0009;
 
 #define BEST_IMPROVEMENT  0
 #define FIRST_IMPROVEMENT  1
 #define RANDOM_SOLUTION  2
 unsigned SELECTION_CRITERIA = BEST_IMPROVEMENT;
 
-#include "solution.hpp"
 #include "neighborhood.hpp"
+#include "utilities.hpp"
 #include <math.h>
 #include <cmath>
 
@@ -26,19 +26,21 @@ class Heuristics {
     Solution solution;
 
     unsigned sa(unsigned oper){
+        //solution.print();
         unsigned makespan = solution.calcMakespan();
         int tempMakespan;
         assert(makespan > 0);
         double t = 1;
         Solution tempS;
         while(t > T_MIN){
-            for(unsigned i=0; i<N_ITER; i++){
+            for(unsigned i=0; i<N_ITER_SA; i++){
                 tempMakespan = -1;
                 while (tempMakespan <= 0){
                     tempS  = Neighborhood::getNeighbor(oper, solution);
                     tempMakespan = tempS.calcMakespan();
+                    //tempS.print();
                 }
-
+                //if(tempMakespan <= 193) exit(0);
                 if(tempMakespan < makespan || accept(t, tempMakespan, makespan)) {
                     /* cout << br << makespan << br; */
                     solution = tempS.copySolution();
