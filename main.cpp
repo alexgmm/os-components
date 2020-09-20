@@ -10,12 +10,23 @@
 
 using namespace std;
 
+unsigned op(unsigned j, unsigned m)
+{
+	if (j == 0 || m == 0)
+		return 0;
+	assert(j >= 0);
+	assert(m >= 0);
+	return (j - 1) * 4 + m;
+}
+
 string t = "test2";
 string g = "inst/gueret-prins/GP03-02.txt";
 string t4 = "inst/taillard/tai04_04_01.txt";
 string t20 = "inst/taillard/tai20_20_01.txt";
 
-int main(int argc, char **argv){
+void test();
+int main(int argc, char **argv)
+{
 	/* if(argc > 1){
 		ofstream file("/home/hal/out");
 		for(int i=1; i< 10; i++)
@@ -32,13 +43,35 @@ int main(int argc, char **argv){
 		Heuristics h(s);
 		cout << h.solve(SA, SWAP_CRITICAL) << br;
 	} */
-	/* srand(0);
-	Instance i("/home/hal/tuning/Instances/GP09-05.txt");
-	Solution s(i, RANDOM);
-	Heuristics h(s);
-	cout << h.solve(SA, SWAP_ALL) << br; */
-	//testSA();
-	Instance i(t);
-	Solution s(i, GREEDY_JOBS);
+	/* 	if(argc > 1){
+		srand(0);
+		string it(argv[4]), a(argv[6]),  f(argv[2]);
+		N_ITER_TS = stoi(it);
+		TABU_DURATION = stod(a);
+		Instance i(f);
+		Solution s(i, GREEDY_JOBS);
+		Heuristics h(s);
+		cout << h.solve(TS, SWAP_CRITICAL) << br;
+	}*/
+	srand(0);
+
+	test();
 	return 0;
+}
+
+void test()
+{
+	testInit(GREEDY_MACHINES);
+	/* for (int i = 1; i < 5; i++)
+	{
+		for (int j = 1; j < 5; j++)
+		{
+			cout << op(i, j) << " ";
+		}
+		cout << br;
+	} */
+	Instance i(t4);
+	//i.print();
+	Solution s(i, GREEDY_MACHINES);
+	//cout << br << s.getMakespan() << br;
 }

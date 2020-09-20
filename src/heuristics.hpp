@@ -1,7 +1,7 @@
 #ifndef HEURISTICS_HPP
 #define HEURISTICS_HPP
 
-unsigned N_ITER_TS = 100;
+unsigned N_ITER_TS = 499;
 unsigned N_ITER_SA = 404;
 double ALPHA = 0.0777;
 double T_MIN = 0.0009;

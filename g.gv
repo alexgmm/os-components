@@ -1,1 +1,1 @@
-digraph G {"23";edge[color=red];1->2;edge[color=blue];1->4;edge[color=red];2->3;edge[color=blue];3->6;edge[color=red];4->5;edge[color=red];5->6;edge[color=blue];5->2;}
+digraph G {2->6->10->14;4->8->12->16;3->7->11->15;1->5->9->13;2->4->3->1;6->8->7->5;10->12->11->9;14->16->15->13;}

@@ -224,7 +224,7 @@ class Neighborhood
 	//////// GERAÇÃO DE VIZINHANÇA COMPLETA /////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 
-	vector<Neighbor> shiftAll()
+	vector<Neighbor> shiftCritical()
 	{
 		unsigned idxBegin, idxEnd;
 		vector<Neighbor> neighbors;
@@ -458,7 +458,7 @@ public:
 			return swapCriticalEdgeNeighbors();
 			break;
 		case SHIFT_CRITICAL:
-			return shiftAll();
+			return shiftCritical();
 		case SHIFT_WHOLE:
 			return shiftWhole();
 			break;
