@@ -14,7 +14,6 @@ using namespace std;
 
 class Solution
 {
-public:
 	vector<unsigned> sJ, pJ, sM, pM;
 	unsigned nM, nJ, nO, last, first;
 	int makespan = 0;
@@ -147,7 +146,7 @@ public:
 	{
 		vector<unsigned> s;
 
-		for (unsigned i = 0; i < predecessors.size(); i++)
+		for (unsigned i = 1; i < predecessors.size(); i++)
 			if (predecessors[i] == DUMMY)
 				s.push_back(i);
 
@@ -195,6 +194,7 @@ public:
 		}
 		return jobs;
 	}
+
 	/////////////////////////////////////////////////////////////////////////
 	//////// MÉTODOS DE INICIALIZAÇÃO E AUXILIARES //////////////////////////
 	/////////////////////////////////////////////////////////////////////////
@@ -204,8 +204,8 @@ public:
 		vector<unsigned> j_ord(nJ + 1, 0),
 			m_ord(nM + 1, 0);
 
-		fillVecRandom(j_ord); //printv(j_ord,1,"Ordem randomizada - jobs");
-		fillVecRandom(m_ord); //printv(m_ord,1,"Ordem randomizada - machines");
+		fillVecRandom(j_ord); //printv(j_ord, 1, "Ordem randomizada - jobs");
+		fillVecRandom(m_ord); //printv(m_ord, 1, "Ordem randomizada - machines");
 		fillOrd(j_ord, m_ord);
 	}
 	void evaluateResult(unsigned &tM, unsigned &bM, unsigned &tV, unsigned &bV)
@@ -217,14 +217,56 @@ public:
 			//cout << tb << tb << tb << "so far: job " << tV << " and " << tM << " subs " << bM << br;
 		}
 	}
+	void fillJobSlot(vector<unsigned> &oJ, vector<unsigned> &oM, unsigned job, unsigned jobSlot)
+	{
+		for (int mach = nM; mach > 0; mach--)
+		{
+			unsigned o = op(job, oM[mach]);
+			pM[o] = op(oJ[jobSlot - 1], oM[mach]);
+			pJ[o] = op(oJ[jobSlot], oM[mach - 1]);
+			sM[o] = op(oJ[jobSlot + 1], oM[mach]);
+			sJ[o] = op(oJ[jobSlot], oM[mach + 1]);
+		}
+	}
+	void resetJobSlot(vector<unsigned> &oM, unsigned job)
+	{
+		for (int mach = 1; mach <= nJ; mach++)
+		{
+			unsigned o = op(oM[mach], job);
+			pM[o] = 0;
+			pJ[o] = 0;
+			sM[o] = 0;
+			sJ[o] = 0;
+		}
+	}
+	void fillMachSlot(vector<unsigned> &oJ, vector<unsigned> &oM, unsigned mach, unsigned machSlot)
+	{
+		for (int job = 1; job <= nJ; job++)
+		{
+			unsigned o = op(oJ[job], mach);
+			pM[o] = op(oJ[job - 1], oM[machSlot]);
+			pJ[o] = op(oJ[job], oM[machSlot - 1]);
+			sM[o] = op(oJ[job + 1], oM[machSlot]);
+			sJ[o] = op(oJ[job], oM[machSlot + 1]);
+		}
+	}
+	void resetMachSlot(vector<unsigned> &oJ, unsigned mach)
+	{
+		for (int job = 1; job <= nJ; job++)
+		{
+			unsigned o = op(oJ[job], mach);
+			pM[o] = 0;
+			pJ[o] = 0;
+			sM[o] = 0;
+			sJ[o] = 0;
+		}
+	}
 	void initGreedyJobs()
 	{
 		vector<unsigned> oJ(nJ + 2, 0), oM(nM + 1, 0), used(nJ + 1, 0);
 		unsigned bestJob, bestMakespan, tempMakespan;
 		fillVecRandom(oM);
 		oM.push_back(0);
-
-		oM = {0, 1, 2, 3, 4, 0};
 		//printv(oM, 1, "chosen mach order");
 
 		partial = true;
@@ -257,77 +299,6 @@ public:
 		makespan = bestMakespan;
 		fillOrd(oJ, oM);
 	}
-	void fillJobSlot(vector<unsigned> &oJ, vector<unsigned> &oM, unsigned job, unsigned jobSlot)
-	{
-		for (int mach = nM; mach > 0; mach--)
-		{
-			unsigned o = op(job, oM[mach]);
-			pM[o] = op(oJ[jobSlot - 1], oM[mach]);
-			pJ[o] = op(oJ[jobSlot], oM[mach - 1]);
-			sM[o] = op(oJ[jobSlot + 1], oM[mach]);
-			sJ[o] = op(oJ[jobSlot], oM[mach + 1]);
-		}
-	}
-	void resetJobSlot(vector<unsigned> &oM, unsigned job)
-	{
-		for (int mach = 1; mach <= nJ; mach++)
-		{
-			unsigned o = op(oM[mach], job);
-			pM[o] = 0;
-			pJ[o] = 0;
-			sM[o] = 0;
-			sJ[o] = 0;
-		}
-	}
-
-	void printClusterGraph(vector<unsigned> &oJ, vector<unsigned> &oM, unsigned machSlot)
-	{
-		cout << "digraph G {";
-		for (int mach = machSlot; mach <= nM; mach++)
-		{
-
-			for (int job = 1; job < nJ; job++)
-				cout << op(oJ[job], oM[mach]) << "->";
-
-			cout << op(oJ[nJ], oM[mach]) << ";";
-		}
-
-		if (machSlot != nM)
-			for (int job = 1; job <= nJ; job++)
-			{
-
-				for (int mach = machSlot; mach < nM; mach++)
-					cout << op(oJ[job], oM[mach]) << "->";
-
-				cout << op(oJ[job], oM[nM]) << ";";
-			}
-		cout << "}" << br;
-	}
-	void printMachClusterGraph(vector<unsigned> &oJ, vector<unsigned> &oM, unsigned machSlot)
-	{
-		cout << "digraph G {";
-		for (int mach = machSlot; mach <= nM; mach++)
-		{
-			cout << "subgraph cluster" << mach << "{color=blue;";
-
-			for (int job = 1; job < nJ; job++)
-				cout << op(oJ[job], oM[mach]) << "->";
-
-			cout << op(oJ[nJ], oM[mach]) << "; label = \"mach" << mach << "\";";
-			cout << "}";
-		}
-
-		if (machSlot != nM)
-			for (int job = 1; job <= nJ; job++)
-			{
-
-				for (int mach = machSlot; mach < nM; mach++)
-					cout << op(oJ[job], oM[mach]) << "->";
-
-				cout << op(oJ[job], oM[nM]) << ";";
-			}
-		cout << "}" << br;
-	}
 	void initGreedyMachines()
 	{
 		vector<unsigned> oJ(nJ + 1, 0), oM(nM + 2, 0), used(nM + 1, 0);
@@ -350,12 +321,11 @@ public:
 
 				oM[machSlot] = testMach;
 				fillMachSlot(oJ, oM, testMach, machSlot);
-				unsigned o1 = op(oJ[1], testMach), o2 = op(oJ[2], testMach), o3 = op(oJ[3], testMach), o4 = op(oJ[4], testMach);
+				//unsigned o1 = op(oJ[1], testMach), o2 = op(oJ[2], testMach), o3 = op(oJ[3], testMach), o4 = op(oJ[4], testMach);
 				//cout << tb << tb << "order " << o1 << ":" << instance.cost[o1] << sp << o2 << ":" << instance.cost[o2] << sp << o3 << ":" << instance.cost[o3] << sp << o4 << ":" << instance.cost[o4] << br;
 
 				first = op(oJ[1], testMach);
 				//printPartial();
-				//printClusterGraph(oJ, oM, machSlot);
 				tempMakespan = calcMakespanPartial();
 				//cout << tb << tb << "found " << tempMakespan << br;
 
@@ -372,30 +342,8 @@ public:
 		partial = false;
 		makespan = bestMakespan;
 		fillOrd(oJ, oM);
+		//print();
 	}
-	void fillMachSlot(vector<unsigned> &oJ, vector<unsigned> &oM, unsigned mach, unsigned machSlot)
-	{
-		for (int job = 1; job <= nJ; job++)
-		{
-			unsigned o = op(oJ[job], mach);
-			pM[o] = op(oJ[job - 1], oM[machSlot]);
-			pJ[o] = op(oJ[job], oM[machSlot - 1]);
-			sM[o] = op(oJ[job + 1], oM[machSlot]);
-			sJ[o] = op(oJ[job], oM[machSlot + 1]);
-		}
-	}
-	void resetMachSlot(vector<unsigned> &oJ, unsigned mach)
-	{
-		for (int job = 1; job <= nJ; job++)
-		{
-			unsigned o = op(oJ[job], mach);
-			pM[o] = 0;
-			pJ[o] = 0;
-			sM[o] = 0;
-			sJ[o] = 0;
-		}
-	}
-
 	void initTest()
 	{
 		first = 1;
@@ -415,17 +363,22 @@ public:
 		sM = {0, 4, 5, 6, 7, 8, 9, 0, 0, 0};
 		instance.cost = {0, 1, 2, 3, 8, 5, 3, 1, 7, 2}; */
 	}
-	void fillOrd(vector<unsigned> &j_ord, vector<unsigned> &m_ord)
+	void fillOrd(vector<unsigned> &oJ, vector<unsigned> &oM)
 	{
-		first = op(j_ord[1], m_ord[1]);
+		first = op(oJ[1], oM[1]);
+		if (oJ.size() == nJ + 1)
+			oJ.push_back(0);
+		if (oM.size() == nM + 1)
+			oM.push_back(0);
 
 		for (int m = 1; m <= nM; m++)
 			for (int j = 1; j <= nJ; j++)
 			{
-				pM[op(j_ord[j], m_ord[m])] = op(j_ord[j - 1], m_ord[m]);
-				pJ[op(j_ord[j], m_ord[m])] = op(j_ord[j], m_ord[m - 1]);
-				sM[op(j_ord[j], m_ord[m])] = op(j_ord[j + 1], m_ord[m]);
-				sJ[op(j_ord[j], m_ord[m])] = op(j_ord[j], m_ord[m + 1]);
+				unsigned o = op(oJ[j], oM[m]);
+				pM[o] = op(oJ[j - 1], oM[m]);
+				pJ[o] = op(oJ[j], oM[m - 1]);
+				sM[o] = op(oJ[j + 1], oM[m]);
+				sJ[o] = op(oJ[j], oM[m + 1]);
 			}
 	}
 	void init(int method)
@@ -492,7 +445,6 @@ public:
 				queue[pushed++] = i;
 		}
 	}
-
 	vector<unsigned> getHeads(vector<unsigned> &deg, vector<unsigned> &queue, unsigned &pushed)
 	{
 		vector<unsigned> heads(nO + 1, 0), cicle;
@@ -533,24 +485,12 @@ public:
 			return cicle;
 		return heads;
 	}
-
 	vector<unsigned> getHeads()
 	{
 		unsigned pushed = 0;
 		vector<unsigned> queue(nO), deg(nO + 1, 0);
 		return getHeads(deg, queue, pushed);
 	}
-
-	/* 	vector<unsigned> getLatestPred(){
-		vector<unsigned> late_pred(nO + 1, 0);
-		for (int i = 1; i <= nO; i++){
-			if (instance.cost[pM[i]] > instance.cost[pJ[i]])
-				late_pred[i] = pM[i];
-			else
-				late_pred[i] = pJ[i];
-		}
-		return late_pred;
-	} */
 	vector<unsigned> getLatestPred()
 	{
 		vector<unsigned> late_pred(nO + 1, 0), heads = getHeads();
@@ -563,6 +503,8 @@ public:
 		}
 		return late_pred;
 	}
+
+public:
 	/////////////////////////////////////////////////////////////////////////
 	//////// DEBUG //////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
@@ -708,6 +650,139 @@ public:
 		printl("first:", first);
 		printl("last:", last);
 	}
+	void print()
+	{
+		cout << br << "======================================" << br;
+		printSchedule();
+		printl("first", first);
+		printl("last", last);
+		printl("makespan", getMakespan());
+		//printGraph();
+		cout << br << "======================================" << br;
+	}
+	void printPartial()
+	{
+		cout << br << "======================================" << br;
+		printSchedule();
+		printl("first", first);
+		printl("last", last);
+		printl("makespan", calcMakespanPartial());
+		printGraph();
+		//printO();
+		cout << br << "======================================" << br;
+	}
+	void printSchedule()
+	{
+		int ini = 1;
+		printv(sJ, ini, "Sucessores nos jobs:");
+		printv(pJ, ini, "Predecessores nos jobs:");
+		printv(sM, ini, "Sucessores nas maquinas:");
+		printv(pM, ini, "Predecessores nas maquinas:");
+		//printv(instance.cost, 1, "custo");
+	}
+	void printGraph()
+	{
+		cout << "digraph G {";
+		cout << "\"" << getMakespan() << "\";";
+		for (int i = 1; i <= nO; i++)
+		{
+			if (sJ[i])
+			{
+				cout << "edge[color=red];";
+				cout << instance.cost[i] << "->" << instance.cost[sJ[i]] << ";";
+			}
+			if (sM[i])
+			{
+				cout << "edge[color=blue];";
+				cout << instance.cost[i] << "->" << instance.cost[sM[i]] << ";";
+			}
+		}
+		cout << "}" << br;
+	}
+	void printClusterGraph(bool printJob, bool printMach)
+	{
+		vector<unsigned> machStarters = starters(pM), jobStarters = starters(pJ);
+		cout << "digraph G {";
+
+		for (int i = 0; i <= machStarters.size(); i++)
+		{
+			if (printMach)
+				cout << "subgraph cluster" << i << "{color=blue;";
+
+			unsigned op = machStarters[i];
+			cout << op;
+			op = sM[op];
+			while (op != 0)
+			{
+				cout << "->" << op;
+				op = sM[op];
+			}
+			cout << ";";
+
+			if (printMach)
+				cout << " label = \"mach" << i << "\";}";
+		}
+
+		for (int i = 0; i <= jobStarters.size(); i++)
+		{
+			if (printJob)
+				cout << "subgraph cluster" << i << "{color=red;";
+
+			unsigned op = jobStarters[i];
+			cout << op;
+			op = sJ[op];
+			while (op != 0)
+			{
+				cout << "->" << op;
+				op = sJ[op];
+			}
+			cout << ";";
+
+			if (printJob)
+				cout << " label = \"job" << i << "\";}";
+		}
+
+		cout << "}" << br;
+	}
+	void printMachCluster()
+	{
+		printClusterGraph(true, false);
+	}
+	void printJobCluster()
+	{
+		printClusterGraph(false, true);
+	}
+	void printClusterGraph()
+	{
+		printClusterGraph(false, false);
+	}
+	string edgeColor(unsigned op1, unsigned op2)
+	{
+		if (sameJob(op1, op2))
+			return jobNode[instance.o_job[op1] - 1];
+		return machNode[instance.o_machine[op1] - 1];
+	}
+
+	/////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////
+
+	Solution() {}
+	Solution(Instance i, int init_method)
+	{
+		instance = i;
+		last = 0;
+		makespan = 0;
+		partial = false;
+		nO = instance.n_ops;
+		nJ = instance.n_jobs;
+		nM = instance.n_machines;
+		sJ.resize(nO + 1, 0);
+		pJ.resize(nO + 1, 0);
+		sM.resize(nO + 1, 0);
+		pM.resize(nO + 1, 0);
+		init(init_method);
+	}
 	int calcMakespanPartial()
 	{
 		makespan = 0;
@@ -743,23 +818,6 @@ public:
 		}
 
 		return makespan;
-	}
-
-	Solution() {}
-	Solution(Instance i, int init_method)
-	{
-		instance = i;
-		last = 0;
-		makespan = 0;
-		partial = false;
-		nO = instance.n_ops;
-		nJ = instance.n_jobs;
-		nM = instance.n_machines;
-		sJ.resize(nO + 1, 0);
-		pJ.resize(nO + 1, 0);
-		sM.resize(nO + 1, 0);
-		pM.resize(nO + 1, 0);
-		init(init_method);
 	}
 	int calcMakespan()
 	{
@@ -803,7 +861,6 @@ public:
 
 		return makespan;
 	}
-	int getMakespan() { return makespan; }
 	Solution copySolution()
 	{
 		Solution s;
@@ -820,62 +877,7 @@ public:
 		s.makespan = calcMakespan();
 		return s;
 	}
-	void print()
-	{
-		cout << br << "======================================" << br;
-		printSchedule();
-		printl("first", first);
-		printl("last", last);
-		printl("makespan", getMakespan());
-		printGraph();
-		cout << br << "======================================" << br;
-	}
-	void printPartial()
-	{
-		cout << br << "======================================" << br;
-		printSchedule();
-		printl("first", first);
-		printl("last", last);
-		printl("makespan", calcMakespanPartial());
-		printGraph();
-		//printO();
-		cout << br << "======================================" << br;
-	}
-	void printSchedule()
-	{
-		int ini = 1;
-		printv(sJ, ini, "Sucessores nos jobs:");
-		printv(pJ, ini, "Predecessores nos jobs:");
-		printv(sM, ini, "Sucessores nas maquinas:");
-		printv(pM, ini, "Predecessores nas maquinas:");
-		//printv(instance.cost, 1, "custo");
-	}
-	void printGraph()
-	{
-		cout << "digraph G {";
-		cout << "\"" << getMakespan() << "\";";
-		for (int i = 1; i <= nO; i++)
-		{
-			if (sJ[i])
-			{
-				cout << "edge[color=red];";
-				cout << instance.cost[i] << "->" << instance.cost[sJ[i]] << ";";
-			}
-			if (sM[i])
-			{
-				cout << "edge[color=blue];";
-				cout << instance.cost[i] << "->" << instance.cost[sM[i]] << ";";
-			}
-		}
-		cout << "}" << br;
-	}
-	string edgeColor(unsigned op1, unsigned op2)
-	{
-		if (sameJob(op1, op2))
-			return jobNode[instance.o_job[op1] - 1];
-		return machNode[instance.o_machine[op1] - 1];
-	}
-
+	int getMakespan() { return makespan; }
 	friend class Heuristics;
 	friend class Neighbor;
 	friend class Neighborhood;

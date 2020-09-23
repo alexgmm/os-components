@@ -47,6 +47,8 @@ unsigned CURRENT_GRAPH_NUMBER = 1;
 
 using namespace std;
 
+void oi() { cout << br << "*** checkpoint *** " << br; }
+
 vector<string> jobNode = {"aliceblue", "blue", "blueviolet", "cadetblue", "cornflowerblue", "darkslateblue", "deepskyblue", "dodgerblue", "indigo", "lightblue", "navy", "powderblue", "royalblue", "steelblue", "midnightblue", "mediumblue", "mediumslateblue", "navyblue", "slateblue", "mediumslateblue"},
 			   machNode = {"coral", "crimson", "darksalmon", "deeppink", "firebrick", "hotpink", "indianred", "lightpink", "lightsalmon", "maroon", "mediumvioletred", "orangered", "palevioletred", "pink", "red", "salmon", "tomato", "violetred", "orange", "darkorange"};
 fstream nextGraph()

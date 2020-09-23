@@ -12,6 +12,7 @@ using namespace std;
 
 float testInit(string file, unsigned init)
 {
+	//cout << file << br;
 	Instance i(file);
 	float media = 0;
 	for (int loop = 0; loop < NLOOPS; loop++)
@@ -23,18 +24,36 @@ float testInit(string file, unsigned init)
 	return media / NLOOPS;
 }
 
-void testInit(unsigned init)
+void testInitMethods()
 {
-	fstream out("/home/hal/os-components/results/sa.csv");
+	fstream out("/home/hal/os-components/results/ini.csv");
 
-	unsigned media;
+	out << "random,greedyMachs,greedyJobs," << br;
 
 	vector<string> names = fileNames();
 
 	for (string n : names)
-		cout << testInit(n, RANDOM) << " x " << testInit(n, GREEDY_MACHINES) << br;
+	{
+		for (unsigned i : {RANDOM, GREEDY_MACHINES, GREEDY_JOBS})
+			out << testInit(n, i) << ",";
+		out << br;
+	}
 
 	out.close();
+}
+
+vector<unsigned> testInit(unsigned init)
+{
+	vector<unsigned> values;
+	vector<string> names = fileNames();
+	for (string n : names)
+	{
+		//cout << n << br;
+		Instance i(n);
+		Solution s(i, init);
+		values.push_back(s.calcMakespan());
+	}
+	return values;
 }
 
 void testSA()

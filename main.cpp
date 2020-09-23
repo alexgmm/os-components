@@ -22,6 +22,7 @@ unsigned op(unsigned j, unsigned m)
 string t = "test2";
 string g = "inst/gueret-prins/GP03-02.txt";
 string t4 = "inst/taillard/tai04_04_01.txt";
+string t5 = "inst/taillard/tai05_05_01.txt";
 string t20 = "inst/taillard/tai20_20_01.txt";
 
 void test();
@@ -61,7 +62,6 @@ int main(int argc, char **argv)
 
 void test()
 {
-	testInit(GREEDY_MACHINES);
 	/* for (int i = 1; i < 5; i++)
 	{
 		for (int j = 1; j < 5; j++)
@@ -70,8 +70,18 @@ void test()
 		}
 		cout << br;
 	} */
-	Instance i(t4);
-	//i.print();
-	Solution s(i, GREEDY_MACHINES);
-	//cout << br << s.getMakespan() << br;
+	/* Instance i(t5);
+	i.print();
+	Solution s(i, RANDOM);
+	cout << br << s.getMakespan() << br; */
+	vector<unsigned> v1 = testInit(RANDOM), v2 = testInit(GREEDY_MACHINES);
+	int random = 0, grm = 0;
+	for (int i = 0; i < v1.size(); i++)
+	{
+		if (v1[i] > v2[i])
+			random++;
+		if (v1[i] < v2[i])
+			grm++;
+	}
+	cout << random << " " << grm << br;
 }
