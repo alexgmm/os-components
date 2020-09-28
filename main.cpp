@@ -54,34 +54,24 @@ int main(int argc, char **argv)
 		Heuristics h(s);
 		cout << h.solve(TS, SWAP_CRITICAL) << br;
 	}*/
-	srand(0);
-
+	/* SAVE_GRAPHS = true;
+	TRACK_OPERATIONS = true; */
 	test();
 	return 0;
 }
 
 void test()
 {
-	/* for (int i = 1; i < 5; i++)
+	Instance i(t4);
+	Solution s(i, GREEDY_MACHINES);
+	cout << s.calcMakespan() << br;
+	//s.printJobCluster();
+	Heuristics h(s);
+	cout << h.solve(TS, SWAP_CRITICAL_EDGE) << br;
+	/* for (int i = 0; i < 10; i++)
 	{
-		for (int j = 1; j < 5; j++)
-		{
-			cout << op(i, j) << " ";
-		}
-		cout << br;
+		vector<unsigned> v(10);
+		fillVecRandom2(v);
+		printv(v, 0, "v");
 	} */
-	/* Instance i(t5);
-	i.print();
-	Solution s(i, RANDOM);
-	cout << br << s.getMakespan() << br; */
-	vector<unsigned> v1 = testInit(RANDOM), v2 = testInit(GREEDY_MACHINES);
-	int random = 0, grm = 0;
-	for (int i = 0; i < v1.size(); i++)
-	{
-		if (v1[i] > v2[i])
-			random++;
-		if (v1[i] < v2[i])
-			grm++;
-	}
-	cout << random << " " << grm << br;
 }

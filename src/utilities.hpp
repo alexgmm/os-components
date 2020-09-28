@@ -42,11 +42,36 @@ unsigned TABU_DURATION = 5;
 unsigned CURRENT_ITER;
 unsigned CURRENT_GRAPH_NUMBER = 1;
 
+bool SAVE_GRAPHS = false;
+bool TRACK_OPERATIONS = false;
+
 #include <utility>
 #include <fstream>
+#include <numeric>	 //iota
+#include <algorithm> //random_shuffle
+#include <random>
+#include <iterator>
+#include <functional>
 
 using namespace std;
 
+void fillVecRandom(vector<unsigned> &v)
+{
+	random_device rnd_device;
+	mt19937 mersenne_engine{rnd_device()};
+	iota(v.begin() + 1, v.end(), 1);
+	shuffle(begin(v) + 1, end(v), mersenne_engine);
+}
+
+void saveGraph(string graph)
+{
+	string filename = "/home/hal/os-components/graphs/" + to_string(CURRENT_GRAPH_NUMBER++) + ".gv";
+	remove(filename.c_str());
+	fstream out(filename, ios::trunc);
+	out.open(filename, ios::out);
+	out << graph;
+	out.close();
+}
 void oi() { cout << br << "*** checkpoint *** " << br; }
 
 vector<string> jobNode = {"aliceblue", "blue", "blueviolet", "cadetblue", "cornflowerblue", "darkslateblue", "deepskyblue", "dodgerblue", "indigo", "lightblue", "navy", "powderblue", "royalblue", "steelblue", "midnightblue", "mediumblue", "mediumslateblue", "navyblue", "slateblue", "mediumslateblue"},
@@ -89,8 +114,6 @@ void printv(vector<unsigned> &v, int ini, string name)
 {
 	cout << "\n"
 		 << name << "\n";
-	/* for(int i=ini; i<v.size(); i++) cout<<i<<" "; cout<<br;
-	for(int i=ini; i<v.size()-1; i++) cout<<"--"; cout<<br; */
 	for (int i = ini; i < v.size(); i++)
 		cout << v[i] << " ";
 	cout << "\n";

@@ -4,8 +4,6 @@
 #include <iostream>
 #include <vector>
 #include <utility>
-#include <algorithm> //random_shuffle
-#include <numeric>	 //iota
 #include <assert.h>
 #include "utilities.hpp"
 #include "instance.hpp"
@@ -20,6 +18,12 @@ class Solution
 	Instance instance;
 	bool partial;
 
+	void error(string e)
+	{
+		cout << br << "ERRO: " << e << br;
+		print();
+		exit(0);
+	}
 	unsigned lowerBound()
 	{
 		unsigned lower = makespan;
@@ -54,12 +58,6 @@ class Solution
 				lower = sum;
 		}
 		return lower;
-	}
-	void error(string e)
-	{
-		cout << br << "ERRO: " << e << br;
-		print();
-		exit(0);
 	}
 	bool sameJob(unsigned op1, unsigned op2) { return instance.o_job[op1] == instance.o_job[op2]; }
 	bool sameMach(unsigned op1, unsigned op2) { return instance.o_machine[op1] == instance.o_machine[op2]; }
@@ -404,12 +402,6 @@ class Solution
 		}
 		makespan = calcMakespan();
 	}
-	void fillVecRandom(vector<unsigned> &v)
-	{
-		iota(v.begin() + 1, v.end(), 1);
-		srand(unsigned(time(NULL)));
-		random_shuffle(v.begin() + 1, v.end());
-	}
 
 	/////////////////////////////////////////////////////////////////////////
 	//////// AUXILIARES PARA CÁLCULO DE MAKESPAN ////////////////////////////
@@ -494,6 +486,7 @@ class Solution
 	vector<unsigned> getLatestPred()
 	{
 		vector<unsigned> late_pred(nO + 1, 0), heads = getHeads();
+		//assert(heads.size() == nO + 1);
 		for (int i = 1; i <= nO; i++)
 		{
 			if (heads[pM[i]] + instance.cost[pM[i]] > heads[pJ[i]] + instance.cost[pJ[i]])
@@ -509,146 +502,11 @@ public:
 	//////// DEBUG //////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 
-	unsigned checkSequence(unsigned op, vector<unsigned> &v)
-	{
-		if (op == DUMMY)
-			return 0;
-		return 1 + checkSequence(v[op], v);
-	}
-	void validSchedule()
-	{
-		unsigned noPredM = 0, noPredJ = 0, noSuccM = 0, noSuccJ = 0;
-
-		// First tem predecessores?
-		if (pM[first] != DUMMY || pJ[first] != DUMMY)
-		{
-			error("First possui predecessor(es)");
-		}
-
-		// DUMMY tem predecessor ou sucessor?
-		if (pJ[0])
-			error("j_pred[0] != 0");
-		if (sJ[0])
-			error("j_succ[0] != 0");
-		if (pM[0])
-			error("m_pred[0] != 0");
-		if (pJ[0])
-			error("m_succ[0] != 0");
-
-		//
-		for (int i = 1; i < nO + 1; i++)
-		{
-			if (i != first && pJ[i] == 0 && pM[i] == 0)
-				error(to_string(i) + " sem predecessor!");
-			//if(i!=tsirf && sJ[i]==0 && sM[i]==0) error(to_string(i) + " sem sucessor!");
-			if (pJ[i] == i)
-				error("j_pred[i] == i");
-			if (sJ[i] == i)
-				error("j_succ[i] == i");
-			if (pJ[i] == 0)
-			{
-				if (checkSequence(i, sJ) != nJ)
-				{
-					printv(sJ, 1, "INCORRETO: j_succ");
-					error("Sequencia comecada em " + to_string(i) + " incorreta!");
-				}
-				noPredJ++;
-			}
-			if (sJ[i] == 0)
-			{
-				if (checkSequence(i, pJ) != nJ)
-				{
-					printv(pJ, 1, "INCORRETO: j_pred");
-					error("Sequencia terminada em " + to_string(i) + " incorreta!");
-				}
-				noSuccJ++;
-			}
-			if (pM[i] == i)
-				error("m_pred[i] == i");
-			if (sM[i] == i)
-				error("m_succ[i] == i");
-			if (pM[i] == 0)
-			{
-				if (checkSequence(i, sM) != nM)
-				{
-					printv(sM, 1, "INCORRETO: m_succ");
-					error("Sequencia comecada em " + to_string(i) + " incorreta!");
-				}
-				noPredM++;
-			}
-			if (sM[i] == 0)
-			{
-				if (checkSequence(i, pM) != nJ)
-				{
-					printv(pM, 1, "INCORRETO: m_pred");
-					error("Sequencia terminada em " + to_string(i) + " incorreta!");
-				}
-				noSuccM++;
-			}
-		}
-
-		if (noPredJ > nJ)
-		{
-			printv(pJ, 1, "j_pred");
-			error("Muitas ops sem predecessores em job");
-		}
-
-		if (noPredM > nM)
-		{
-			printv(pM, 1, "m_pred");
-			error("Muitas ops sem predecessores em mach");
-		}
-
-		if (noSuccJ > nJ)
-		{
-			printv(sJ, 1, "j_succ");
-			error("Muitas ops sem sucessores em job");
-		}
-
-		if (noSuccM > nM)
-		{
-			printv(sM, 1, "m_succ");
-			error("Muitas ops sem sucessores em mach");
-		}
-	}
 	void validOp(unsigned op)
 	{
 		if (!partial)
 			assert(op <= nJ * nJ && op <= nM * nM);
 		assert(op > 0);
-	}
-	void printG()
-	{
-		unsigned op = first, op1;
-
-		cout << br;
-		for (unsigned j = 1; j <= nJ; j++)
-		{
-			if (op == first)
-				cout << "(" << op << ") ";
-			else
-				cout << " " << op << "  ";
-			op1 = op;
-			for (unsigned m = 2; m <= nM; m++)
-			{
-				op1 = sJ[op1];
-				if (op == last)
-					cout << "[" << op1 << "] ";
-				else
-					cout << op1 << "  ";
-			}
-			cout << br;
-			op = sM[op];
-		}
-		cout << br;
-
-		if (makespan == 0)
-			calcMakespan();
-		cout << br << "makespan = " << makespan << br;
-
-		printv(instance.cost, 1, "Custo");
-		printl("first:", first);
-		printl("last:", last);
 	}
 	void print()
 	{
@@ -660,17 +518,6 @@ public:
 		//printGraph();
 		cout << br << "======================================" << br;
 	}
-	void printPartial()
-	{
-		cout << br << "======================================" << br;
-		printSchedule();
-		printl("first", first);
-		printl("last", last);
-		printl("makespan", calcMakespanPartial());
-		printGraph();
-		//printO();
-		cout << br << "======================================" << br;
-	}
 	void printSchedule()
 	{
 		int ini = 1;
@@ -680,77 +527,82 @@ public:
 		printv(pM, ini, "Predecessores nas maquinas:");
 		//printv(instance.cost, 1, "custo");
 	}
-	void printGraph()
+	string label(unsigned o)
 	{
-		cout << "digraph G {";
-		cout << "\"" << getMakespan() << "\";";
-		for (int i = 1; i <= nO; i++)
-		{
-			if (sJ[i])
-			{
-				cout << "edge[color=red];";
-				cout << instance.cost[i] << "->" << instance.cost[sJ[i]] << ";";
-			}
-			if (sM[i])
-			{
-				cout << "edge[color=blue];";
-				cout << instance.cost[i] << "->" << instance.cost[sM[i]] << ";";
-			}
-		}
-		cout << "}" << br;
+		validOp(o);
+		vector<unsigned> p = critical();
+		string color = count(p.begin(), p.end(), o) && o != first ? "style=filled;color=chartreuse3;" : "";
+		return to_string(o) + "[" + color + "label=\"" +
+			   to_string(o) + "(" +
+			   to_string(instance.cost[o]) +
+			   ")\"];\n";
 	}
-	void printClusterGraph(bool printJob, bool printMach)
+	string printClusterGraph(bool printJob, bool printMach)
 	{
-		vector<unsigned> machStarters = starters(pM), jobStarters = starters(pJ);
-		cout << "digraph G {";
+		vector<unsigned> machStarters = starters(pM), jobStarters = starters(pJ), p = critical();
+		unsigned o, m = calcMakespan();
+		string graph = "digraph G {\n";
 
-		for (int i = 0; i <= machStarters.size(); i++)
+		graph += to_string(first) + "[style=filled,color=green];\nrankdir=LR;\n";
+		graph += to_string(m) + "[color=yellow, style=filled, shape=box, label=\"makespan: " + to_string(m) + "\"];\n";
+
+		for (int i = 0; i < machStarters.size(); i++)
 		{
 			if (printMach)
-				cout << "subgraph cluster" << i << "{color=blue;";
+				graph += "\tsubgraph cluster" + to_string(i + 1) + "{\n\t\tcolor=blue;\n\t\t";
 
-			unsigned op = machStarters[i];
-			cout << op;
-			op = sM[op];
-			while (op != 0)
+			o = machStarters[i];
+			graph += to_string(o);
+			o = sM[o];
+			while (o != 0)
 			{
-				cout << "->" << op;
-				op = sM[op];
+				graph += "->" + to_string(o);
+				o = sM[o];
 			}
-			cout << ";";
+			graph += ";\n\t\t";
 
 			if (printMach)
-				cout << " label = \"mach" << i << "\";}";
+				graph += " label = \"mach" + to_string(i) + "\";\n\t}\n";
 		}
 
-		for (int i = 0; i <= jobStarters.size(); i++)
+		for (int i = 0; i < jobStarters.size(); i++)
 		{
 			if (printJob)
-				cout << "subgraph cluster" << i << "{color=red;";
+				graph += "\tsubgraph cluster" + to_string(i + 1) + "{\n\t\tcolor=red;\n\t\t";
 
-			unsigned op = jobStarters[i];
-			cout << op;
-			op = sJ[op];
-			while (op != 0)
+			o = jobStarters[i];
+			graph += to_string(o);
+			o = sJ[o];
+			while (o != 0)
 			{
-				cout << "->" << op;
-				op = sJ[op];
+				graph += "->" + to_string(o);
+				o = sJ[o];
 			}
-			cout << ";";
+			graph += ";\n\t\t";
 
 			if (printJob)
-				cout << " label = \"job" << i << "\";}";
+				graph += " label = \"job" + to_string(i) + "\";\n\t}\n";
 		}
 
-		cout << "}" << br;
+		for (int o = 1; o <= nO; o++)
+			graph += label(o);
+
+		graph += "\n}";
+		return graph;
 	}
 	void printMachCluster()
 	{
-		printClusterGraph(true, false);
+		//printSchedule();
+		cout << br << "saving m-graph number " << CURRENT_GRAPH_NUMBER << br;
+		string graph = printClusterGraph(false, true);
+		saveGraph(graph);
 	}
 	void printJobCluster()
 	{
-		printClusterGraph(false, true);
+		//printSchedule();
+		cout << br << "saving j-graph number " << CURRENT_GRAPH_NUMBER << br;
+		string graph = printClusterGraph(true, false);
+		saveGraph(graph);
 	}
 	void printClusterGraph()
 	{
@@ -877,7 +729,7 @@ public:
 		s.makespan = calcMakespan();
 		return s;
 	}
-	int getMakespan() { return makespan; }
+	int getMakespan() { return partial ? calcMakespanPartial() : calcMakespan(); }
 	friend class Heuristics;
 	friend class Neighbor;
 	friend class Neighborhood;

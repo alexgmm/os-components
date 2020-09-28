@@ -13,7 +13,7 @@ class Neighbor
 	bool legal;
 
 public:
-	Neighbor(){}
+	Neighbor() {}
 	Neighbor(Solution n, unsigned v, bool l)
 	{
 		if (v == 0)
@@ -43,57 +43,66 @@ class Neighborhood
 	//////// GERAÇÃO DE VIZINHO /////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 
-	void swapRandomSucc(){
+	void swapRandomSucc()
+	{
 		unsigned randOp = randint(1, sol.nO);
 
-		while(!sol.sJ[randOp] && !sol.sM[randOp]) 
+		while (!sol.sJ[randOp] && !sol.sM[randOp])
 			randOp = randint(1, sol.nO);
 
-		if(!sol.sJ[randOp])
+		if (!sol.sJ[randOp])
 			swapM(randOp, sol.sM[randOp]);
-		else if(!sol.sM[randOp])
+		else if (!sol.sM[randOp])
 			swapJ(randOp, sol.sJ[randOp]);
-		else {
-			if(randint(0,1) == SWAP_J)
+		else
+		{
+			if (randint(0, 1) == SWAP_J)
 				swapJ(randOp, sol.sJ[randOp]);
 			else
 				swapM(randOp, sol.sM[randOp]);
 		}
 	}
-	void swapRandomPred(){
+	void swapRandomPred()
+	{
 		unsigned randOp = randint(1, sol.nO);
 
-		while(!sol.pJ[randOp] && !sol.pM[randOp]) 
+		while (!sol.pJ[randOp] && !sol.pM[randOp])
 			randOp = randint(1, sol.nO);
 
-		if(!sol.pJ[randOp])
+		if (!sol.pJ[randOp])
 			swapM(randOp, sol.pM[randOp]);
-		else if(!sol.pM[randOp])
+		else if (!sol.pM[randOp])
 			swapJ(randOp, sol.pJ[randOp]);
-		else {
-			if(randint(0,1) == SWAP_J)
+		else
+		{
+			if (randint(0, 1) == SWAP_J)
 				swapJ(randOp, sol.pJ[randOp]);
 			else
 				swapM(randOp, sol.pM[randOp]);
 		}
 	}
-	Solution swapAllOne(){
+	Solution swapAllOne()
+	{
 		if (randint(0, 1) == SWAP_PRED)
 			swapRandomPred();
 		else
 			swapRandomSucc();
 		return sol;
 	}
-	Solution swapCriticalOne(){
+	Solution swapCriticalOne()
+	{
 		vector<unsigned> b, e, p = sol.critical(), succ, pred;
 		unsigned idxEnd = 0, idxBegin = 0, chosenBlock, op;
 		int chosenOperator = randint(0, 1);
 
-		if (chosenOperator == SWAP_J){
+		if (chosenOperator == SWAP_J)
+		{
 			succ = sol.sJ;
 			pred = sol.pJ;
 			sol.blocksJ(b, e);
-		} else {
+		}
+		else
+		{
 			succ = sol.sM;
 			pred = sol.pM;
 			sol.blocksM(b, e);
@@ -105,43 +114,50 @@ class Neighborhood
 		idxEnd = (idxEnd - idxBegin > 1 ? randint(idxBegin + 1, idxEnd) : idxEnd);
 		op = p[randint(idxBegin, idxEnd)];
 
-		if (chosenOperator == SWAP_J){
-			if(!pred[op])
-				swapJ(op,succ[op]);
-			else if(!succ[op])
-					swapJ(op,pred[op]);
-			else {
-				if(randint(0,1) == SWAP_PRED)
-					swapJ(op,pred[op]);
+		if (chosenOperator == SWAP_J)
+		{
+			if (!pred[op])
+				swapJ(op, succ[op]);
+			else if (!succ[op])
+				swapJ(op, pred[op]);
+			else
+			{
+				if (randint(0, 1) == SWAP_PRED)
+					swapJ(op, pred[op]);
 				else
-					swapJ(op,succ[op]);
+					swapJ(op, succ[op]);
 			}
-		} else {
-			if(!pred[op])
-				swapM(op,succ[op]);
-			else if(!succ[op])
-					swapM(op,pred[op]);
-			else {
-				if(randint(0,1) == SWAP_PRED)
-					swapM(op,pred[op]);
+		}
+		else
+		{
+			if (!pred[op])
+				swapM(op, succ[op]);
+			else if (!succ[op])
+				swapM(op, pred[op]);
+			else
+			{
+				if (randint(0, 1) == SWAP_PRED)
+					swapM(op, pred[op]);
 				else
-					swapM(op,succ[op]);
+					swapM(op, succ[op]);
 			}
 		}
 
 		return sol;
 	}
-	Solution swapCriticalEdgeOne(){
+	Solution swapCriticalEdgeOne()
+	{
 		vector<unsigned> b, e, p = sol.critical();
 
-		if (randint(0, 1) == SWAP_J){
+		if (randint(0, 1) == SWAP_J)
+		{
 			sol.blocksJ(b, e);
 
 			unsigned chosenBlock = (b.size() == 1) ? 0 : randint(0, b.size() - 1);
 			unsigned idxBegin = b[chosenBlock], idxEnd = e[chosenBlock];
-			if(idxBegin != idxEnd - 1)
+			if (idxBegin != idxEnd - 1)
 				idxEnd = (idxEnd - idxBegin > 1 ? randint(idxBegin + 1, idxEnd) : idxEnd);
-			if(randint(0,1) == BLOCK_START)
+			if (randint(0, 1) == BLOCK_START)
 				swapJ(p[idxBegin], p[idxBegin + 1]);
 			else
 				swapJ(p[idxEnd], p[idxEnd - 1]);
@@ -152,9 +168,9 @@ class Neighborhood
 
 			unsigned chosenBlock = (b.size() == 1) ? 0 : randint(0, b.size() - 1);
 			unsigned idxBegin = b[chosenBlock], idxEnd = e[chosenBlock];
-			if(idxBegin != idxEnd - 1)
+			if (idxBegin != idxEnd - 1)
 				idxEnd = (idxEnd - idxBegin > 1 ? randint(idxBegin + 1, idxEnd) : idxEnd);
-			if(randint(0,1) == BLOCK_START)
+			if (randint(0, 1) == BLOCK_START)
 				swapM(p[idxBegin], p[idxBegin + 1]);
 			else
 				swapM(p[idxEnd], p[idxEnd - 1]);
@@ -178,42 +194,48 @@ class Neighborhood
 			legal = legal && swapM(lastOp, p[i - 1]);
 		return legal;
 	}
-	Solution shiftCriticalOne(){
+	Solution shiftCriticalOne()
+	{
 		vector<unsigned> b, e, p = sol.critical();
 
-		if (randint(0, 1) == SHIFT_J){
+		if (randint(0, 1) == SHIFT_J)
+		{
 			sol.blocksJ(b, e);
 
 			unsigned chosenBlock = (b.size() == 1) ? 0 : randint(0, b.size() - 1);
 			unsigned idxBegin = b[chosenBlock], idxEnd = e[chosenBlock];
-			if(idxBegin != idxEnd - 1)
+			if (idxBegin != idxEnd - 1)
 				idxEnd = (idxEnd - idxBegin > 1 ? randint(idxBegin + 1, idxEnd) : idxEnd);
 			shiftJ(p, idxBegin, idxEnd);
 		}
-		else{
+		else
+		{
 			sol.blocksM(b, e);
 
 			unsigned chosenBlock = (b.size() == 1) ? 0 : randint(0, b.size() - 1);
 			unsigned idxBegin = b[chosenBlock], idxEnd = e[chosenBlock];
-			if(idxBegin != idxEnd - 1)
+			if (idxBegin != idxEnd - 1)
 				idxEnd = (idxEnd - idxBegin > 1 ? randint(idxBegin + 1, idxEnd) : idxEnd);
 			shiftM(p, idxBegin, idxEnd);
 		}
 
 		return sol;
 	}
-	Solution shiftWholeOne(){
+	Solution shiftWholeOne()
+	{
 
-		if (randint(0, 1) == SHIFT_J){
+		if (randint(0, 1) == SHIFT_J)
+		{
 			vector<vector<unsigned>> jobs = sol.wholeJobs();
-			vector<unsigned> job = jobs[randint(0, jobs.size()-1)];
-			unsigned i = randint(1, job.size()-1);
+			vector<unsigned> job = jobs[randint(0, jobs.size() - 1)];
+			unsigned i = randint(1, job.size() - 1);
 			shiftJ(job, 0, i);
 		}
-		else{
+		else
+		{
 			vector<vector<unsigned>> machs = sol.wholeMachines();
-			vector<unsigned> mach = machs[randint(0, machs.size()-1)];
-			unsigned i = randint(1, mach.size()-1);
+			vector<unsigned> mach = machs[randint(0, machs.size() - 1)];
+			unsigned i = randint(1, mach.size() - 1);
 			shiftM(mach, 0, i);
 		}
 
@@ -242,7 +264,8 @@ class Neighborhood
 			{
 				legal = shiftJ(p, idxBegin, idxEnd);
 				value = sol.getMakespan();
-				if (value){
+				if (value)
+				{
 					Neighbor n(sol.copySolution(), value, legal);
 					neighbors.push_back(n);
 				}
@@ -271,18 +294,21 @@ class Neighborhood
 
 		return neighbors;
 	}
-
-	vector<Neighbor> shiftWhole(){
+	vector<Neighbor> shiftWhole()
+	{
 		unsigned value;
 		vector<Neighbor> neighbors;
 		vector<vector<unsigned>> machines = sol.wholeMachines(), jobs = sol.wholeJobs();
 		bool legal;
 
-		for (vector<unsigned> machine : machines){ //printv(machine, 0, "mach");
-			for(unsigned i=machine.size()-1; i>0; i--){
+		for (vector<unsigned> machine : machines)
+		{ //printv(machine, 0, "mach");
+			for (unsigned i = machine.size() - 1; i > 0; i--)
+			{
 				legal = shiftM(machine, 0, i);
 				value = sol.getMakespan();
-				if (value){
+				if (value)
+				{
 					Neighbor n(sol.copySolution(), value, legal);
 					neighbors.push_back(n);
 				}
@@ -290,11 +316,14 @@ class Neighborhood
 			}
 		}
 
-		for (vector<unsigned> job : jobs){
-			for(unsigned i=job.size()-1; i>0; i--){
+		for (vector<unsigned> job : jobs)
+		{
+			for (unsigned i = job.size() - 1; i > 0; i--)
+			{
 				legal = shiftJ(job, 0, i);
 				value = sol.getMakespan();
-				if (value){
+				if (value)
+				{
 					Neighbor n(sol.copySolution(), value, legal);
 					neighbors.push_back(n);
 				}
@@ -304,13 +333,14 @@ class Neighborhood
 
 		return neighbors;
 	}
-
-	bool legal(unsigned op1, unsigned op2){
+	bool legal(unsigned op1, unsigned op2)
+	{
 		if (CURRENT_ITER - TABU_DURATION > tabu[op1][op2] || tabu[op1][op2] == 0)
 			return true;
 		return false;
 	}
-	void traverseSwapJ(vector<Neighbor> &neighborhood, unsigned op, vector<bool> &visited){
+	void traverseSwapJ(vector<Neighbor> &neighborhood, unsigned op, vector<bool> &visited)
+	{
 		//cout << br << "traverseSwapJ(" << op << ")" << br;
 		//sol.print();
 		bool l = swapJ(op, sol.sJ[op]);
@@ -442,7 +472,6 @@ public:
 	//////// OPERADORES DE VIZINHANÇA ///////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 
-
 	bool isLast(unsigned op) { return sol.sJ[op] == DUMMY && sol.sM[op] == DUMMY; }
 	vector<Neighbor> getNeighborhood(int oper)
 	{
@@ -466,7 +495,6 @@ public:
 			break;
 		}
 	}
-
 	static Solution getNeighbor(unsigned oper, Solution &s)
 	{
 		Solution copied = s.copySolution(), selected;
@@ -474,50 +502,56 @@ public:
 		unsigned tries = 1000;
 
 		bool invalid = true;
-		while(invalid && tries > 0){
-			switch (oper){
-				case SWAP_ALL:
-					selected = n.swapAllOne();
-					n.restore();
-					break;
-				case SWAP_CRITICAL:
-					selected = n.swapCriticalOne();
-					n.restore();
-					break;
-				case SWAP_CRITICAL_EDGE:
-					selected = n.swapCriticalEdgeOne();
-					n.restore();
-					break;
-				case SHIFT_CRITICAL:
-					selected = n.shiftCriticalOne();
-					n.restore();
-					break;
-				case SHIFT_WHOLE:
-					selected = n.shiftWholeOne();
-					n.restore();
-					break;
-				default:
-					break;
-				}
+		while (invalid && tries > 0)
+		{
+			switch (oper)
+			{
+			case SWAP_ALL:
+				selected = n.swapAllOne();
+				n.restore();
+				break;
+			case SWAP_CRITICAL:
+				selected = n.swapCriticalOne();
+				n.restore();
+				break;
+			case SWAP_CRITICAL_EDGE:
+				selected = n.swapCriticalEdgeOne();
+				n.restore();
+				break;
+			case SHIFT_CRITICAL:
+				selected = n.shiftCriticalOne();
+				n.restore();
+				break;
+			case SHIFT_WHOLE:
+				selected = n.shiftWholeOne();
+				n.restore();
+				break;
+			default:
+				break;
+			}
 			//selected.print();
 			invalid = (selected.getMakespan() == 0);
 			tries--;
 		}
-		if(invalid) return n.getSolution();
+		if (invalid)
+			return n.getSolution();
 		return selected;
 	}
-
 	Solution getSolution() { return sol; }
-
-	bool swapJ(unsigned op1, unsigned op2){ //cout << br << "swapJ(" << op1 << "," << op2 << ")" << br;
+	bool swapJ(unsigned op1, unsigned op2)
+	{
+		if (TRACK_OPERATIONS)
+			cout << br << "swapJ(" << op1 << "," << op2 << ")" << br;
 		assert(op1 > 0);
 		assert(op2 > 0);
-		assert(op1 != op2); //printl("op1 j",sol.instance.o_job[op1]);printl("op2 j",sol.instance.o_job[op2]);
+		assert(op1 != op2);
 		assert(sol.adjJob(op1, op2));
+
+		if (op1 == sol.first || op2 == sol.first)
+			return false;
 
 		if (op1 == sol.first)
 			sol.first = op2;
-		//if(op2 == sol.tsirf) sol.tsirf = op1;
 
 		if (sol.sJ[op2] == op1)
 		{
@@ -541,6 +575,8 @@ public:
 		//sol.validSchedule();
 		sol.calcMakespan();
 		//sol.print();
+		if (SAVE_GRAPHS)
+			sol.printJobCluster();
 		if (legal(op1, op2))
 		{
 			tabu[op1][op2] = CURRENT_ITER;
@@ -548,15 +584,20 @@ public:
 		}
 		return false;
 	}
-	bool swapM(unsigned op1, unsigned op2){ //cout << br << "swapM(" << op1 << "," << op2 << ")" << br;
+	bool swapM(unsigned op1, unsigned op2)
+	{
+		if (TRACK_OPERATIONS)
+			cout << br << "swapM(" << op1 << "," << op2 << ")" << br;
 		assert(op1 > 0);
 		assert(op2 > 0);
-		assert(op1 != op2); //printl("op1 m",sol.instance.o_machine[op1]);printl("op2 m",sol.instance.o_machine[op2]);
+		assert(op1 != op2);
 		assert(sol.adjMach(op1, op2));
+
+		if (op1 == sol.first || op2 == sol.first)
+			return false;
 
 		if (op1 == sol.first)
 			sol.first = op2;
-		//if(op2 == sol.tsirf) sol.tsirf = op1;
 
 		if (sol.sM[op2] == op1)
 		{
@@ -580,6 +621,8 @@ public:
 		//sol.validSchedule();
 		sol.calcMakespan();
 		//sol.print();
+		if (SAVE_GRAPHS)
+			sol.printJobCluster();
 		if (legal(op1, op2))
 		{
 			tabu[op1][op2] = CURRENT_ITER;
@@ -588,6 +631,5 @@ public:
 		return false;
 	}
 };
-
 
 #endif
