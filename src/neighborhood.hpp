@@ -38,6 +38,96 @@ class Neighborhood
 	Solution sol;
 	Solution previous;
 	vector<vector<unsigned>> tabu;
+	bool swapJ(unsigned op1, unsigned op2)
+	{
+		if (TRACK_OPERATIONS)
+			cout << br << "swapJ(" << op1 << "," << op2 << ")" << br;
+		assert(op1 > 0 && op2 > 0);
+		assert(op1 != op2);
+		assert(sol.adjJob(op1, op2));
+
+		if (op1 == sol.first || op2 == sol.first)
+			return false;
+
+		if (op1 == sol.first)
+			sol.first = op2;
+
+		if (sol.sJ[op2] == op1)
+		{
+			unsigned o = op1;
+			op1 = op2;
+			op2 = o;
+		}
+
+		unsigned jp = sol.pJ[op1], js = sol.sJ[op2];
+
+		if (jp)
+			sol.sJ[jp] = op2;
+		if (js)
+			sol.pJ[js] = op1;
+
+		sol.sJ[op1] = js;
+		sol.pJ[op1] = op2;
+		sol.pJ[op2] = jp;
+		sol.sJ[op2] = op1;
+
+		//sol.validSchedule();
+		sol.calcMakespan();
+		//sol.print();
+		if (SAVE_GRAPHS)
+			sol.printJobCluster();
+		if (legal(op1, op2))
+		{
+			tabu[op1][op2] = CURRENT_ITER;
+			return true;
+		}
+		return false;
+	}
+	bool swapM(unsigned op1, unsigned op2)
+	{
+		if (TRACK_OPERATIONS)
+			cout << br << "swapM(" << op1 << "," << op2 << ")" << br;
+		assert(op1 > 0 && op2 > 0);
+		assert(op1 != op2);
+		assert(sol.adjMach(op1, op2));
+
+		if (op1 == sol.first || op2 == sol.first)
+			return false;
+
+		if (op1 == sol.first)
+			sol.first = op2;
+
+		if (sol.sM[op2] == op1)
+		{
+			unsigned o = op1;
+			op1 = op2;
+			op2 = o;
+		}
+
+		unsigned mp = sol.pM[op1], ms = sol.sM[op2];
+
+		if (mp)
+			sol.sM[mp] = op2;
+		if (ms)
+			sol.pM[ms] = op1;
+
+		sol.sM[op1] = ms;
+		sol.pM[op1] = op2;
+		sol.pM[op2] = mp;
+		sol.sM[op2] = op1;
+
+		//sol.validSchedule();
+		sol.calcMakespan();
+		//sol.print();
+		if (SAVE_GRAPHS)
+			sol.printJobCluster();
+		if (legal(op1, op2))
+		{
+			tabu[op1][op2] = CURRENT_ITER;
+			return true;
+		}
+		return false;
+	}
 
 	/////////////////////////////////////////////////////////////////////////
 	//////// GERAÇÃO DE VIZINHO /////////////////////////////////////////////
@@ -419,34 +509,17 @@ class Neighborhood
 
 		return neighborhood;
 	}
-	bool isN5EdgeJ(unsigned index1, unsigned index2, vector<unsigned> &p)
-	{
-		if (p[index1] == sol.first || p[index2 == sol.last])
-			return false;
-		if (sol.sameJob(p[index1], p[index2]) && (!sol.sameJob(p[index1], p[index1 - 1]) || !sol.sameJob(p[index2], p[index2 + 1])))
-			return true;
-		return false;
-	}
-	bool isN5EdgeM(unsigned index1, unsigned index2, vector<unsigned> &p)
-	{
-		if (p[index1] == sol.first || p[index2 == sol.last])
-			return false;
-		if (sol.sameMach(p[index1], p[index2]) && (!sol.sameMach(p[index1], p[index1 - 1]) || !sol.sameMach(p[index2], p[index2 + 1])))
-			return true;
-		return false;
-	}
 	vector<Neighbor> swapCriticalEdgeNeighbors()
 	{
 		vector<Neighbor> neighborhood;
 		vector<unsigned> p = sol.critical();
+		vector<pair<unsigned, unsigned>> jEdges = sol.getJEdgesN5(), mEdges = sol.getMEdgesN5();
 
-		for (unsigned i = 1; i < p.size() - 2; i++)
-		{
-			if (isN5EdgeJ(i, i + 1, p))
-				swapJAdd(p[i], p[i + 1], neighborhood);
-			if (isN5EdgeM(i, i + 1, p))
-				swapMAdd(p[i], p[i + 1], neighborhood);
-		}
+		for (pair<unsigned, unsigned> e : jEdges)
+			swapJAdd(e.first, e.second, neighborhood);
+
+		for (pair<unsigned, unsigned> e : mEdges)
+			swapMAdd(e.first, e.second, neighborhood);
 
 		return neighborhood;
 	}
@@ -538,98 +611,6 @@ public:
 		return selected;
 	}
 	Solution getSolution() { return sol; }
-	bool swapJ(unsigned op1, unsigned op2)
-	{
-		if (TRACK_OPERATIONS)
-			cout << br << "swapJ(" << op1 << "," << op2 << ")" << br;
-		assert(op1 > 0);
-		assert(op2 > 0);
-		assert(op1 != op2);
-		assert(sol.adjJob(op1, op2));
-
-		if (op1 == sol.first || op2 == sol.first)
-			return false;
-
-		if (op1 == sol.first)
-			sol.first = op2;
-
-		if (sol.sJ[op2] == op1)
-		{
-			unsigned o = op1;
-			op1 = op2;
-			op2 = o;
-		}
-
-		unsigned jp = sol.pJ[op1], js = sol.sJ[op2];
-
-		if (jp)
-			sol.sJ[jp] = op2;
-		if (js)
-			sol.pJ[js] = op1;
-
-		sol.sJ[op1] = js;
-		sol.pJ[op1] = op2;
-		sol.pJ[op2] = jp;
-		sol.sJ[op2] = op1;
-
-		//sol.validSchedule();
-		sol.calcMakespan();
-		//sol.print();
-		if (SAVE_GRAPHS)
-			sol.printJobCluster();
-		if (legal(op1, op2))
-		{
-			tabu[op1][op2] = CURRENT_ITER;
-			return true;
-		}
-		return false;
-	}
-	bool swapM(unsigned op1, unsigned op2)
-	{
-		if (TRACK_OPERATIONS)
-			cout << br << "swapM(" << op1 << "," << op2 << ")" << br;
-		assert(op1 > 0);
-		assert(op2 > 0);
-		assert(op1 != op2);
-		assert(sol.adjMach(op1, op2));
-
-		if (op1 == sol.first || op2 == sol.first)
-			return false;
-
-		if (op1 == sol.first)
-			sol.first = op2;
-
-		if (sol.sM[op2] == op1)
-		{
-			unsigned o = op1;
-			op1 = op2;
-			op2 = o;
-		}
-
-		unsigned mp = sol.pM[op1], ms = sol.sM[op2];
-
-		if (mp)
-			sol.sM[mp] = op2;
-		if (ms)
-			sol.pM[ms] = op1;
-
-		sol.sM[op1] = ms;
-		sol.pM[op1] = op2;
-		sol.pM[op2] = mp;
-		sol.sM[op2] = op1;
-
-		//sol.validSchedule();
-		sol.calcMakespan();
-		//sol.print();
-		if (SAVE_GRAPHS)
-			sol.printJobCluster();
-		if (legal(op1, op2))
-		{
-			tabu[op1][op2] = CURRENT_ITER;
-			return true;
-		}
-		return false;
-	}
 };
 
 #endif

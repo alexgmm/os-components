@@ -72,10 +72,7 @@ void saveGraph(string graph)
 	out << graph;
 	out.close();
 }
-void oi() { cout << br << "*** checkpoint *** " << br; }
 
-vector<string> jobNode = {"aliceblue", "blue", "blueviolet", "cadetblue", "cornflowerblue", "darkslateblue", "deepskyblue", "dodgerblue", "indigo", "lightblue", "navy", "powderblue", "royalblue", "steelblue", "midnightblue", "mediumblue", "mediumslateblue", "navyblue", "slateblue", "mediumslateblue"},
-			   machNode = {"coral", "crimson", "darksalmon", "deeppink", "firebrick", "hotpink", "indianred", "lightpink", "lightsalmon", "maroon", "mediumvioletred", "orangered", "palevioletred", "pink", "red", "salmon", "tomato", "violetred", "orange", "darkorange"};
 fstream nextGraph()
 {
 	fstream g("/home/hal/os-components/graphs/" + to_string(CURRENT_GRAPH_NUMBER++));
@@ -101,7 +98,11 @@ vector<string> nameInit = {"ran", "grm", "grj"};
 vector<string> nameHeur = {"SA", "IG", "TS"};
 vector<string> nameOper = {"swAll", "swCritical", "swEdges", "shWhole"};
 
-void c() { cout << br << "checkpoint" << br; }
+/////////////////////////////////////////////////////////////////////////
+////////////////////////////// DEBUG ////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
+
+void c() { cout << br << "*** checkpoint ***" << br; }
 
 int randint(int ini, int end)
 {

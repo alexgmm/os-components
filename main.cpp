@@ -19,7 +19,7 @@ unsigned op(unsigned j, unsigned m)
 	return (j - 1) * 4 + m;
 }
 
-string t = "test2";
+string t = "tests/test2";
 string g = "inst/gueret-prins/GP03-02.txt";
 string t4 = "inst/taillard/tai04_04_01.txt";
 string t5 = "inst/taillard/tai05_05_01.txt";
@@ -54,20 +54,27 @@ int main(int argc, char **argv)
 		Heuristics h(s);
 		cout << h.solve(TS, SWAP_CRITICAL) << br;
 	}*/
-	/* SAVE_GRAPHS = true;
-	TRACK_OPERATIONS = true; */
+	SAVE_GRAPHS = true;
+	TRACK_OPERATIONS = true;
 	test();
 	return 0;
 }
 
 void test()
 {
-	Instance i(t4);
-	Solution s(i, GREEDY_MACHINES);
-	cout << s.calcMakespan() << br;
-	//s.printJobCluster();
+	Instance i(t);
+	Solution s(i, RANDOM);
+	int initialMakespan = s.calcMakespan();
+	cout << initialMakespan << br;
+	s.printJobCluster();
+
+	/* Neighborhood n(s);
+	vector<Neighbor> vi = n.getNeighborhood(SWAP_CRITICAL_EDGE);
+	for (Neighbor v : vi)
+		cout << v.getSolution().getMakespan() << br; */
+
 	Heuristics h(s);
-	cout << h.solve(TS, SWAP_CRITICAL_EDGE) << br;
+	cout << h.solve(SA, SWAP_CRITICAL_EDGE) << br;
 	/* for (int i = 0; i < 10; i++)
 	{
 		vector<unsigned> v(10);

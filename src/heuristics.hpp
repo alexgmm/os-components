@@ -2,9 +2,10 @@
 #define HEURISTICS_HPP
 
 unsigned N_ITER_TS = 499;
-unsigned N_ITER_SA = 404;
-double ALPHA = 0.0777;
-double T_MIN = 0.0009;
+unsigned N_ITER_SA = 50; //404;
+unsigned N_ITER = 200;
+double ALPHA = 0.001;  // 0.0777;
+double T_MIN = 0.0001; //0.0009;
 
 #define BEST_IMPROVEMENT 0
 #define FIRST_IMPROVEMENT 1
@@ -108,6 +109,29 @@ public:
         default:
             break;
         }
+    }
+
+    unsigned ls()
+    {
+        unsigned global = solution.getMakespan(), mlocal;
+        Solution local = solution;
+        for (unsigned i = 0; i < N_ITER; i++)
+        {
+            mlocal = UMAX;
+            Neighborhood n(local);
+            vector<Neighbor> vi = n.getNeighborhood(SWAP_CRITICAL_EDGE);
+            for (Neighbor v : vi)
+            {
+                if (mlocal > v.getSolution().getMakespan())
+                {
+                    mlocal = v.getSolution().getMakespan();
+                    local = v.getSolution();
+                }
+            }
+            global = min(global, mlocal);
+        }
+
+        return global;
     }
 };
 

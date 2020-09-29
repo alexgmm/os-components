@@ -1,10 +1,6 @@
 #ifndef SOLUTION_HPP
 #define SOLUTION_HPP
 
-#include <iostream>
-#include <vector>
-#include <utility>
-#include <assert.h>
 #include "utilities.hpp"
 #include "instance.hpp"
 
@@ -12,6 +8,7 @@ using namespace std;
 
 class Solution
 {
+public:
 	vector<unsigned> sJ, pJ, sM, pM;
 	unsigned nM, nJ, nO, last, first;
 	int makespan = 0;
@@ -191,6 +188,36 @@ class Solution
 				jobs.push_back(block);
 		}
 		return jobs;
+	}
+	bool isJEdgeN5(unsigned i1, unsigned i2, vector<unsigned> &p)
+	{
+		if (sameJob(p[i1], p[i2]) && (!sameJob(p[i2], p[i2 + 1]) || !sameJob(p[i1 - 1], p[i1])))
+			return true;
+		return false;
+	}
+	bool isMEdgeN5(unsigned i1, unsigned i2, vector<unsigned> &p)
+	{
+		if (sameMach(p[i1], p[i2]) && (!sameMach(p[i2], p[i2 + 1]) || !sameMach(p[i1 - 1], p[i1])))
+			return true;
+		return false;
+	}
+	vector<pair<unsigned, unsigned>> getJEdgesN5()
+	{
+		vector<pair<unsigned, unsigned>> edges;
+		vector<unsigned> p = critical();
+		for (unsigned i = 1; i < p.size() - 2; i++)
+			if (isJEdgeN5(i, i + 1, p))
+				edges.push_back(make_pair(p[i], p[i + 1]));
+		return edges;
+	}
+	vector<pair<unsigned, unsigned>> getMEdgesN5()
+	{
+		vector<pair<unsigned, unsigned>> edges;
+		vector<unsigned> p = critical();
+		for (unsigned i = 1; i < p.size() - 2; i++)
+			if (isMEdgeN5(i, i + 1, p))
+				edges.push_back(make_pair(p[i], p[i + 1]));
+		return edges;
 	}
 
 	/////////////////////////////////////////////////////////////////////////
@@ -497,7 +524,6 @@ class Solution
 		return late_pred;
 	}
 
-public:
 	/////////////////////////////////////////////////////////////////////////
 	//////// DEBUG //////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
@@ -607,12 +633,6 @@ public:
 	void printClusterGraph()
 	{
 		printClusterGraph(false, false);
-	}
-	string edgeColor(unsigned op1, unsigned op2)
-	{
-		if (sameJob(op1, op2))
-			return jobNode[instance.o_job[op1] - 1];
-		return machNode[instance.o_machine[op1] - 1];
 	}
 
 	/////////////////////////////////////////////////////////////////////////
