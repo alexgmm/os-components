@@ -466,9 +466,9 @@ public:
 	Printer makePrinter()
 	{
 		Printer p(sJ, sM);
-		p.setInstanceData(nO, instance.cost);
-		p.setStarters(starters(sJ), starters(sM));
-		p.setSolutionData(first, calcMakespan(), critical());
+		p.setInstanceData(nO, instance.cost, instance.o_job, instance.o_machine);
+		p.setStarters(starters(sJ), starters(pM));
+		p.setSolutionData(first, calcMakespan(), critical(), getHeads());
 		return p;
 	}
 	void printMachCluster()
@@ -478,6 +478,10 @@ public:
 	void printJobCluster()
 	{
 		makePrinter().printJobCluster();
+	}
+	void printGantt()
+	{
+		makePrinter().printGantt();
 	}
 
 	/////////////////////////////////////////////////////////////////////////

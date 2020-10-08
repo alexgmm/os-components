@@ -21,12 +21,6 @@ void fillVecRandom(vector<unsigned> &v)
 	shuffle(begin(v) + 1, end(v), mersenne_engine);
 }
 
-fstream nextGraph()
-{
-	fstream g("/home/hal/os-components/graphs/" + to_string(CURRENT_GRAPH_NUMBER++));
-	return g;
-}
-
 vector<string> fileNames()
 {
 	vector<string> path = {"inst/taillard/", "inst/brucker/", "inst/gueret-prins/"};

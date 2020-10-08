@@ -2,10 +2,10 @@
 #define HEURISTICS_HPP
 
 unsigned N_ITER_TS = 499;
-unsigned N_ITER_SA = 404;
+unsigned N_ITER_SA = 1;
 unsigned N_ITER = 20;
-double ALPHA = 0.001;  // 0.0777;
-double T_MIN = 0.0001; //0.0009;
+double ALPHA = 0.9;  // 0.0777;
+double T_MIN = 0.01; //0.0009;
 
 #define BEST_IMPROVEMENT 0
 #define FIRST_IMPROVEMENT 1

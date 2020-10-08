@@ -53,8 +53,8 @@ void test()
 	Solution s(i, RANDOM);
 	int initialMakespan = s.calcMakespan();
 	cout << initialMakespan;
-	//s.printJobCluster();
-
+	s.printJobCluster();
+	s.printGantt();
 	Heuristics h(s);
-	cout << " " << h.solve(TS, SWAP_ALL) << br;
+	cout << " " << h.solve(SA, SWAP_CRITICAL_EDGE) << br;
 }

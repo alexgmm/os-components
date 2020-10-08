@@ -1,5 +1,8 @@
 #pragma once
 
+#include <bits/stdc++.h>
+#include <string.h>
+
 #include "solution.hpp"
 
 using namespace std;
@@ -7,7 +10,7 @@ using namespace std;
 class Printer
 {
     unsigned first, makespan, nO;
-    vector<unsigned> sJ, sM, critical, machStarters, jobStarters, cost;
+    vector<unsigned> sJ, sM, critical, machStarters, jobStarters, cost, heads, operationToJob, operationToMach;
     string label(unsigned o)
     {
         vector<unsigned> p = critical;
@@ -28,6 +31,7 @@ class Printer
     }
     string printClusterGraph(bool printJob, bool printMach)
     {
+        printGantt();
         unsigned o;
         string graph = "digraph G {\n";
 
@@ -81,6 +85,35 @@ class Printer
         graph += "\n}";
         return graph;
     }
+    string getOperationLabel(unsigned &o)
+    {
+        string operationLabel = to_string(o) + " " + to_string(heads[o]) + " " + to_string(cost[o]) + " " + to_string(operationToJob[o]) + " " + to_string(operationToMach[o]);
+        o = sM[o];
+        if (o > 0)
+            operationLabel += ",";
+        return operationLabel;
+    }
+    string getGannt(string label)
+    {
+        string gantt = label + "." + to_string(makespan) + ".";
+        unsigned o;
+        for (unsigned o : machStarters)
+        {
+            do
+                gantt += getOperationLabel(o);
+            while (o > 0);
+            gantt += ",";
+        }
+        gantt = gantt.substr(0, gantt.size() - 1);
+        gantt = "\"" + gantt + "\"";
+        return gantt;
+    }
+    void saveGantt()
+    {
+        string command = "python3 gantt.py " + getGannt(to_string(CURRENT_GRAPH_NUMBER));
+        //cout << command << br;
+        system(command.c_str());
+    }
 
 public:
     Printer() {}
@@ -90,29 +123,38 @@ public:
         jobStarters = jS;
         machStarters = mS;
     }
-    void setInstanceData(unsigned numberO, vector<unsigned> opCost)
+    void setInstanceData(unsigned numberO, vector<unsigned> opCost, vector<unsigned> oJ, vector<unsigned> oM)
     {
         nO = numberO;
         cost = opCost;
+        operationToJob = oJ;
+        operationToMach = oM;
     }
-    void setSolutionData(unsigned f, unsigned m, vector<unsigned> c)
+    void setSolutionData(unsigned f, unsigned m, vector<unsigned> c, vector<unsigned> h)
     {
         first = f;
         makespan = m;
         critical = c;
+        heads = h;
     }
     void printMachCluster()
     {
-        //printSchedule();
-        cout << br << "saving m-graph number " << CURRENT_GRAPH_NUMBER << br;
+        cout << endl
+             << "saving m-graph number " << CURRENT_GRAPH_NUMBER << endl;
         string graph = printClusterGraph(false, true);
         saveGraph(graph);
     }
     void printJobCluster()
     {
-        //printSchedule();
-        cout << br << "saving j-graph number " << CURRENT_GRAPH_NUMBER << br;
+        cout << endl
+             << "saving j-graph number " << CURRENT_GRAPH_NUMBER << endl;
         string graph = printClusterGraph(true, false);
         saveGraph(graph);
+    }
+    void printGantt()
+    {
+        cout << endl
+             << "saving gantt chart number " << CURRENT_GRAPH_NUMBER << endl;
+        saveGantt();
     }
 };

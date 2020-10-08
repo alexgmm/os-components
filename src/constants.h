@@ -42,5 +42,6 @@ unsigned CURRENT_ITER;
 unsigned CURRENT_GRAPH_NUMBER = 1;
 
 bool SAVE_GRAPHS = false;
+bool SAVE_CHARTS = false;
 bool TRACK_OPERATIONS = false;
 unsigned VERBOSE = false;
