@@ -1,50 +1,6 @@
 #ifndef UTILITIES_HPP
 #define UTILITIES_HPP
 
-#define INVALID 0
-#define RANDOM 0
-#define GREEDY_MACHINES 1
-#define GREEDY_JOBS 2
-#define TEST 3
-#define DUMMY (0)
-#define br "\n"
-#define tb "  "
-#define sp " "
-#define SA 0
-#define IG 1
-#define TS 2
-#define UMAX 4294967295
-
-#define BLOCK_J 0
-#define BLOCK_M 1
-
-#define SWAP_J 0
-#define SWAP_M 1
-#define SHIFT_J 0
-#define SHIFT_M 1
-
-#define SWAP_ALL 0
-#define SWAP_CRITICAL 1
-#define SWAP_CRITICAL_EDGE 2
-#define SHIFT_CRITICAL 4
-#define SHIFT_WHOLE 3
-
-#define SWAP_PRED 0
-#define SWAP_SUCC 1
-
-#define BLOCK_START 0
-#define BLOCK_END 1
-
-#define SWAP 0
-#define SHIFT 1
-unsigned TABU_DURATION = 5;
-
-unsigned CURRENT_ITER;
-unsigned CURRENT_GRAPH_NUMBER = 1;
-
-bool SAVE_GRAPHS = false;
-bool TRACK_OPERATIONS = false;
-
 #include <utility>
 #include <fstream>
 #include <numeric>	 //iota
@@ -52,6 +8,8 @@ bool TRACK_OPERATIONS = false;
 #include <random>
 #include <iterator>
 #include <functional>
+
+#include "constants.h"
 
 using namespace std;
 
@@ -61,16 +19,6 @@ void fillVecRandom(vector<unsigned> &v)
 	mt19937 mersenne_engine{rnd_device()};
 	iota(v.begin() + 1, v.end(), 1);
 	shuffle(begin(v) + 1, end(v), mersenne_engine);
-}
-
-void saveGraph(string graph)
-{
-	string filename = "/home/hal/os-components/graphs/" + to_string(CURRENT_GRAPH_NUMBER++) + ".gv";
-	remove(filename.c_str());
-	fstream out(filename, ios::trunc);
-	out.open(filename, ios::out);
-	out << graph;
-	out.close();
 }
 
 fstream nextGraph()

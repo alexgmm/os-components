@@ -3,6 +3,7 @@
 
 #include "utilities.hpp"
 #include "instance.hpp"
+#include "printer.hpp"
 
 using namespace std;
 
@@ -13,7 +14,7 @@ public:
 	unsigned nM, nJ, nO, last, first;
 	int makespan = 0;
 	Instance instance;
-	bool partial;
+	bool partial = false;
 
 	void error(string e)
 	{
@@ -72,7 +73,7 @@ public:
 	vector<unsigned> critical()
 	{
 		assert(last <= nO);
-		vector<unsigned> late_pred = getLatestPred(), p;
+		vector<unsigned> heads = getHeads(), late_pred = getLatestPred(heads), p;
 		unsigned op = last;
 
 		while (op > 0)
@@ -226,12 +227,12 @@ public:
 
 	void initRandom()
 	{
-		vector<unsigned> j_ord(nJ + 1, 0),
-			m_ord(nM + 1, 0);
+		vector<unsigned> oJ(nJ + 1, 0),
+			oM(nM + 1, 0);
 
-		fillVecRandom(j_ord); //printv(j_ord, 1, "Ordem randomizada - jobs");
-		fillVecRandom(m_ord); //printv(m_ord, 1, "Ordem randomizada - machines");
-		fillOrd(j_ord, m_ord);
+		fillVecRandom(oJ); //printv(oJ, 1, "Ordem randomizada - jobs");
+		fillVecRandom(oM); //printv(oM, 1, "Ordem randomizada - machines");
+		fillOrd(oJ, oM);
 	}
 	void evaluateResult(unsigned &tM, unsigned &bM, unsigned &tV, unsigned &bV)
 	{ //testMakespan, bestMakespan, testValue, bestValue
@@ -309,7 +310,7 @@ public:
 				fillJobSlot(oJ, oM, testJob, jobSlot);
 				first = op(testJob, oM[1]);
 				//printPartial();
-				tempMakespan = calcMakespanPartial();
+				tempMakespan = computePartialMakespan();
 				//cout << tb << tb << "found " << tempMakespan << br;
 				evaluateResult(tempMakespan, bestMakespan, testJob, bestJob);
 				resetJobSlot(oM, testJob);
@@ -351,7 +352,7 @@ public:
 
 				first = op(oJ[1], testMach);
 				//printPartial();
-				tempMakespan = calcMakespanPartial();
+				tempMakespan = computePartialMakespan();
 				//cout << tb << tb << "found " << tempMakespan << br;
 
 				evaluateResult(tempMakespan, bestMakespan, testMach, bestMach);
@@ -428,6 +429,55 @@ public:
 			break;
 		}
 		makespan = calcMakespan();
+	}
+
+	/////////////////////////////////////////////////////////////////////////
+	//////// DEBUG //////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////
+
+	void validOp(unsigned op)
+	{
+		if (!partial)
+			assert(op <= nJ * nJ && op <= nM * nM);
+		assert(op > 0);
+	}
+	void print()
+	{
+		cout << br << "======================================" << br;
+		if (VERBOSE)
+			printJobCluster();
+		printSchedule();
+		vector<unsigned> p = critical();
+		printv(p, 0, "critical path");
+		printl("first", first);
+		printl("last", last);
+		printl("makespan", getMakespan());
+		cout << br << "======================================" << br;
+	}
+	void printSchedule()
+	{
+		int ini = 1;
+		printv(sJ, ini, "Sucessores nos jobs:");
+		printv(pJ, ini, "Predecessores nos jobs:");
+		printv(sM, ini, "Sucessores nas maquinas:");
+		printv(pM, ini, "Predecessores nas maquinas:");
+		//printv(instance.cost, 1, "custo");
+	}
+	Printer makePrinter()
+	{
+		Printer p(sJ, sM);
+		p.setInstanceData(nO, instance.cost);
+		p.setStarters(starters(sJ), starters(sM));
+		p.setSolutionData(first, calcMakespan(), critical());
+		return p;
+	}
+	void printMachCluster()
+	{
+		makePrinter().printMachCluster();
+	}
+	void printJobCluster()
+	{
+		makePrinter().printJobCluster();
 	}
 
 	/////////////////////////////////////////////////////////////////////////
@@ -510,10 +560,9 @@ public:
 		vector<unsigned> queue(nO), deg(nO + 1, 0);
 		return getHeads(deg, queue, pushed);
 	}
-	vector<unsigned> getLatestPred()
+	vector<unsigned> getLatestPred(vector<unsigned> &heads)
 	{
-		vector<unsigned> late_pred(nO + 1, 0), heads = getHeads();
-		//assert(heads.size() == nO + 1);
+		vector<unsigned> late_pred(nO + 1, 0);
 		for (int i = 1; i <= nO; i++)
 		{
 			if (heads[pM[i]] + instance.cost[pM[i]] > heads[pJ[i]] + instance.cost[pJ[i]])
@@ -522,117 +571,6 @@ public:
 				late_pred[i] = pJ[i];
 		}
 		return late_pred;
-	}
-
-	/////////////////////////////////////////////////////////////////////////
-	//////// DEBUG //////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////
-
-	void validOp(unsigned op)
-	{
-		if (!partial)
-			assert(op <= nJ * nJ && op <= nM * nM);
-		assert(op > 0);
-	}
-	void print()
-	{
-		cout << br << "======================================" << br;
-		printSchedule();
-		printl("first", first);
-		printl("last", last);
-		printl("makespan", getMakespan());
-		//printGraph();
-		cout << br << "======================================" << br;
-	}
-	void printSchedule()
-	{
-		int ini = 1;
-		printv(sJ, ini, "Sucessores nos jobs:");
-		printv(pJ, ini, "Predecessores nos jobs:");
-		printv(sM, ini, "Sucessores nas maquinas:");
-		printv(pM, ini, "Predecessores nas maquinas:");
-		//printv(instance.cost, 1, "custo");
-	}
-	string label(unsigned o)
-	{
-		validOp(o);
-		vector<unsigned> p = critical();
-		string color = count(p.begin(), p.end(), o) && o != first ? "style=filled;color=chartreuse3;" : "";
-		return to_string(o) + "[" + color + "label=\"" +
-			   to_string(o) + "(" +
-			   to_string(instance.cost[o]) +
-			   ")\"];\n";
-	}
-	string printClusterGraph(bool printJob, bool printMach)
-	{
-		vector<unsigned> machStarters = starters(pM), jobStarters = starters(pJ), p = critical();
-		unsigned o, m = calcMakespan();
-		string graph = "digraph G {\n";
-
-		graph += to_string(first) + "[style=filled,color=green];\nrankdir=LR;\n";
-		graph += to_string(m) + "[color=yellow, style=filled, shape=box, label=\"makespan: " + to_string(m) + "\"];\n";
-
-		for (int i = 0; i < machStarters.size(); i++)
-		{
-			if (printMach)
-				graph += "\tsubgraph cluster" + to_string(i + 1) + "{\n\t\tcolor=blue;\n\t\t";
-
-			o = machStarters[i];
-			graph += to_string(o);
-			o = sM[o];
-			while (o != 0)
-			{
-				graph += "->" + to_string(o);
-				o = sM[o];
-			}
-			graph += ";\n\t\t";
-
-			if (printMach)
-				graph += " label = \"mach" + to_string(i) + "\";\n\t}\n";
-		}
-
-		for (int i = 0; i < jobStarters.size(); i++)
-		{
-			if (printJob)
-				graph += "\tsubgraph cluster" + to_string(i + 1) + "{\n\t\tcolor=red;\n\t\t";
-
-			o = jobStarters[i];
-			graph += to_string(o);
-			o = sJ[o];
-			while (o != 0)
-			{
-				graph += "->" + to_string(o);
-				o = sJ[o];
-			}
-			graph += ";\n\t\t";
-
-			if (printJob)
-				graph += " label = \"job" + to_string(i) + "\";\n\t}\n";
-		}
-
-		for (int o = 1; o <= nO; o++)
-			graph += label(o);
-
-		graph += "\n}";
-		return graph;
-	}
-	void printMachCluster()
-	{
-		//printSchedule();
-		cout << br << "saving m-graph number " << CURRENT_GRAPH_NUMBER << br;
-		string graph = printClusterGraph(false, true);
-		saveGraph(graph);
-	}
-	void printJobCluster()
-	{
-		//printSchedule();
-		cout << br << "saving j-graph number " << CURRENT_GRAPH_NUMBER << br;
-		string graph = printClusterGraph(true, false);
-		saveGraph(graph);
-	}
-	void printClusterGraph()
-	{
-		printClusterGraph(false, false);
 	}
 
 	/////////////////////////////////////////////////////////////////////////
@@ -645,7 +583,6 @@ public:
 		instance = i;
 		last = 0;
 		makespan = 0;
-		partial = false;
 		nO = instance.n_ops;
 		nJ = instance.n_jobs;
 		nM = instance.n_machines;
@@ -655,14 +592,14 @@ public:
 		pM.resize(nO + 1, 0);
 		init(init_method);
 	}
-	int calcMakespanPartial()
+	int computePartialMakespan()
 	{
 		makespan = 0;
 		unsigned temp_makespan = 0, op, lookat = 0, pushed = 0;
 		vector<unsigned> queue(nO),
 			deg(nO + 1, 0),
 			heads = getHeads(deg, queue, pushed);
-		vector<unsigned> latePred = getLatestPred();
+		vector<unsigned> latePred = getLatestPred(heads);
 
 		while (lookat < pushed)
 		{
@@ -703,7 +640,7 @@ public:
 		if (heads.size() == 0)
 			return 0;
 
-		vector<unsigned> latePred = getLatestPred(); // latest predecessors AKA prev
+		vector<unsigned> latePred = getLatestPred(heads); // latest predecessors AKA prev
 
 		//printv(deg, 0, "deg"); printv(heads,1,"heads"); printv(latePred,1,"prev");
 		while (lookat < pushed)
@@ -749,7 +686,7 @@ public:
 		s.makespan = calcMakespan();
 		return s;
 	}
-	int getMakespan() { return partial ? calcMakespanPartial() : calcMakespan(); }
+	int getMakespan() { return partial ? computePartialMakespan() : calcMakespan(); }
 	friend class Heuristics;
 	friend class Neighbor;
 	friend class Neighborhood;

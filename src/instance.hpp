@@ -74,6 +74,7 @@ public:
 	friend class Solution;
 	friend class Heuristics;
 	friend class Neighborhood;
+	friend class Printer;
 };
 
 #endif

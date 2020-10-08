@@ -2,13 +2,29 @@
 #define TESTS_HPP
 #define NLOOPS 20
 
-#include <iostream>
-#include <vector>
 #include <fstream>
 #include "heuristics.hpp"
 #include "utilities.hpp"
 
 using namespace std;
+
+void printAverageExecutionTime(int heuristic, int op)
+{
+	float avg = 0;
+	vector<string> names = fileNames();
+
+	for (string name : names)
+	{
+		startTimeCounting();
+		Instance i(name);
+		Solution s(i, GREEDY_JOBS);
+		Heuristics h(s);
+		h.solve(heuristic, op);
+		avg += getElapsedTime();
+	}
+	avg /= 1000; // transforma a média para segundos
+	cout << avg / names.size() << br;
+}
 
 float testInit(string file, unsigned init)
 {

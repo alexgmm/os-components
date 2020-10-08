@@ -2,8 +2,8 @@
 #define HEURISTICS_HPP
 
 unsigned N_ITER_TS = 499;
-unsigned N_ITER_SA = 50; //404;
-unsigned N_ITER = 200;
+unsigned N_ITER_SA = 404;
+unsigned N_ITER = 20;
 double ALPHA = 0.001;  // 0.0777;
 double T_MIN = 0.0001; //0.0009;
 
@@ -14,6 +14,7 @@ unsigned SELECTION_CRITERIA = BEST_IMPROVEMENT;
 
 #include "neighborhood.hpp"
 #include "utilities.hpp"
+#include "time.hpp"
 #include <math.h>
 #include <cmath>
 
@@ -39,25 +40,25 @@ class Heuristics
         int tempMakespan;
         assert(makespan > 0);
         double t = 1;
+        bool shouldStop = false;
         Solution tempS;
-        while (t > T_MIN)
+        while (t > T_MIN && !shouldStop)
         {
-            for (unsigned i = 0; i < N_ITER_SA; i++)
+            for (unsigned i = 0; i < N_ITER_SA && !shouldStop; i++)
             {
                 tempMakespan = -1;
                 while (tempMakespan <= 0)
                 {
                     tempS = Neighborhood::getNeighbor(oper, solution);
                     tempMakespan = tempS.calcMakespan();
-                    //tempS.print();
                 }
-                //if(tempMakespan <= 193) exit(0);
                 if (tempMakespan < makespan || accept(t, tempMakespan, makespan))
                 {
-                    /* cout << br << makespan << br; */
                     solution = tempS.copySolution();
                     makespan = tempMakespan;
                 }
+
+                shouldStop = isTimeOver();
             }
             t *= ALPHA;
         }

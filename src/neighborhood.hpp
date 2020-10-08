@@ -73,7 +73,8 @@ class Neighborhood
 
 		//sol.validSchedule();
 		sol.calcMakespan();
-		//sol.print();
+		if (VERBOSE)
+			sol.print();
 		if (SAVE_GRAPHS)
 			sol.printJobCluster();
 		if (legal(op1, op2))
@@ -118,7 +119,8 @@ class Neighborhood
 
 		//sol.validSchedule();
 		sol.calcMakespan();
-		//sol.print();
+		if (VERBOSE)
+			sol.print();
 		if (SAVE_GRAPHS)
 			sol.printJobCluster();
 		if (legal(op1, op2))
