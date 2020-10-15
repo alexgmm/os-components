@@ -38,10 +38,13 @@
 #define SHIFT 1
 unsigned TABU_DURATION = 5;
 
-unsigned CURRENT_ITER;
-unsigned CURRENT_GRAPH_NUMBER = 1;
+#define BEST_IMPROVEMENT 0
+#define FIRST_IMPROVEMENT 1
+#define RANDOM_SOLUTION 2
+unsigned SELECTION_CRITERIA = BEST_IMPROVEMENT;
 
-bool SAVE_GRAPHS = false;
-bool SAVE_CHARTS = false;
-bool TRACK_OPERATIONS = false;
+unsigned CURRENT_ITER;
+
+bool TRACK_SWAP_OPERATIONS = false;
+bool TRACK_SHIFT_OPERATIONS = false;
 unsigned VERBOSE = false;

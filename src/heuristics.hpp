@@ -1,16 +1,7 @@
 #ifndef HEURISTICS_HPP
 #define HEURISTICS_HPP
 
-unsigned N_ITER_TS = 499;
-unsigned N_ITER_SA = 1;
 unsigned N_ITER = 20;
-double ALPHA = 0.9;  // 0.0777;
-double T_MIN = 0.01; //0.0009;
-
-#define BEST_IMPROVEMENT 0
-#define FIRST_IMPROVEMENT 1
-#define RANDOM_SOLUTION 2
-unsigned SELECTION_CRITERIA = BEST_IMPROVEMENT;
 
 #include "neighborhood.hpp"
 #include "utilities.hpp"
@@ -32,11 +23,12 @@ bool accept(double t, unsigned v_new, unsigned v_old) { return (rand() / (double
 class Heuristics
 {
     Solution solution;
+    unsigned N_ITER_SA, N_ITER_TS, ALPHA, T_MIN;
 
     unsigned sa(unsigned oper)
     {
         //solution.print();
-        unsigned makespan = solution.calcMakespan();
+        unsigned makespan = solution.computeMakespan();
         int tempMakespan;
         assert(makespan > 0);
         double t = 1;
@@ -50,7 +42,7 @@ class Heuristics
                 while (tempMakespan <= 0)
                 {
                     tempS = Neighborhood::getNeighbor(oper, solution);
-                    tempMakespan = tempS.calcMakespan();
+                    tempMakespan = tempS.computeMakespan();
                 }
                 if (tempMakespan < makespan || accept(t, tempMakespan, makespan))
                 {
@@ -92,16 +84,38 @@ class Heuristics
 
         return incumbent.getMakespan();
     }
+    void setSimulatedAnnealingDefaultParams(unsigned oper)
+    {
+        switch (oper)
+        {
+        case SWAP_CRITICAL_EDGE:
+            setSimulatedAnnealingParams(0.3772, 0.0006, 5857);
+            break;
+        case SWAP_CRITICAL:
+            setSimulatedAnnealingParams(0.2232, 0.0006, 7631);
+            break;
+        default:
+            break;
+        }
+    }
 
 public:
     Heuristics() {}
     Heuristics(Solution s) : solution(s) {}
+    void setSimulatedAnnealingParams(unsigned alpha, unsigned temp, unsigned iter)
+    {
+        ALPHA = alpha;
+        T_MIN = temp;
+        N_ITER_SA = iter;
+    }
+
     Solution getSolution() { return solution; }
     unsigned solve(unsigned h, unsigned oper)
     {
         switch (h)
         {
         case SA:
+            setSimulatedAnnealingDefaultParams(oper);
             return sa(oper);
         case IG:
             return ig(oper);
@@ -135,5 +149,19 @@ public:
         return global;
     }
 };
+
+/* old
+414  --i 2997 --a 0.7047 --t 0.0003
+292  --i 2583 --a 0.6949 --t 0.0003
+222  --i 804 --a 0.6575 --t 0.0002 */
+
+/* 911   --i 5857 --a 0.3772 --t 0.0006
+598   --i 5323 --a 0.3391 --t 0.0005
+1588  --i 5014 --a 0.364 --t 0.0005
+ */
+
+/* 1019  --i 7631 --a 0.2232 --t 0.0006
+606   --i 5022 --a 0.718 --t 0.0009
+993   --i 6260 --a 0.8916 --t 0.0008 */
 
 #endif

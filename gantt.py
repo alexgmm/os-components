@@ -31,3 +31,4 @@ for mach in machines:
     printOperation(mach)
 
 plt.savefig(f"graphs/{filename}g.jpg") 
+

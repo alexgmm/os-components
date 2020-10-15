@@ -84,14 +84,15 @@ public:
 		reverse(p.begin(), p.end());
 		return p;
 	}
-	void blocksJ(vector<unsigned> &begins, vector<unsigned> &ends)
+	void blocks(vector<unsigned> &begins, vector<unsigned> &ends, unsigned blockType)
 	{
 		vector<unsigned> p = critical(), blocksBegins, blocksEnds;
 		assert(p.size() > 0);
 		blocksBegins.push_back(0);
 		for (unsigned i = 1; i < p.size(); i++)
 		{
-			if (!sameJob(p[i], p[i - 1]))
+			bool sameCluster = (blockType == BLOCK_J) ? sameJob(p[i], p[i - 1]) : sameMach(p[i], p[i - 1]);
+			if (!sameCluster)
 			{
 				if (p[i] == first)
 					blocksBegins.push_back(i + 1);
@@ -111,32 +112,10 @@ public:
 			}
 		}
 	}
-	void blocksM(vector<unsigned> &begins, vector<unsigned> &ends)
+	unsigned randomBlock(unsigned blockType, vector<unsigned> &begins, vector<unsigned> &ends)
 	{
-		vector<unsigned> p = critical(), blocksBegins, blocksEnds;
-		assert(p.size() > 0);
-		blocksBegins.push_back(0);
-		for (unsigned i = 1; i < p.size(); i++)
-		{
-			if (!sameMach(p[i], p[i - 1]))
-			{
-				if (p[i] == first)
-					blocksBegins.push_back(i + 1);
-				else
-					blocksBegins.push_back(i);
-				blocksEnds.push_back(i - 1);
-			}
-		}
-		blocksEnds.push_back(p.size() - 1);
-
-		for (unsigned i = 0; i < blocksBegins.size(); i++)
-		{
-			if (blocksEnds[i] - blocksBegins[i] > 0)
-			{
-				begins.push_back(blocksBegins[i]);
-				ends.push_back(blocksEnds[i]);
-			}
-		}
+		blocks(begins, ends, blockType);
+		return randint(0, begins.size() - 1);
 	}
 	vector<unsigned> starters(vector<unsigned> predecessors)
 	{
@@ -428,7 +407,7 @@ public:
 			initTest();
 			break;
 		}
-		makespan = calcMakespan();
+		makespan = computeMakespan();
 	}
 
 	/////////////////////////////////////////////////////////////////////////
@@ -467,8 +446,8 @@ public:
 	{
 		Printer p(sJ, sM);
 		p.setInstanceData(nO, instance.cost, instance.o_job, instance.o_machine);
-		p.setStarters(starters(sJ), starters(pM));
-		p.setSolutionData(first, calcMakespan(), critical(), getHeads());
+		p.setStarters(starters(pJ), starters(pM));
+		p.setSolutionData(first, computeMakespan(), critical(), getHeads());
 		return p;
 	}
 	void printMachCluster()
@@ -632,7 +611,7 @@ public:
 
 		return makespan;
 	}
-	int calcMakespan()
+	int computeMakespan()
 	{
 		makespan = 0;
 		unsigned temp_makespan = 0, op, lookat = 0, pushed = 0;
@@ -687,10 +666,10 @@ public:
 		s.first = first;
 		s.last = last;
 		s.instance = instance;
-		s.makespan = calcMakespan();
+		s.makespan = computeMakespan();
 		return s;
 	}
-	int getMakespan() { return partial ? computePartialMakespan() : calcMakespan(); }
+	int getMakespan() { return partial ? computePartialMakespan() : computeMakespan(); }
 	friend class Heuristics;
 	friend class Neighbor;
 	friend class Neighborhood;

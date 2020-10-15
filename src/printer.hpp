@@ -5,6 +5,13 @@
 
 #include "solution.hpp"
 
+bool SAVE_GRAPHS_ON_SWAP = false;
+bool SAVE_GRAPHS_ON_SHIFT = false;
+bool SAVE_CHARTS_ON_SWAP = false;
+bool SAVE_CHARTS_ON_SHIFT = false;
+unsigned CURRENT_GRAPH_NUMBER = 1;
+unsigned CURRENT_CHART_NUMBER = 1;
+
 using namespace std;
 
 class Printer
@@ -31,14 +38,16 @@ class Printer
     }
     string printClusterGraph(bool printJob, bool printMach)
     {
-        printGantt();
         unsigned o;
         string graph = "digraph G {\n";
 
         graph += to_string(first) + "[style=filled,color=green];\nrankdir=LR;\n";
-        if (!VERBOSE && SAVE_GRAPHS)
+        if (!VERBOSE && SAVE_GRAPHS_ON_SWAP)
         {
-            graph += to_string(makespan) + "[color=yellow, style=filled, shape=box, label=\"makespan: " + to_string(makespan) + "\"];\n";
+            graph += to_string(makespan);
+            graph += "[color=yellow, style=filled, shape=box, label=\"makespan: ";
+            graph += to_string(makespan);
+            graph += "\"];\n";
         }
 
         for (int i = 0; i < machStarters.size(); i++)
@@ -110,7 +119,7 @@ class Printer
     }
     void saveGantt()
     {
-        string command = "python3 gantt.py " + getGannt(to_string(CURRENT_GRAPH_NUMBER));
+        string command = "python3 gantt.py " + getGannt(to_string(CURRENT_CHART_NUMBER++));
         //cout << command << br;
         system(command.c_str());
     }
@@ -154,7 +163,7 @@ public:
     void printGantt()
     {
         cout << endl
-             << "saving gantt chart number " << CURRENT_GRAPH_NUMBER << endl;
+             << "saving gantt chart number " << CURRENT_CHART_NUMBER << endl;
         saveGantt();
     }
 };

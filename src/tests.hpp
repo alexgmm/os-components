@@ -34,7 +34,7 @@ float testInit(string file, unsigned init)
 	for (int loop = 0; loop < NLOOPS; loop++)
 	{
 		Solution s(i, init);
-		media += s.calcMakespan();
+		media += s.computeMakespan();
 	}
 
 	return media / NLOOPS;
@@ -67,7 +67,7 @@ vector<unsigned> testInit(unsigned init)
 		//cout << n << br;
 		Instance i(n);
 		Solution s(i, init);
-		values.push_back(s.calcMakespan());
+		values.push_back(s.computeMakespan());
 	}
 	return values;
 }

@@ -24,22 +24,21 @@ int main(int argc, char **argv)
 			cout << i << " " << argv[i] << br; */
 
 		string iterationsNumber(argv[4]), alpha(argv[6]), temperature(argv[8]), instanceFileName(argv[2]);
-		N_ITER_SA = stoi(iterationsNumber);
-		ALPHA = stod(alpha);
-		T_MIN = stod(temperature);
-		//cout << it << " " << a << " " << t << " " << f << br;
 		Instance i(instanceFileName);
 		Solution s(i, RANDOM);
 		Heuristics h(s);
-		unsigned r = h.solve(SA, SWAP_CRITICAL_EDGE);
-		to_string(6);
+		h.setSimulatedAnnealingParams(stod(alpha), stod(temperature), stoi(iterationsNumber));
+		unsigned r = h.solve(SA, SHIFT_WHOLE);
 		cout << r;
 	}
 	else
 	{
 		VERBOSE = false;
-		SAVE_GRAPHS = true;
-		TRACK_OPERATIONS = false;
+		SAVE_GRAPHS_ON_SWAP = false;
+		TRACK_SWAP_OPERATIONS = false;
+
+		TRACK_SHIFT_OPERATIONS = true;
+		SAVE_GRAPHS_ON_SHIFT = true;
 		test();
 	}
 
@@ -51,10 +50,15 @@ void test()
 	//printAverageExecutionTime(SA, SWAP_CRITICAL_EDGE);
 	Instance i(t4);
 	Solution s(i, RANDOM);
-	int initialMakespan = s.calcMakespan();
-	cout << initialMakespan;
 	s.printJobCluster();
-	s.printGantt();
-	Heuristics h(s);
-	cout << " " << h.solve(SA, SWAP_CRITICAL_EDGE) << br;
+	vector<unsigned> p = s.critical(), bj, ej, bm, em;
+	s.blocks(bj, ej, BLOCK_J);
+	s.blocks(bm, em, BLOCK_M);
+	for (int i = 0; i < bj.size(); i++)
+		cout << p[bj[i]] << "--" << p[ej[i]] << br;
+	cout << br;
+	for (int i = 0; i < bm.size(); i++)
+		cout << p[bm[i]] << "--" << p[em[i]] << br;
+	//Neighborhood n(s);
+	//vector<Neighbor> v = n.getNeighborhood(SHIFT_CRITICAL);
 }

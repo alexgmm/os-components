@@ -40,7 +40,7 @@ class Neighborhood
 	vector<vector<unsigned>> tabu;
 	bool swapJ(unsigned op1, unsigned op2)
 	{
-		if (TRACK_OPERATIONS)
+		if (TRACK_SWAP_OPERATIONS)
 			cout << br << "swapJ(" << op1 << "," << op2 << ")" << br;
 		assert(op1 > 0 && op2 > 0);
 		assert(op1 != op2);
@@ -72,11 +72,10 @@ class Neighborhood
 		sol.sJ[op2] = op1;
 
 		//sol.validSchedule();
-		sol.calcMakespan();
+		sol.computeMakespan();
 		if (VERBOSE)
 			sol.print();
-		if (SAVE_GRAPHS)
-			sol.printJobCluster();
+		saveDataSwap();
 		if (legal(op1, op2))
 		{
 			tabu[op1][op2] = CURRENT_ITER;
@@ -86,7 +85,7 @@ class Neighborhood
 	}
 	bool swapM(unsigned op1, unsigned op2)
 	{
-		if (TRACK_OPERATIONS)
+		if (TRACK_SWAP_OPERATIONS)
 			cout << br << "swapM(" << op1 << "," << op2 << ")" << br;
 		assert(op1 > 0 && op2 > 0);
 		assert(op1 != op2);
@@ -118,11 +117,10 @@ class Neighborhood
 		sol.sM[op2] = op1;
 
 		//sol.validSchedule();
-		sol.calcMakespan();
+		sol.computeMakespan();
 		if (VERBOSE)
 			sol.print();
-		if (SAVE_GRAPHS)
-			sol.printJobCluster();
+		saveDataSwap();
 		if (legal(op1, op2))
 		{
 			tabu[op1][op2] = CURRENT_ITER;
@@ -191,13 +189,13 @@ class Neighborhood
 		{
 			succ = sol.sJ;
 			pred = sol.pJ;
-			sol.blocksJ(b, e);
+			sol.blocks(b, e, BLOCK_J);
 		}
 		else
 		{
 			succ = sol.sM;
 			pred = sol.pM;
-			sol.blocksM(b, e);
+			sol.blocks(b, e, BLOCK_M);
 		}
 
 		chosenBlock = (b.size() == 1) ? 0 : randint(0, b.size() - 1);
@@ -243,7 +241,7 @@ class Neighborhood
 
 		if (randint(0, 1) == SWAP_J)
 		{
-			sol.blocksJ(b, e);
+			sol.blocks(b, e, BLOCK_J);
 
 			unsigned chosenBlock = (b.size() == 1) ? 0 : randint(0, b.size() - 1);
 			unsigned idxBegin = b[chosenBlock], idxEnd = e[chosenBlock];
@@ -256,7 +254,7 @@ class Neighborhood
 		}
 		else
 		{
-			sol.blocksM(b, e);
+			sol.blocks(b, e, BLOCK_M);
 
 			unsigned chosenBlock = (b.size() == 1) ? 0 : randint(0, b.size() - 1);
 			unsigned idxBegin = b[chosenBlock], idxEnd = e[chosenBlock];
@@ -272,44 +270,40 @@ class Neighborhood
 	}
 	bool shiftJ(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd)
 	{
+		assert(idxBegin != idxEnd);
+		printv(p, 0, "p");
+		if (TRACK_SHIFT_OPERATIONS)
+			cout << br << "shiftJ(" << p[idxBegin] << "," << p[idxBegin] << ")" << br;
 		bool legal = true;
 		unsigned lastOp = p[idxEnd];
 		for (unsigned i = idxEnd; i > idxBegin; i--)
 			legal = legal && swapJ(lastOp, p[i - 1]);
+		saveDataShift();
 		return legal;
 	}
 	bool shiftM(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd)
 	{
+		assert(idxBegin != idxEnd);
+		printv(p, 0, "p");
+		if (TRACK_SHIFT_OPERATIONS)
+			cout << br << "shiftM(" << p[idxBegin] << "," << p[idxBegin] << ")" << br;
 		bool legal = true;
 		unsigned lastOp = p[idxEnd];
 		for (unsigned i = idxEnd; i > idxBegin; i--)
 			legal = legal && swapM(lastOp, p[i - 1]);
+		saveDataShift();
 		return legal;
 	}
 	Solution shiftCriticalOne()
 	{
 		vector<unsigned> b, e, p = sol.critical();
+		unsigned typeChoice = randint(0, 1);
+		unsigned index = sol.randomBlock(typeChoice, b, e);
 
-		if (randint(0, 1) == SHIFT_J)
-		{
-			sol.blocksJ(b, e);
-
-			unsigned chosenBlock = (b.size() == 1) ? 0 : randint(0, b.size() - 1);
-			unsigned idxBegin = b[chosenBlock], idxEnd = e[chosenBlock];
-			if (idxBegin != idxEnd - 1)
-				idxEnd = (idxEnd - idxBegin > 1 ? randint(idxBegin + 1, idxEnd) : idxEnd);
-			shiftJ(p, idxBegin, idxEnd);
-		}
+		if (typeChoice == SHIFT_J)
+			shiftJ(p, b[index], e[index]);
 		else
-		{
-			sol.blocksM(b, e);
-
-			unsigned chosenBlock = (b.size() == 1) ? 0 : randint(0, b.size() - 1);
-			unsigned idxBegin = b[chosenBlock], idxEnd = e[chosenBlock];
-			if (idxBegin != idxEnd - 1)
-				idxEnd = (idxEnd - idxBegin > 1 ? randint(idxBegin + 1, idxEnd) : idxEnd);
-			shiftM(p, idxBegin, idxEnd);
-		}
+			shiftM(p, b[index], e[index]);
 
 		return sol;
 	}
@@ -343,8 +337,8 @@ class Neighborhood
 		unsigned idxBegin, idxEnd;
 		vector<Neighbor> neighbors;
 		vector<unsigned> p = sol.critical(), bJ, bM, eJ, eM;
-		sol.blocksJ(bJ, eJ);
-		sol.blocksM(bM, eM);
+		sol.blocks(bJ, eJ, BLOCK_J);
+		sol.blocks(bM, eM, BLOCK_M);
 		bool legal;
 		unsigned value;
 
@@ -438,7 +432,7 @@ class Neighborhood
 		bool l = swapJ(op, sol.sJ[op]);
 		//sol.print();
 
-		Neighbor n(sol, sol.calcMakespan(), l);
+		Neighbor n(sol, sol.computeMakespan(), l);
 		neighborhood.push_back(n);
 		restore();
 
@@ -457,7 +451,7 @@ class Neighborhood
 			//sol.print();
 			bool l = swapM(op, sol.sM[op]);
 			//sol.print();
-			Neighbor n(sol, sol.calcMakespan(), l);
+			Neighbor n(sol, sol.computeMakespan(), l);
 			neighborhood.push_back(n);
 
 			restore();
@@ -485,14 +479,14 @@ class Neighborhood
 	void swapJAdd(unsigned op1, unsigned op2, vector<Neighbor> &neighborhood)
 	{
 		bool l = swapJ(op1, op2);
-		Neighbor n(sol, sol.calcMakespan(), l);
+		Neighbor n(sol, sol.computeMakespan(), l);
 		neighborhood.push_back(n);
 		restore();
 	}
 	void swapMAdd(unsigned op1, unsigned op2, vector<Neighbor> &neighborhood)
 	{
 		bool l = swapM(op1, op2);
-		Neighbor n(sol, sol.calcMakespan(), l);
+		Neighbor n(sol, sol.computeMakespan(), l);
 		neighborhood.push_back(n);
 		restore();
 	}
@@ -525,6 +519,20 @@ class Neighborhood
 
 		return neighborhood;
 	}
+	void saveDataShift()
+	{
+		if (SAVE_GRAPHS_ON_SHIFT)
+			sol.printJobCluster();
+		if (SAVE_CHARTS_ON_SHIFT)
+			sol.printGantt();
+	}
+	void saveDataSwap()
+	{
+		if (SAVE_GRAPHS_ON_SWAP)
+			sol.printJobCluster();
+		if (SAVE_CHARTS_ON_SWAP)
+			sol.printGantt();
+	}
 
 public:
 	Neighborhood() {}
@@ -535,7 +543,6 @@ public:
 		for (unsigned i = 0; i <= s.nO; i++)
 			tabu[i].resize(s.nO + 1, 0);
 	}
-
 	void restore() { sol = previous.copySolution(); }
 	void setSolution(Solution s)
 	{
