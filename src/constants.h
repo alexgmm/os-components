@@ -19,8 +19,8 @@
 
 #define SWAP_J 0
 #define SWAP_M 1
-#define SHIFT_J 0
-#define SHIFT_M 1
+#define SHIFT_J 2
+#define SHIFT_M 3
 
 #define SWAP_ALL 0
 #define SWAP_CRITICAL 1

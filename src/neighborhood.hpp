@@ -295,7 +295,7 @@ class Neighborhood
 	Solution shiftCriticalOne()
 	{
 		vector<unsigned> b, e, p = sol.critical();
-		unsigned typeChoice = randint(0, 1);
+		unsigned typeChoice = randint(2, 3);
 		sol.blocks(b, e, typeChoice);
 		/* string s = typeChoice == BLOCK_J ? "BJ" : "MJ";
 		cout << br << s << br;
@@ -314,7 +314,7 @@ class Neighborhood
 	Solution shiftWholeOne()
 	{
 
-		if (randint(0, 1) == SHIFT_J)
+		if (randint(2, 3) == SHIFT_J)
 		{
 			vector<vector<unsigned>> jobs = sol.wholeJobs();
 			vector<unsigned> job = jobs[randint(0, jobs.size() - 1)];
