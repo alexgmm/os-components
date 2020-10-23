@@ -40,24 +40,19 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		Instance i(t5);
-		Solution s(i, RANDOM);
-		s.printJobCluster();
-		GreedyIterator g(s, 4, SWAP_CRITICAL);
-		g.solve();
-		/* VERBOSE = false;
+		VERBOSE = false;
 		SAVE_GRAPHS_ON_SWAP = false;
 		TRACK_SWAP_OPERATIONS = false;
 
 		TRACK_SHIFT_OPERATIONS = false;
 		SAVE_GRAPHS_ON_SHIFT = false;
-		Tester t;
-		t.testHeuristic(g, SWAP_CRITICAL_EDGE, SA, 100);
-		t.testHeuristic(g, SWAP_CRITICAL_EDGE, TS, 100); */
-		/* t.generateInitializationResults();
-		t.transposeInstances();
-		t.generateInitializationResults(); */
-		//test();
+
+		Instance i(t4);
+		Solution s(i, RANDOM);
+		s.printJobCluster();
+		GreedyIterator g(s,4,SWAP_CRITICAL);
+		g.solve();
+		g.getSolution().printJobCluster();
 	}
 
 	return 0;

@@ -3,8 +3,6 @@
 
 unsigned N_ITER = 20;
 
-#define EXECUTION_TIME 30
-
 #include "neighborhood.hpp"
 #include "utilities.hpp"
 #include "time.hpp"

@@ -73,7 +73,8 @@ public:
 	vector<unsigned> critical()
 	{
 		assert(last <= nO);
-		vector<unsigned> heads = getHeads(), late_pred = getLatestPred(heads), p;
+		vector<unsigned> heads = getHeads();
+		vector<unsigned> late_pred = getLatestPred(heads), p;
 		unsigned op = last;
 
 		while (op > 0)

@@ -1,5 +1,7 @@
 #pragma once
 
+#define MAX_GRAPH_NUMBER 20
+
 #include <bits/stdc++.h>
 #include <string.h>
 
@@ -148,6 +150,8 @@ public:
     }
     void printMachCluster()
     {
+        if(CURRENT_GRAPH_NUMBER == MAX_GRAPH_NUMBER)
+            return;
         cout << endl
              << "saving m-graph number " << CURRENT_GRAPH_NUMBER << endl;
         string graph = printClusterGraph(false, true);
@@ -155,6 +159,8 @@ public:
     }
     void printJobCluster()
     {
+        if(CURRENT_GRAPH_NUMBER == MAX_GRAPH_NUMBER)
+            return;
         cout << endl
              << "saving j-graph number " << CURRENT_GRAPH_NUMBER << endl;
         string graph = printClusterGraph(true, false);

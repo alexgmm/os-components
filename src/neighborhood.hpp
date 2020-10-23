@@ -6,6 +6,9 @@
 
 using namespace std;
 
+struct Mutation{
+    unsigned operation, mutationType, blockType;
+};
 class Neighbor
 {
 	Solution neighbor;
@@ -552,6 +555,29 @@ public:
 	{
 		sol = s.copySolution();
 		previous = s.copySolution();
+	}
+
+	unsigned executeMutation(Mutation m){
+		unsigned o = m.operation;
+		if(m.blockType == BLOCK_J && m.mutationType == SWAP_PRED){
+			swapJ(o, sol.pJ[o]);
+			return sol.computeMakespan();
+		}
+
+		if(m.blockType == BLOCK_J && m.mutationType == SWAP_SUCC){
+			swapJ(o, sol.sJ[o]);
+			return sol.computeMakespan();
+		}
+
+		if(m.blockType == BLOCK_M && m.mutationType == SWAP_PRED){
+			swapM(o, sol.pM[o]);
+			return sol.computeMakespan();
+		}
+
+		if(m.blockType == BLOCK_M && m.mutationType == SWAP_SUCC){
+			swapM(o, sol.sM[o]);
+			return sol.computeMakespan();
+		}
 	}
 
 	/////////////////////////////////////////////////////////////////////////
