@@ -2,9 +2,9 @@
 #include <fstream>
 #include "src/instance.hpp"
 #include "src/solution.hpp"
-#include "src/tests.hpp"
+#include "src/tester.hpp"
 #include "src/heuristics.hpp"
-#include "src/time.hpp"
+#include "src/greedy_iterator.hpp"
 
 using namespace std;
 
@@ -17,29 +17,47 @@ string t20 = "inst/taillard/tai20_20_01.txt";
 void test();
 int main(int argc, char **argv)
 {
-	startTimeCounting();
 	if (argc > 1)
 	{
 		/* for (int i = 1; i < 10; i++)
 			cout << i << " " << argv[i] << br; */
 
-		string iterationsNumber(argv[4]), alpha(argv[6]), temperature(argv[8]), instanceFileName(argv[2]);
+		/* string iterationsNumber(argv[4]), alpha(argv[6]), temperature(argv[8]), instanceFileName(argv[2]);
 		Instance i(instanceFileName);
 		Solution s(i, RANDOM);
 		Heuristics h(s);
 		h.setSimulatedAnnealingParams(stod(alpha), stod(temperature), stoi(iterationsNumber));
-		unsigned r = h.solve(SA, SHIFT_WHOLE);
+		unsigned r = h.solve(SA, SHIFT_CRITICAL); */
+
+		string   instanceFileName(argv[2]), duration(argv[4]);
+		Instance i(instanceFileName);
+		Solution s(i, RANDOM);
+		Heuristics h(s);
+		h.setTabuSearchParams(stoi(duration));
+		unsigned r = h.solve(TS, SWAP_CRITICAL_EDGE);
+
 		cout << r;
 	}
 	else
 	{
-		VERBOSE = false;
+		Instance i(t5);
+		Solution s(i, RANDOM);
+		s.printJobCluster();
+		GreedyIterator g(s, 4, SWAP_CRITICAL);
+		g.solve();
+		/* VERBOSE = false;
 		SAVE_GRAPHS_ON_SWAP = false;
 		TRACK_SWAP_OPERATIONS = false;
 
-		TRACK_SHIFT_OPERATIONS = true;
-		SAVE_GRAPHS_ON_SHIFT = true;
-		test();
+		TRACK_SHIFT_OPERATIONS = false;
+		SAVE_GRAPHS_ON_SHIFT = false;
+		Tester t;
+		t.testHeuristic(g, SWAP_CRITICAL_EDGE, SA, 100);
+		t.testHeuristic(g, SWAP_CRITICAL_EDGE, TS, 100); */
+		/* t.generateInitializationResults();
+		t.transposeInstances();
+		t.generateInitializationResults(); */
+		//test();
 	}
 
 	return 0;
@@ -51,14 +69,7 @@ void test()
 	Instance i(t4);
 	Solution s(i, RANDOM);
 	s.printJobCluster();
-	vector<unsigned> p = s.critical(), bj, ej, bm, em;
-	s.blocks(bj, ej, BLOCK_J);
-	s.blocks(bm, em, BLOCK_M);
-	for (int i = 0; i < bj.size(); i++)
-		cout << p[bj[i]] << "--" << p[ej[i]] << br;
-	cout << br;
-	for (int i = 0; i < bm.size(); i++)
-		cout << p[bm[i]] << "--" << p[em[i]] << br;
-	//Neighborhood n(s);
-	//vector<Neighbor> v = n.getNeighborhood(SHIFT_CRITICAL);
+	cout << s.getHighestCostFromMachine() << br;
+	/* Heuristics h(s);
+	h.solve(SA, SHIFT_CRITICAL); */
 }

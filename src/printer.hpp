@@ -42,7 +42,7 @@ class Printer
         string graph = "digraph G {\n";
 
         graph += to_string(first) + "[style=filled,color=green];\nrankdir=LR;\n";
-        if (!VERBOSE && SAVE_GRAPHS_ON_SWAP)
+        if (!VERBOSE && (SAVE_GRAPHS_ON_SWAP || SAVE_GRAPHS_ON_SHIFT))
         {
             graph += to_string(makespan);
             graph += "[color=yellow, style=filled, shape=box, label=\"makespan: ";

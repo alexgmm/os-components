@@ -271,9 +271,8 @@ class Neighborhood
 	bool shiftJ(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd)
 	{
 		assert(idxBegin != idxEnd);
-		printv(p, 0, "p");
 		if (TRACK_SHIFT_OPERATIONS)
-			cout << br << "shiftJ(" << p[idxBegin] << "," << p[idxBegin] << ")" << br;
+			cout << br << "shiftJ(" << p[idxBegin] << "," << p[idxEnd] << ")" << br;
 		bool legal = true;
 		unsigned lastOp = p[idxEnd];
 		for (unsigned i = idxEnd; i > idxBegin; i--)
@@ -284,9 +283,8 @@ class Neighborhood
 	bool shiftM(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd)
 	{
 		assert(idxBegin != idxEnd);
-		printv(p, 0, "p");
 		if (TRACK_SHIFT_OPERATIONS)
-			cout << br << "shiftM(" << p[idxBegin] << "," << p[idxBegin] << ")" << br;
+			cout << br << "shiftM(" << p[idxBegin] << "," << p[idxEnd] << ")" << br;
 		bool legal = true;
 		unsigned lastOp = p[idxEnd];
 		for (unsigned i = idxEnd; i > idxBegin; i--)
@@ -298,7 +296,13 @@ class Neighborhood
 	{
 		vector<unsigned> b, e, p = sol.critical();
 		unsigned typeChoice = randint(0, 1);
-		unsigned index = sol.randomBlock(typeChoice, b, e);
+		sol.blocks(b, e, typeChoice);
+		/* string s = typeChoice == BLOCK_J ? "BJ" : "MJ";
+		cout << br << s << br;
+		printv(p, 0, "path");
+		printv(b, 0, "begins");
+		printv(e, 0, "ends"); */
+		unsigned index = b.size() == 1 ? 0 : randint(0, b.size() - 1);
 
 		if (typeChoice == SHIFT_J)
 			shiftJ(p, b[index], e[index]);

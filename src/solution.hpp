@@ -88,8 +88,8 @@ public:
 	{
 		vector<unsigned> p = critical(), blocksBegins, blocksEnds;
 		assert(p.size() > 0);
-		blocksBegins.push_back(0);
-		for (unsigned i = 1; i < p.size(); i++)
+		blocksBegins.push_back(1);
+		for (unsigned i = 2; i < p.size(); i++)
 		{
 			bool sameCluster = (blockType == BLOCK_J) ? sameJob(p[i], p[i - 1]) : sameMach(p[i], p[i - 1]);
 			if (!sameCluster)
@@ -112,11 +112,63 @@ public:
 			}
 		}
 	}
-	unsigned randomBlock(unsigned blockType, vector<unsigned> &begins, vector<unsigned> &ends)
-	{
-		blocks(begins, ends, blockType);
-		return randint(0, begins.size() - 1);
+	vector<unsigned> getRandomJBlock(){
+		vector<unsigned> p = critical(), begins, ends, block;
+		blocks(begins, ends, BLOCK_J);
+		unsigned i = (begins.size()==1)? 0 : randint(0, begins.size()-1);
+
+		for(unsigned index = begins[i]; index <= ends[i]; index++)
+			block.push_back(p[index]);
+
+		return block;
 	}
+	vector<unsigned> getRandomMBlock(){
+		vector<unsigned> p = critical(), begins, ends, block;
+		blocks(begins, ends, BLOCK_M);
+		unsigned i = (begins.size()==1)? 0 : randint(0, begins.size()-1);
+
+		for(unsigned index = begins[i]; index <= ends[i]; index++)
+			block.push_back(p[index]);
+
+		return block;
+	}
+	vector<bool> getCriticalOperationsList(){
+		vector<bool> list(nO + 1, false);
+		vector<unsigned> p = critical();
+
+		for(unsigned o : p)
+			list[o] = true;
+
+		return list;
+	}
+	unsigned getHighestCostFromMachine(){
+		vector<vector<unsigned>> machs = wholeMachines();
+		unsigned highestCost = 0, costSum;
+		for(vector<unsigned> mach: machs){
+			costSum =0;
+			for(unsigned o: mach)
+				costSum += instance.cost[o];
+			if(costSum > highestCost)
+				highestCost = costSum;
+		}
+
+		return highestCost;
+	}
+
+	unsigned getHighestCostFromJob(){
+		vector<vector<unsigned>> jobs = wholeJobs();
+		unsigned highestCost = 0, costSum;
+		for(vector<unsigned> job: jobs){
+			costSum =0;
+			for(unsigned o: job)
+				costSum += instance.cost[o];
+			if(costSum > highestCost)
+				highestCost = costSum;
+		}
+
+		return highestCost;
+	}
+
 	vector<unsigned> starters(vector<unsigned> predecessors)
 	{
 		vector<unsigned> s;
@@ -673,6 +725,7 @@ public:
 	friend class Heuristics;
 	friend class Neighbor;
 	friend class Neighborhood;
+	friend class GreedyIterator;
 };
 
 #endif

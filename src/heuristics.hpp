@@ -3,6 +3,8 @@
 
 unsigned N_ITER = 20;
 
+#define EXECUTION_TIME 30
+
 #include "neighborhood.hpp"
 #include "utilities.hpp"
 #include "time.hpp"
@@ -10,6 +12,7 @@ unsigned N_ITER = 20;
 #include <cmath>
 
 using namespace std;
+using namespace std::chrono;
 
 unsigned absol(unsigned n1)
 {
@@ -23,11 +26,11 @@ bool accept(double t, unsigned v_new, unsigned v_old) { return (rand() / (double
 class Heuristics
 {
     Solution solution;
-    unsigned N_ITER_SA, N_ITER_TS, ALPHA, T_MIN;
+    unsigned N_ITER_SA = 100, N_ITER_TS = 100, ALPHA, T_MIN;
 
     unsigned sa(unsigned oper)
     {
-        //solution.print();
+        startTimeCounting();
         unsigned makespan = solution.computeMakespan();
         int tempMakespan;
         assert(makespan > 0);
@@ -61,23 +64,18 @@ class Heuristics
 
     unsigned ts(unsigned oper)
     {
+        startTimeCounting();
         Neighborhood n(solution);
         Solution incumbent = solution.copySolution();
         vector<Neighbor> neighbors;
 
-        for (CURRENT_ITER = 0; CURRENT_ITER < N_ITER_TS; CURRENT_ITER++)
+        while(!isTimeOver())
         {
             neighbors = n.getNeighborhood(oper);
 
             for (Neighbor neighbor : neighbors)
-            {
-                //cout << neighbor.getValue() << br;
                 if (neighbor.getValue() < incumbent.getMakespan() && neighbor.isLegal())
-                {
                     incumbent = neighbor.getSolution().copySolution();
-                }
-            }
-
             n.setSolution(incumbent);
         }
         solution = incumbent.copySolution();
@@ -99,6 +97,18 @@ class Heuristics
         }
     }
 
+    void setTabuSearchDefaultParams(unsigned oper)
+    {
+        switch (oper)
+        {
+        case SWAP_CRITICAL:
+            TABU_DURATION = 47;
+            break;
+        default:
+            break;
+        }
+    }
+
 public:
     Heuristics() {}
     Heuristics(Solution s) : solution(s) {}
@@ -107,6 +117,10 @@ public:
         ALPHA = alpha;
         T_MIN = temp;
         N_ITER_SA = iter;
+    }
+    void setTabuSearchParams(unsigned duration){
+        TABU_DURATION = duration;
+
     }
 
     Solution getSolution() { return solution; }

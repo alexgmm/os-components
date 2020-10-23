@@ -8,20 +8,29 @@
 using namespace std;
 using namespace std::chrono;
 
-std::chrono::_V2::system_clock::time_point start;
+uint64_t start;
+
+uint64_t timeSinceEpochMillisec() {
+  using namespace std::chrono;
+  return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+}
+
+
 
 void startTimeCounting()
 {
-    start = high_resolution_clock::now();
+    start = timeSinceEpochMillisec();
 }
 
-float getElapsedTime()
+uint64_t getElapsedTime()
 {
-    milliseconds elapsedTime = duration_cast<milliseconds>(high_resolution_clock::now() - start);
-    return stod(to_string(elapsedTime.count()));
+    return (timeSinceEpochMillisec() - start)/1000;
 }
 
 bool isTimeOver()
 {
-    return ((getElapsedTime() / 1000) >= EXECUTION_TIME);
+    return getElapsedTime() >= EXECUTION_TIME;
 }
+
+
+
