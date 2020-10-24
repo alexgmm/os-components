@@ -116,21 +116,44 @@ public:
 	vector<unsigned> getRandomJBlock(){
 		vector<unsigned> p = critical(), begins, ends, block;
 		blocks(begins, ends, BLOCK_J);
+		
+		if(begins.size() <= 0)
+			return begins;
+
 		unsigned i = (begins.size()==1)? 0 : randint(0, begins.size()-1);
 
 		for(unsigned index = begins[i]; index <= ends[i]; index++)
 			block.push_back(p[index]);
-
+		//printv(block,0,"block m");
 		return block;
 	}
 	vector<unsigned> getRandomMBlock(){
 		vector<unsigned> p = critical(), begins, ends, block;
 		blocks(begins, ends, BLOCK_M);
+		
+		if(begins.size() <= 0)
+			return begins;
+		
 		unsigned i = (begins.size()==1)? 0 : randint(0, begins.size()-1);
 
 		for(unsigned index = begins[i]; index <= ends[i]; index++)
 			block.push_back(p[index]);
-
+		//printv(block,0,"block m");
+		return block;
+	}
+	vector<unsigned> getRandomBlock(){
+		vector<unsigned> block;
+		if(randint(0,1) == BLOCK_J){
+			block = getRandomJBlock();
+			if(block.size()==0)
+				block = getRandomMBlock();
+		}
+		else {
+			block = getRandomMBlock();
+			if(block.size()==0)
+				block = getRandomJBlock();
+		}
+		//printv(block,0,"block -");
 		return block;
 	}
 	vector<bool> getCriticalOperationsList(){
@@ -155,7 +178,6 @@ public:
 
 		return highestCost;
 	}
-
 	unsigned getHighestCostFromJob(){
 		vector<vector<unsigned>> jobs = wholeJobs();
 		unsigned highestCost = 0, costSum;
@@ -169,7 +191,6 @@ public:
 
 		return highestCost;
 	}
-
 	vector<unsigned> starters(vector<unsigned> predecessors)
 	{
 		vector<unsigned> s;
@@ -404,16 +425,16 @@ public:
 	}
 	void initTest()
 	{
-		first = 1;
-		nO = 6;
-		nJ = 2;
-		nM = 3;
+		first = 15;
+		nO = 16;
+		nJ = 4;
+		nM = 4;
 
-		pJ = {0, 0, 1, 2, 0, 4, 5};
-		sJ = {0, 2, 3, 0, 5, 6, 0};
-		pM = {0, 0, 0, 0, 1, 0, 3};
-		sM = {0, 4, 0, 6, 0, 2, 0};
-		instance.cost = {0, 7, 3, 2, 5, 6, 7};
+		pJ = {0, 0, 1, 2, 3, 7, 8, 6, 0, 11, 0, 12, 10, 16, 13, 0, 15};
+		sJ = {0, 2, 3, 4, 0, 0, 7, 5, 6, 0, 12, 9, 11, 14, 0, 16, 13};
+		pM = {0, 0, 10, 15, 12, 9, 2, 11, 0, 13, 0, 3, 16, 1, 6, 0, 8};
+		sM = {0, 13, 6, 11, 0, 0, 14, 0, 16, 5, 2, 7, 4, 9, 0, 3, 12};
+		instance.cost = {0, 34, 15, 38, 95, 2, 89, 19, 7, 54, 70, 28, 34, 61, 9, 87, 29};
 
 		/* pJ = {0, 0, 1, 2, 0, 4, 5, 0, 7, 8};
 		sJ = {0, 2, 3, 0, 5, 6, 0, 8, 9, 0};

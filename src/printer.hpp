@@ -1,6 +1,6 @@
 #pragma once
 
-#define MAX_GRAPH_NUMBER 20
+#define MAX_GRAPH_NUMBER 100
 
 #include <bits/stdc++.h>
 #include <string.h>

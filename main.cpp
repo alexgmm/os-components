@@ -34,7 +34,7 @@ int main(int argc, char **argv)
 		Solution s(i, RANDOM);
 		Heuristics h(s);
 		h.setTabuSearchParams(stoi(duration));
-		unsigned r = h.solve(TS, SWAP_CRITICAL_EDGE);
+		unsigned r = h.solve(TS, SHIFT_CRITICAL);
 
 		cout << r;
 	}
@@ -47,12 +47,11 @@ int main(int argc, char **argv)
 		TRACK_SHIFT_OPERATIONS = false;
 		SAVE_GRAPHS_ON_SHIFT = false;
 
-		Instance i(t4);
+		Instance i(t20);
 		Solution s(i, RANDOM);
-		s.printJobCluster();
-		GreedyIterator g(s,4,SWAP_CRITICAL);
-		g.solve();
-		g.getSolution().printJobCluster();
+		cout << s.computeMakespan() << br;
+		GreedyIterator g(s,1,SWAP_CRITICAL_EDGE);
+		cout << g.solve() << br;
 	}
 
 	return 0;
@@ -61,7 +60,7 @@ int main(int argc, char **argv)
 void test()
 {
 	//printAverageExecutionTime(SA, SWAP_CRITICAL_EDGE);
-	Instance i(t4);
+	Instance i(t20);
 	Solution s(i, RANDOM);
 	s.printJobCluster();
 	cout << s.getHighestCostFromMachine() << br;

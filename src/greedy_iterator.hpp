@@ -42,7 +42,6 @@ class GreedyIterator {
     unsigned getOneRandomOperation_swapCritical(vector<unsigned> &used){
         vector<unsigned> p = s.critical();
         unsigned o, pathIndex;
-
         do {
         pathIndex = randint(0, p.size()-1);
         o = p[pathIndex];
@@ -53,12 +52,19 @@ class GreedyIterator {
     }
 
     unsigned getOneRandomOperation_swapCriticalEdge(vector<unsigned> &used){
-        vector<unsigned> p = s.critical();
-        unsigned o, pathIndex;
+        vector<unsigned> block;
+        unsigned o = 0;
 
         do {
-        pathIndex = randint(0, p.size()-1);
-        o = p[pathIndex];
+            block = s.getRandomBlock();
+            
+            if(block.size()<=0)
+                return 0;
+                
+            if(randint(0,1) == BLOCK_START)
+                o = block[0];
+            else
+                o = block[block.size()-1];
         } while(used[o]);
         used[o] = 1;
 
@@ -69,6 +75,8 @@ class GreedyIterator {
         switch(oper){
             case SWAP_CRITICAL:
                 return getOneRandomOperation_swapCritical(used);
+            case SWAP_CRITICAL_EDGE:
+                return getOneRandomOperation_swapCriticalEdge(used);
             default:
                 return 0;
         }
@@ -124,6 +132,8 @@ class GreedyIterator {
         switch(oper){
             case SWAP_CRITICAL:
                 possibleMutations = listPossibleMutations_swapCritical(o);
+             case SWAP_CRITICAL_EDGE:
+                possibleMutations = listPossibleMutations_swapCritical(o);
         }
 
         return possibleMutations;        
@@ -151,9 +161,9 @@ class GreedyIterator {
         }
 
         n.executeMutation(bestMutation);
+        
         s = n.getSolution();
     }
-
 public:
     GreedyIterator(){}
     GreedyIterator(Solution solution, unsigned number, unsigned o):s(solution),
@@ -162,13 +172,26 @@ public:
 
     void iterate(){
         vector<unsigned> used(s.nO + 1, 0);
-
+        used[0] = 1;
         for(unsigned count = 1; count <= numberOps; count++){
             unsigned o = getOneRandomOperation(used);
+            if(o==0)
+                break;
             executeMutationGreedly(o);
         }
     }
 
+    void test(){
+        vector<unsigned> d(s.nO + 1, 0);
+        for(unsigned i = 0; i<4; i++){
+        unsigned o = getOneRandomOperation_swapCriticalEdge(d);
+
+        vector<Mutation> mutations = listPossibleMutations_swapCritical(o);
+        cout << "operation m" << br;
+        for(Mutation m: mutations)
+            printMutation(m);
+        }
+    }
 
     unsigned solve(){
         startTimeCounting();
