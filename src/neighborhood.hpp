@@ -7,7 +7,7 @@
 using namespace std;
 
 struct Mutation{
-    unsigned operation, mutationType, blockType;
+    unsigned operation, mutationType, blockType, factor;
 };
 class Neighbor
 {
@@ -45,7 +45,9 @@ class Neighborhood
 	{
 		if (TRACK_SWAP_OPERATIONS)
 			cout << br << "swapJ(" << op1 << "," << op2 << ")" << br;
-		assert(op1 > 0 && op2 > 0);
+		if(op1 ==0 or op2 == 0)
+			return false;
+		//assert(op1 > 0 && op2 > 0);
 		assert(op1 != op2);
 		assert(sol.adjJob(op1, op2));
 
@@ -90,7 +92,9 @@ class Neighborhood
 	{
 		if (TRACK_SWAP_OPERATIONS)
 			cout << br << "swapM(" << op1 << "," << op2 << ")" << br;
-		assert(op1 > 0 && op2 > 0);
+		if(op1 ==0 or op2 == 0)
+			return false;
+		//assert(op1 > 0 && op2 > 0);
 		assert(op1 != op2);
 		assert(sol.adjMach(op1, op2));
 
@@ -557,7 +561,7 @@ public:
 		previous = s.copySolution();
 	}
 
-	unsigned executeMutation(Mutation m){
+	unsigned applyMutation(Mutation m){
 		unsigned o = m.operation;
 		if(m.blockType == BLOCK_J && m.mutationType == SWAP_PRED){
 			swapJ(o, sol.pJ[o]);
@@ -576,6 +580,20 @@ public:
 
 		if(m.blockType == BLOCK_M && m.mutationType == SWAP_SUCC){
 			swapM(o, sol.sM[o]);
+			return sol.computeMakespan();
+		}
+
+		if(m.blockType == BLOCK_J && m.mutationType == SHIFT_WHOLE){
+			vector<unsigned> block = sol.getOperationsJBlock(o);
+			//printv(block,0,"j block");
+			shiftJ(block, 0, m.factor);
+			return sol.computeMakespan();
+		}
+
+		if(m.blockType == BLOCK_M && m.mutationType == SHIFT_WHOLE){
+			vector<unsigned> block = sol.getOperationsMBlock(o);
+			//printv(block,0,"j block");
+			shiftM(block, 0, m.factor);
 			return sol.computeMakespan();
 		}
 	}

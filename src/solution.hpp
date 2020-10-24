@@ -138,7 +138,6 @@ public:
 
 		for(unsigned index = begins[i]; index <= ends[i]; index++)
 			block.push_back(p[index]);
-		//printv(block,0,"block m");
 		return block;
 	}
 	vector<unsigned> getRandomBlock(){
@@ -153,7 +152,44 @@ public:
 			if(block.size()==0)
 				block = getRandomJBlock();
 		}
-		//printv(block,0,"block -");
+		return block;
+	}
+	unsigned getJobAncestor(unsigned o){
+		while(pJ[o] != 0)
+			o = pJ[o];
+		return o;
+	}
+	unsigned getMachAncestor(unsigned o){
+		while(pM[o] != 0)
+			o = pM[o];
+		return o;
+	}
+	vector<unsigned> getOperationsJBlock(unsigned o){
+		vector<unsigned> block;
+
+		unsigned operation = getJobAncestor(o);
+		if(operation == first)
+			operation = sJ[operation];
+
+		do{
+			block.push_back(operation);
+			operation = sJ[operation];
+		}while(operation != 0);
+
+		return block;
+	}
+	vector<unsigned> getOperationsMBlock(unsigned o){
+		vector<unsigned> block;
+
+		unsigned operation = getMachAncestor(o);
+		if(operation == first)
+			operation = sM[operation];
+
+		do{
+			block.push_back(operation);
+			operation = sM[operation];
+		}while(operation != 0);
+
 		return block;
 	}
 	vector<bool> getCriticalOperationsList(){

@@ -47,11 +47,11 @@ int main(int argc, char **argv)
 		TRACK_SHIFT_OPERATIONS = false;
 		SAVE_GRAPHS_ON_SHIFT = false;
 
-		Instance i(t20);
+		Instance i(t4);
 		Solution s(i, RANDOM);
 		cout << s.computeMakespan() << br;
-		GreedyIterator g(s,1,SWAP_CRITICAL_EDGE);
-		cout << g.solve() << br;
+		GreedyIterator g(s, 4, SHIFT_WHOLE);
+		cout << g.solve() << br;;
 	}
 
 	return 0;
