@@ -88,6 +88,7 @@ public:
 	void blocks(vector<unsigned> &begins, vector<unsigned> &ends, unsigned blockType)
 	{
 		vector<unsigned> p = critical(), blocksBegins, blocksEnds;
+		
 		assert(p.size() > 0);
 		blocksBegins.push_back(1);
 		for (unsigned i = 2; i < p.size(); i++)
@@ -191,6 +192,41 @@ public:
 		}while(operation != 0);
 
 		return block;
+	}
+	vector<unsigned> getOperationsCriticalJBlock(unsigned o){
+		vector<unsigned> p = critical(), block;
+		unsigned operation, index = findIndex(p, o);
+
+		if(index > nO) return block;
+
+		while(index <= nO){
+			operation = p[index];
+				if(!sameJob(o, operation) || operation == first)
+					break;
+			index--;
+		}
+
+		reverse(block.begin(), block.end());
+
+		return block;		
+	}
+	vector<unsigned> getOperationsCriticalMBlock(unsigned o){
+		vector<unsigned> p = critical(), block;
+		unsigned operation, index = findIndex(p, o);
+
+		if(index > nO) return block;
+ 
+		while(index <= nO){
+			operation = p[index];
+				if(!sameMach(o, operation) || operation == first)
+					break;
+			block.push_back(operation);
+			index--;
+		}
+
+		reverse(block.begin(), block.end());
+
+		return block;			
 	}
 	vector<bool> getCriticalOperationsList(){
 		vector<bool> list(nO + 1, false);

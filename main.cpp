@@ -49,9 +49,9 @@ int main(int argc, char **argv)
 
 		Instance i(t4);
 		Solution s(i, RANDOM);
-		cout << s.computeMakespan() << br;
-		GreedyIterator g(s, 4, SHIFT_WHOLE);
-		cout << g.solve() << br;;
+		s.printJobCluster();
+		GreedyIterator g(s, 1, SHIFT_CRITICAL);
+		g.test();
 	}
 
 	return 0;

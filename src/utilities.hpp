@@ -45,4 +45,11 @@ void printv(vector<unsigned> &v, int ini, string name)
 
 void printl(string s, unsigned v) { cout << br << s << " " << v << br; }
 
+unsigned findIndex(vector<unsigned> &v, unsigned value){
+	for(unsigned i = 0; i < v.size(); i++)
+		if(v[i] == value)
+			return i;
+	return UMAX;
+}
+
 #endif
