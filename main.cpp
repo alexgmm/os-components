@@ -10,6 +10,7 @@ using namespace std;
 
 string t = "tests/test2";
 string g = "inst/gueret-prins/GP03-02.txt";
+string g7 = "inst/gueret-prins/GP07-09.txt";
 string t4 = "inst/taillard/tai04_04_01.txt";
 string t5 = "inst/taillard/tai05_05_01.txt";
 string t20 = "inst/taillard/tai20_20_01.txt";
@@ -47,11 +48,12 @@ int main(int argc, char **argv)
 		TRACK_SHIFT_OPERATIONS = false;
 		SAVE_GRAPHS_ON_SHIFT = false;
 
-		Instance i(t4);
+		/* Instance i(t4);
 		Solution s(i, RANDOM);
-		s.printJobCluster();
-		GreedyIterator g(s, 1, SHIFT_CRITICAL);
-		g.test();
+		GreedyIterator g(s, 5, SHIFT_CRITICAL);
+		g.solve(); */
+		for(int i=0; i<10;i++)
+			cout << randint(0,1) << br;
 	}
 
 	return 0;

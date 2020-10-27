@@ -1,42 +1,12 @@
 #pragma once
 
 #include "neighborhood.hpp"
+#include "mutation.hpp"
 #include "time.hpp"
 
 using namespace std;
 
-void printMutation(Mutation m){
-    string mutationTypeLabel, blockTypeLabel;
 
-    switch(m.mutationType){
-        case SWAP_PRED:
-            mutationTypeLabel = "swap_predecessor";
-            break;
-        case SWAP_SUCC:
-            mutationTypeLabel = "swap_successor";
-            break;
-        case SHIFT_WHOLE:
-            mutationTypeLabel = "shift " + to_string(m.factor) + " units";
-            break;
-        default:
-            mutationTypeLabel = "shift";
-            break;
-    }
-
-    switch(m.blockType){
-        case BLOCK_J:
-            blockTypeLabel = "job block";
-            break;
-        case BLOCK_M:
-            blockTypeLabel = "mach block";
-            break;
-        default:
-            blockTypeLabel = "???";
-            break;
-    }
-
-    cout << mutationTypeLabel << "(" << m.operation << ") on " << blockTypeLabel << endl;
-}
 
 class GreedyIterator {
     Solution s;
@@ -90,6 +60,8 @@ class GreedyIterator {
         do {
             unsigned index = ends.size() == 1? 0 : randint(0, ends.size() - 1);
             o = p[ends[index]];
+            printl("o",o);
+            printv(used,0,"used");
         }while(used[o]);
         used[o] = 1;
 
@@ -173,7 +145,7 @@ class GreedyIterator {
     }
     vector<Mutation> listPossibleMutations_shiftCritical(unsigned o){
         vector<Mutation> possibleMutations;
-
+        
         vector<unsigned> jobBlock = s.getOperationsCriticalJBlock(o), machBlock = s.getOperationsCriticalMBlock(o);
 
         if(jobBlock.size() > 1)
@@ -240,6 +212,7 @@ public:
         vector<unsigned> used(s.nO + 1, 0);
         used[0] = 1;
         for(unsigned count = 1; count <= numberOps; count++){
+            cout <<getElapsedTime() << br;
             unsigned o = getOneRandomOperation(used);
             if(o==0)
                 break;

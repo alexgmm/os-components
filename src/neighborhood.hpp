@@ -3,12 +3,10 @@
 
 #include <iostream>
 #include "solution.hpp"
+#include "mutation.hpp"
 
 using namespace std;
 
-struct Mutation{
-    unsigned operation, mutationType, blockType, factor;
-};
 class Neighbor
 {
 	Solution neighbor;
@@ -343,6 +341,8 @@ class Neighborhood
 	//////// GERAÇÃO DE VIZINHANÇA COMPLETA /////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 
+
+
 	vector<Neighbor> shiftCritical()
 	{
 		unsigned idxBegin, idxEnd;
@@ -371,7 +371,7 @@ class Neighborhood
 			}
 		}
 
-		for (unsigned pos = 0; pos < bJ.size(); pos++)
+		for (unsigned pos = 0; pos < bM.size(); pos++)
 		{
 			idxBegin = bM[pos];
 			idxEnd = eM[pos];

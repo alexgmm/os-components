@@ -31,7 +31,11 @@ int randint(int ini, int end)
 {
 	assert(ini >= 0);
 	assert(end > ini);
-	return ini + (rand() % (end - ini + 1));
+	random_device rd;
+	mt19937 m(rd());
+	uniform_int_distribution<int> b(ini,end);
+	return b(m);
+	//return ini + (rand() % (end - ini + 1));
 }
 
 void printv(vector<unsigned> &v, int ini, string name)

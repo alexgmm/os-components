@@ -816,6 +816,7 @@ public:
 		return s;
 	}
 	int getMakespan() { return partial ? computePartialMakespan() : computeMakespan(); }
+	
 	friend class Heuristics;
 	friend class Neighbor;
 	friend class Neighborhood;
