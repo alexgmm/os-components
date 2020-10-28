@@ -105,6 +105,9 @@ class Heuristics
         case SWAP_CRITICAL_EDGE:
             TABU_DURATION = 27;
             break;
+        case SHIFT_CRITICAL:
+            TABU_DURATION = 34;
+            break;
         default:
             break;
         }

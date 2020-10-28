@@ -1,6 +1,6 @@
 #pragma once
 
-#define EXECUTION_TIME 30
+#define EXECUTION_TIME 2
 
 #include <iostream>
 #include <chrono>

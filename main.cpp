@@ -35,7 +35,7 @@ int main(int argc, char **argv)
 		Solution s(i, RANDOM);
 		Heuristics h(s);
 		h.setTabuSearchParams(stoi(duration));
-		unsigned r = h.solve(TS, SHIFT_CRITICAL);
+		unsigned r = h.solve(TS, SHIFT_WHOLE);
 
 		cout << r;
 	}
@@ -48,12 +48,12 @@ int main(int argc, char **argv)
 		TRACK_SHIFT_OPERATIONS = false;
 		SAVE_GRAPHS_ON_SHIFT = false;
 
-		/* Instance i(t4);
+		Instance i(t4);
 		Solution s(i, RANDOM);
-		GreedyIterator g(s, 5, SHIFT_CRITICAL);
-		g.solve(); */
-		for(int i=0; i<10;i++)
-			cout << randint(0,1) << br;
+		cout << s.computeMakespan() << br;
+		GreedyIterator g(s, 5, SWAP_CRITICAL_EDGE);
+		cout << g.solve() << br;
+
 	}
 
 	return 0;
