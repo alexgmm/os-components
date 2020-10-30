@@ -43,7 +43,7 @@ class Neighborhood
 	{
 		if (TRACK_SWAP_OPERATIONS)
 			cout << br << "swapJ(" << op1 << "," << op2 << ")" << br;
-		if(op1 ==0 or op2 == 0)
+		if (op1 == 0 or op2 == 0)
 			return false;
 		//assert(op1 > 0 && op2 > 0);
 		assert(op1 != op2);
@@ -90,7 +90,7 @@ class Neighborhood
 	{
 		if (TRACK_SWAP_OPERATIONS)
 			cout << br << "swapM(" << op1 << "," << op2 << ")" << br;
-		if(op1 ==0 or op2 == 0)
+		if (op1 == 0 or op2 == 0)
 			return false;
 		//assert(op1 > 0 && op2 > 0);
 		assert(op1 != op2);
@@ -341,8 +341,6 @@ class Neighborhood
 	//////// GERAÇÃO DE VIZINHANÇA COMPLETA /////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 
-
-
 	vector<Neighbor> shiftCritical()
 	{
 		unsigned idxBegin, idxEnd;
@@ -561,39 +559,46 @@ public:
 		previous = s.copySolution();
 	}
 
-	unsigned applyMutation(Mutation m){
+	unsigned applyMutation(Mutation m)
+	{
 		unsigned o = m.operation;
-		if(m.blockType == BLOCK_J && m.mutationType == SWAP_PRED){
+		if (m.blockType == BLOCK_J && m.mutationType == SWAP_PRED)
+		{
 			swapJ(o, sol.pJ[o]);
 			return sol.computeMakespan();
 		}
 
-		if(m.blockType == BLOCK_J && m.mutationType == SWAP_SUCC){
+		if (m.blockType == BLOCK_J && m.mutationType == SWAP_SUCC)
+		{
 			swapJ(o, sol.sJ[o]);
 			return sol.computeMakespan();
 		}
 
-		if(m.blockType == BLOCK_M && m.mutationType == SWAP_PRED){
+		if (m.blockType == BLOCK_M && m.mutationType == SWAP_PRED)
+		{
 			swapM(o, sol.pM[o]);
 			return sol.computeMakespan();
 		}
 
-		if(m.blockType == BLOCK_M && m.mutationType == SWAP_SUCC){
+		if (m.blockType == BLOCK_M && m.mutationType == SWAP_SUCC)
+		{
 			swapM(o, sol.sM[o]);
 			return sol.computeMakespan();
 		}
 
-		if(m.blockType == BLOCK_J && m.mutationType == SHIFT_WHOLE){
+		if (m.blockType == BLOCK_J && m.mutationType == SHIFT_WHOLE)
+		{
 			vector<unsigned> block = sol.getOperationsJBlock(o);
-			//printv(block,0,"j block");
-			shiftJ(block, 0, m.factor);
+			unsigned opIndex = findIndex(block, o);
+			shiftJ(block, opIndex - m.factor, opIndex);
 			return sol.computeMakespan();
 		}
 
-		if(m.blockType == BLOCK_M && m.mutationType == SHIFT_WHOLE){
+		if (m.blockType == BLOCK_M && m.mutationType == SHIFT_WHOLE)
+		{
 			vector<unsigned> block = sol.getOperationsMBlock(o);
-			//printv(block,0,"j block");
-			shiftM(block, 0, m.factor);
+			unsigned opIndex = findIndex(block, o);
+			shiftM(block, opIndex - m.factor, findIndex(block, o));
 			return sol.computeMakespan();
 		}
 	}

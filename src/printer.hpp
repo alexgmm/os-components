@@ -29,6 +29,18 @@ class Printer
                to_string(cost[o]) +
                ")\"];\n";
     }
+    string getMakespanValueNode()
+    {
+        string node = to_string(makespan);
+        node += "[color=yellow, style=filled, shape=box, label=\"makespan: ";
+        node += to_string(makespan);
+        node += "\"];\n";
+        return node;
+    }
+    string getFirstOperationNode()
+    {
+        return to_string(first) + "[style=filled,color=green];\nrankdir=LR;\n";
+    }
     void saveGraph(string graph)
     {
         string filename = "/home/hal/os-components/graphs/" + to_string(CURRENT_GRAPH_NUMBER++) + ".gv";
@@ -38,56 +50,69 @@ class Printer
         out << graph;
         out.close();
     }
+    string getMachSequence(unsigned index)
+    {
+        string sequence = "";
+        unsigned o;
+        o = machStarters[index];
+        sequence += to_string(o);
+        o = sM[o];
+        while (o != 0)
+        {
+            sequence += "->" + to_string(o);
+            o = sM[o];
+        }
+        return sequence + ";\n\t\t";
+    }
+    string getJobSequence(unsigned index)
+    {
+        string sequence = "";
+        unsigned o;
+        o = jobStarters[index];
+        sequence += to_string(o);
+        o = sJ[o];
+        while (o != 0)
+        {
+            sequence += "->" + to_string(o);
+            o = sJ[o];
+        }
+        return sequence + ";\n\t\t";
+    }
+    string getJobClusterDeclaration(unsigned index)
+    {
+        return "\tsubgraph cluster" + to_string(index + 1) + "{\n\t\tcolor=red;\n\t\t";
+    }
+    string getJobClusterLabel(unsigned index)
+    {
+        return " label = \"job" + to_string(index) + "\";\n\t}\n";
+    }
+    string getMachClusterDeclaration(unsigned index)
+    {
+        return "\tsubgraph cluster" + to_string(index + 1) + "{\n\t\tcolor=blue;\n\t\t";
+    }
+    string getMachClusterLabel(unsigned index)
+    {
+        return " label = \"mach" + to_string(index) + "\";\n\t}\n";
+    }
     string printClusterGraph(bool printJob, bool printMach)
     {
-        unsigned o;
         string graph = "digraph G {\n";
 
-        graph += to_string(first) + "[style=filled,color=green];\nrankdir=LR;\n";
-        if (!VERBOSE && (SAVE_GRAPHS_ON_SWAP || SAVE_GRAPHS_ON_SHIFT))
-        {
-            graph += to_string(makespan);
-            graph += "[color=yellow, style=filled, shape=box, label=\"makespan: ";
-            graph += to_string(makespan);
-            graph += "\"];\n";
-        }
+        graph += getFirstOperationNode();
+        graph += getMakespanValueNode();
 
         for (int i = 0; i < machStarters.size(); i++)
         {
-            if (printMach)
-                graph += "\tsubgraph cluster" + to_string(i + 1) + "{\n\t\tcolor=blue;\n\t\t";
-
-            o = machStarters[i];
-            graph += to_string(o);
-            o = sM[o];
-            while (o != 0)
-            {
-                graph += "->" + to_string(o);
-                o = sM[o];
-            }
-            graph += ";\n\t\t";
-
-            if (printMach)
-                graph += " label = \"mach" + to_string(i) + "\";\n\t}\n";
+            graph += printMach ? getMachClusterDeclaration(i) : "";
+            graph += getMachSequence(i);
+            graph += printMach ? getMachClusterLabel(i) : "";
         }
 
         for (int i = 0; i < jobStarters.size(); i++)
         {
-            if (printJob)
-                graph += "\tsubgraph cluster" + to_string(i + 1) + "{\n\t\tcolor=red;\n\t\t";
-
-            o = jobStarters[i];
-            graph += to_string(o);
-            o = sJ[o];
-            while (o != 0)
-            {
-                graph += "->" + to_string(o);
-                o = sJ[o];
-            }
-            graph += ";\n\t\t";
-
-            if (printJob)
-                graph += " label = \"job" + to_string(i) + "\";\n\t}\n";
+            graph += printJob ? getJobClusterDeclaration(i) : "";
+            graph += getJobSequence(i);
+            graph += printJob ? getJobClusterLabel(i) : "";
         }
 
         for (int o = 1; o <= nO; o++)
@@ -150,7 +175,7 @@ public:
     }
     void printMachCluster()
     {
-        if(CURRENT_GRAPH_NUMBER == MAX_GRAPH_NUMBER)
+        if (CURRENT_GRAPH_NUMBER == MAX_GRAPH_NUMBER)
             return;
         cout << endl
              << "saving m-graph number " << CURRENT_GRAPH_NUMBER << endl;
@@ -159,7 +184,7 @@ public:
     }
     void printJobCluster()
     {
-        if(CURRENT_GRAPH_NUMBER == MAX_GRAPH_NUMBER)
+        if (CURRENT_GRAPH_NUMBER == MAX_GRAPH_NUMBER)
             return;
         cout << endl
              << "saving j-graph number " << CURRENT_GRAPH_NUMBER << endl;

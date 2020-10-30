@@ -13,6 +13,20 @@
 
 using namespace std;
 
+string getVectorString(vector<unsigned> &v, string name)
+{
+	string c = "\n" + name + " = {";
+	for (unsigned i = 0; i < v.size(); i++)
+	{
+		c += to_string(v[i]);
+		if (i != v.size() - 1)
+			c += ",";
+	}
+	c += "};\n";
+
+	return c;
+}
+
 void fillVecRandom(vector<unsigned> &v)
 {
 	random_device rnd_device;
@@ -33,7 +47,7 @@ int randint(int ini, int end)
 	assert(end > ini);
 	random_device rd;
 	mt19937 m(rd());
-	uniform_int_distribution<int> b(ini,end);
+	uniform_int_distribution<int> b(ini, end);
 	return b(m);
 	//return ini + (rand() % (end - ini + 1));
 }
@@ -49,9 +63,10 @@ void printv(vector<unsigned> &v, int ini, string name)
 
 void printl(string s, unsigned v) { cout << br << s << " " << v << br; }
 
-unsigned findIndex(vector<unsigned> &v, unsigned value){
-	for(unsigned i = 0; i < v.size(); i++)
-		if(v[i] == value)
+unsigned findIndex(vector<unsigned> &v, unsigned value)
+{
+	for (unsigned i = 0; i < v.size(); i++)
+		if (v[i] == value)
 			return i;
 	return UMAX;
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#define EXECUTION_TIME 2
+#define EXECUTION_TIME 5
 
 #include <iostream>
 #include <chrono>
@@ -10,9 +10,10 @@ using namespace std::chrono;
 
 uint64_t start;
 
-uint64_t timeSinceEpochMillisec() {
-  using namespace std::chrono;
-  return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+uint64_t timeSinceEpochMillisec()
+{
+    using namespace std::chrono;
+    return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 }
 
 void startTimeCounting()
@@ -22,13 +23,10 @@ void startTimeCounting()
 
 uint64_t getElapsedTime()
 {
-    return (timeSinceEpochMillisec() - start)/1000;
+    return (timeSinceEpochMillisec() - start) / 1000;
 }
 
 bool isTimeOver()
 {
     return getElapsedTime() >= EXECUTION_TIME;
 }
-
-
-

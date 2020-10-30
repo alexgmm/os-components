@@ -211,12 +211,12 @@ public:
 
 		if (index > nO)
 			return block;
-
 		while (index <= nO)
 		{
 			operation = p[index];
 			if (!sameJob(o, operation) || operation == first)
 				break;
+			block.push_back(operation);
 			index--;
 		}
 
@@ -231,7 +231,6 @@ public:
 
 		if (index > nO)
 			return block;
-
 		while (index <= nO)
 		{
 			operation = p[index];
@@ -755,30 +754,137 @@ public:
 		return o;
 	}
 	unsigned getOneRandomOperation_shiftWhole()
-    {
-        unsigned o = 0;
+	{
+		unsigned o = 0;
 
-        do
-            o = randint(1, nO);
-        while (o == first);
+		do
+			o = randint(1, nO);
+		while (o == first);
 
-        return o;
-    }
+		return o;
+	}
 	unsigned getOneRandomOperation_shiftCritical()
-    {
-        vector<unsigned> begins, ends, p = critical();
+	{
+		vector<unsigned> begins, ends, p = critical();
 
-        unsigned blockType = randint(0, 1), o;
-        blocks(begins, ends, blockType);
+		unsigned blockType = randint(0, 1), o;
+		blocks(begins, ends, blockType);
+		if (ends.size() == 1)
+		{
+			begins.clear();
+			ends.clear();
+			blocks(begins, ends, (blockType + 1) % 2);
+		}
 
+		if (ends.size() == 1)
+			return p[p.size() - 2];
+		unsigned index = ends.size() == 2 ? 0 : randint(0, ends.size() - 2);
+		o = p[ends[index]];
 
-        unsigned index = ends.size() == 1 ? 0 : randint(0, ends.size() - 1);
-        o = p[ends[index]];
+		return o;
+	}
 
-        return o;
-    }
-	
+	unsigned getOneRandomOperation(unsigned neighborType)
+	{
+		switch (neighborType)
+		{
+		case SWAP_CRITICAL:
+			return getOneRandomOperation_swapCritical();
+		case SWAP_CRITICAL_EDGE:
+			return getOneRandomOperation_swapCriticalEdge();
+		case SHIFT_WHOLE:
+			return getOneRandomOperation_shiftWhole();
+		case SHIFT_CRITICAL:
+			return getOneRandomOperation_shiftCritical();
+		default:
+			return UMAX;
+		}
+	}
+	vector<Mutation> listPossibleMutations_swapCritical(unsigned o)
+	{
+		vector<Mutation> possibleMutations;
+		vector<bool> isCriticalOperation = getCriticalOperationsList();
+		Mutation mutation = {0, 0, 0, 0};
 
+		if (isCriticalOperation[pM[o]] && pM[o] != first)
+		{
+			mutation = {o, SWAP_PRED, BLOCK_M, 0};
+			possibleMutations.push_back(mutation);
+		}
+
+		if (isCriticalOperation[sM[o]])
+		{
+			mutation = {o, SWAP_SUCC, BLOCK_M, 0};
+			possibleMutations.push_back(mutation);
+		}
+
+		if (isCriticalOperation[pJ[o]] && pJ[o] != first)
+		{
+			mutation = {o, SWAP_PRED, BLOCK_J, 0};
+			possibleMutations.push_back(mutation);
+		}
+
+		if (isCriticalOperation[sJ[o]])
+		{
+			mutation = {o, SWAP_SUCC, BLOCK_J, 0};
+			possibleMutations.push_back(mutation);
+		}
+
+		return possibleMutations;
+	}
+	void addPossibleMutationsOnJobBlock(vector<Mutation> &possibleMutations, vector<unsigned> &block, unsigned o)
+	{
+		if (block[0] == o || (block[o] == first && block[1] == o))
+			return;
+
+		unsigned index = 0;
+		Mutation mutation = {0, 0, 0, 0};
+		while (block[index] != o)
+		{
+			mutation = {o, SHIFT_WHOLE, BLOCK_J, index + 1};
+			possibleMutations.push_back(mutation);
+			index++;
+		}
+	}
+	void addPossibleMutationsOnMachBlock(vector<Mutation> &possibleMutations, vector<unsigned> &block, unsigned o)
+	{
+		if (block[0] == o || (block[o] == first && block[1] == o))
+			return;
+
+		unsigned index = 0;
+		Mutation mutation = {0, 0, 0, 0};
+		while (block[index] != o)
+		{
+			mutation = {o, SHIFT_WHOLE, BLOCK_M, index + 1};
+			possibleMutations.push_back(mutation);
+			index++;
+		}
+	}
+	vector<Mutation> listPossibleMutations_shiftWhole(unsigned o)
+	{
+		vector<Mutation> possibleMutations;
+
+		vector<unsigned> jobBlock = getOperationsJBlock(o), machBlock = getOperationsMBlock(o);
+
+		addPossibleMutationsOnJobBlock(possibleMutations, jobBlock, o);
+		addPossibleMutationsOnMachBlock(possibleMutations, machBlock, o);
+
+		return possibleMutations;
+	}
+	vector<Mutation> listPossibleMutations_shiftCritical(unsigned o)
+	{
+		vector<Mutation> possibleMutations;
+
+		vector<unsigned> jobBlock = getOperationsCriticalJBlock(o), machBlock = getOperationsCriticalMBlock(o);
+		//printv(jobBlock, 0, "j-block");
+		//printv(machBlock, 0, "m-block");
+		if (jobBlock.size() > 1)
+			addPossibleMutationsOnJobBlock(possibleMutations, jobBlock, o);
+		if (machBlock.size() > 1)
+			addPossibleMutationsOnMachBlock(possibleMutations, machBlock, o);
+
+		return possibleMutations;
+	}
 
 	/////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
@@ -894,128 +1000,37 @@ public:
 		return s;
 	}
 	int getMakespan() { return partial ? computePartialMakespan() : computeMakespan(); }
-
-	unsigned getOneRandomOperation(unsigned neighborType)
+	string getSolutionString()
 	{
-		switch(neighborType){
-			case SWAP_CRITICAL:
-				return getOneRandomOperation_swapCritical();
-			case SWAP_CRITICAL_EDGE:
-				return getOneRandomOperation_swapCriticalEdge();
-			case SHIFT_WHOLE:
-				return getOneRandomOperation_shiftWhole();
-			case SHIFT_CRITICAL:
-				return getOneRandomOperation_shiftCritical();
-			default:
-				return UMAX;
-		}
+		string pJStr = getVectorString(pJ, "pJ");
+		string sJStr = getVectorString(sJ, "sJ");
+		string pMStr = getVectorString(pM, "pM");
+		string sMStr = getVectorString(sM, "sM");
+		string costStr = getVectorString(instance.cost, "cost");
+		return pJStr + sJStr + pMStr + sMStr + costStr;
 	}
-	vector<Mutation> listPossibleMutations_swapCritical(unsigned o)
-    {
-        vector<Mutation> possibleMutations;
-        vector<bool> isCriticalOperation = getCriticalOperationsList();
-        Mutation mutation = {0, 0, 0, 0};
-
-        if (isCriticalOperation[pM[o]] && pM[o] != first)
-        {
-            mutation = {o, SWAP_PRED, BLOCK_M, 0};
-            possibleMutations.push_back(mutation);
-        }
-
-        if (isCriticalOperation[sM[o]])
-        {
-            mutation = {o, SWAP_SUCC, BLOCK_M, 0};
-            possibleMutations.push_back(mutation);
-        }
-
-        if (isCriticalOperation[pJ[o]] && pJ[o] != first)
-        {
-            mutation = {o, SWAP_PRED, BLOCK_J, 0};
-            possibleMutations.push_back(mutation);
-        }
-
-        if (isCriticalOperation[sJ[o]])
-        {
-            mutation = {o, SWAP_SUCC, BLOCK_J, 0};
-            possibleMutations.push_back(mutation);
-        }
-
-        return possibleMutations;
-    }
-    void addPossibleMutationsOnJob(vector<Mutation> &possibleMutations, vector<unsigned> &block, unsigned o)
-    {
-        if (block[0] == o || (block[o] == first && block[1] == o))
-            return;
-
-        unsigned index = 0;
-        Mutation mutation = {0, 0, 0, 0};
-        while (block[index] != o)
-        {
-            mutation = {o, SHIFT_WHOLE, BLOCK_J, index + 1};
-            possibleMutations.push_back(mutation);
-            index++;
-        }
-    }
-    void addPossibleMutationsOnMach(vector<Mutation> &possibleMutations, vector<unsigned> &block, unsigned o)
-    {
-        if (block[0] == o || (block[o] == first && block[1] == o))
-            return;
-
-        unsigned index = 0;
-        Mutation mutation = {0, 0, 0, 0};
-        while (block[index] != o)
-        {
-            mutation = {o, SHIFT_WHOLE, BLOCK_M, index + 1};
-            possibleMutations.push_back(mutation);
-            index++;
-        }
-    }
-    vector<Mutation> listPossibleMutations_shiftWhole(unsigned o)
-    {
-        vector<Mutation> possibleMutations;
-
-        vector<unsigned> jobBlock = getOperationsJBlock(o), machBlock = getOperationsMBlock(o);
-
-        addPossibleMutationsOnJob(possibleMutations, jobBlock, o);
-        addPossibleMutationsOnMach(possibleMutations, machBlock, o);
-
-        return possibleMutations;
-    }
-    vector<Mutation> listPossibleMutations_shiftCritical(unsigned o)
-    {
-        vector<Mutation> possibleMutations;
-
-        vector<unsigned> jobBlock = getOperationsCriticalJBlock(o), machBlock = getOperationsCriticalMBlock(o);
-
-        if (jobBlock.size() > 1)
-            addPossibleMutationsOnJob(possibleMutations, jobBlock, o);
-        if (machBlock.size() > 1)
-            addPossibleMutationsOnMach(possibleMutations, machBlock, o);
-
-        return possibleMutations;
-    }
 	vector<Mutation> listPossibleMutations(unsigned o, unsigned neighborType)
-    {
-        vector<Mutation> possibleMutations;
+	{
+		vector<Mutation> possibleMutations;
 
-        switch (neighborType)
-        {
-        case SWAP_CRITICAL:
-            possibleMutations = listPossibleMutations_swapCritical(o);
-            break;
-        case SWAP_CRITICAL_EDGE:
-            possibleMutations = listPossibleMutations_swapCritical(o);
-            break;
-        case SHIFT_WHOLE:
-            possibleMutations = listPossibleMutations_shiftWhole(o);
-            break;
-        case SHIFT_CRITICAL:
-            possibleMutations = listPossibleMutations_shiftCritical(o);
-            break;
-        }
+		switch (neighborType)
+		{
+		case SWAP_CRITICAL:
+			possibleMutations = listPossibleMutations_swapCritical(o);
+			break;
+		case SWAP_CRITICAL_EDGE:
+			possibleMutations = listPossibleMutations_swapCritical(o);
+			break;
+		case SHIFT_WHOLE:
+			possibleMutations = listPossibleMutations_shiftWhole(o);
+			break;
+		case SHIFT_CRITICAL:
+			possibleMutations = listPossibleMutations_shiftCritical(o);
+			break;
+		}
 
-        return possibleMutations;
-    }
+		return possibleMutations;
+	}
 	friend class Heuristics;
 	friend class Neighbor;
 	friend class Neighborhood;

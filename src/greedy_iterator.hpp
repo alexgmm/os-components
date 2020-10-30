@@ -13,9 +13,11 @@ class GreedyIterator
 
     unsigned getOneRandomOperation(vector<unsigned> &used)
     {
-        unsigned o = 0;
-        while(used[o])
+        unsigned o;
+        do
             o = s.getOneRandomOperation(oper);
+        while (used[o]);
+
         return o;
     }
 
@@ -28,17 +30,26 @@ class GreedyIterator
 
         Neighborhood n(s);
 
-        unsigned bestValue = UMAX, value;
+        unsigned bestValue = s.computeMakespan(), value;
         Mutation bestMutation = {0, 0, 0, 0};
 
         for (Mutation m : mutations)
         {
-            //printMutation(m);
+            /* s.printJobCluster();
+            if (CURRENT_GRAPH_NUMBER < MAX_GRAPH_NUMBER)
+            {
+                TRACK_SHIFT_OPERATIONS = true;
+                printMutation(m);
+            } */
             value = n.applyMutation(m);
+            //TRACK_SHIFT_OPERATIONS = false;
+
+            //n.getSolution().printJobCluster();
             n.restore();
 
             if (value < bestValue && value > 0)
             {
+
                 bestValue = value;
                 bestMutation = m;
             }
@@ -71,7 +82,18 @@ public:
 
     void test()
     {
-        
+        vector<unsigned> used(s.nO + 1, 0);
+        unsigned o = getOneRandomOperation(used);
+        printl("o", o);
+        vector<Mutation> ms = s.listPossibleMutations(o, oper);
+        Neighborhood n(s);
+        for (Mutation m : ms)
+        {
+            printMutation(m);
+            n.applyMutation(m);
+            cout << n.getSolution().computeMakespan() << br;
+            n.restore();
+        }
     }
 
     unsigned solve()

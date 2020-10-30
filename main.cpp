@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 		h.setSimulatedAnnealingParams(stod(alpha), stod(temperature), stoi(iterationsNumber));
 		unsigned r = h.solve(SA, SHIFT_CRITICAL); */
 
-		string   instanceFileName(argv[2]), duration(argv[4]);
+		string instanceFileName(argv[2]), duration(argv[4]);
 		Instance i(instanceFileName);
 		Solution s(i, RANDOM);
 		Heuristics h(s);
@@ -50,10 +50,12 @@ int main(int argc, char **argv)
 
 		Instance i(t4);
 		Solution s(i, RANDOM);
-		cout << s.computeMakespan() << br;
-		GreedyIterator g(s, 5, SWAP_CRITICAL_EDGE);
-		cout << g.solve() << br;
-
+		s.printJobCluster();
+		cout << s.getSolutionString() << br;
+		/* cout << s.computeMakespan() << br;
+		GreedyIterator g(s, 10, SHIFT_CRITICAL);
+		//cout << g.solve() << br;
+		g.test(); */
 	}
 
 	return 0;

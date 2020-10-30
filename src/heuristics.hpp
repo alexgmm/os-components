@@ -67,7 +67,7 @@ class Heuristics
         Solution incumbent = solution.copySolution();
         vector<Neighbor> neighbors;
 
-        while(!isTimeOver())
+        while (!isTimeOver())
         {
             neighbors = n.getNeighborhood(oper);
 
@@ -108,6 +108,9 @@ class Heuristics
         case SHIFT_CRITICAL:
             TABU_DURATION = 34;
             break;
+        case SHIFT_WHOLE:
+            TABU_DURATION = 33;
+            break;
         default:
             break;
         }
@@ -122,9 +125,9 @@ public:
         T_MIN = temp;
         N_ITER_SA = iter;
     }
-    void setTabuSearchParams(unsigned duration){
+    void setTabuSearchParams(unsigned duration)
+    {
         TABU_DURATION = duration;
-
     }
 
     Solution getSolution() { return solution; }
