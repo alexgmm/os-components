@@ -51,11 +51,10 @@ int main(int argc, char **argv)
 		Instance i(t4);
 		Solution s(i, RANDOM);
 		s.printJobCluster();
-		cout << s.getSolutionString() << br;
-		/* cout << s.computeMakespan() << br;
-		GreedyIterator g(s, 10, SHIFT_CRITICAL);
-		//cout << g.solve() << br;
-		g.test(); */
+		cout << s.computeMakespan() << br;
+		GreedyIterator g(s, 5, SWAP_CRITICAL);
+		cout << g.solve() << br;
+		//g.test();
 	}
 
 	return 0;

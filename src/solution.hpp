@@ -115,6 +115,66 @@ public:
 			}
 		}
 	}
+	vector<vector<unsigned>> getCriticalJBlocks()
+	{
+		vector<vector<unsigned>> jBlocks;
+		vector<unsigned> p = critical(), block;
+		unsigned index = 1, o;
+		block.push_back(p[0]);
+
+		while (true)
+		{
+			o = p[index++];
+			if (!sameJob(o, p[index - 2]))
+			{
+				jBlocks.push_back(block);
+				block.clear();
+			}
+			block.push_back(o);
+			if (index == p.size())
+			{
+				jBlocks.push_back(block);
+				break;
+			}
+		}
+
+		return jBlocks;
+	}
+	vector<vector<unsigned>> getCriticalMBlocks()
+	{
+		vector<vector<unsigned>> mBlocks;
+		vector<unsigned> p = critical(), block;
+		unsigned index = 1, o;
+		block.push_back(p[0]);
+
+		while (true)
+		{
+			o = p[index++];
+			if (!sameMach(o, p[index - 2]))
+			{
+				mBlocks.push_back(block);
+				block.clear();
+			}
+			block.push_back(o);
+			if (index == p.size())
+			{
+				mBlocks.push_back(block);
+				break;
+			}
+		}
+
+		return mBlocks;
+	}
+	void filterNonTrivialBlocks(vector<vector<unsigned>> &blocks)
+	{
+		vector<vector<unsigned>> filtered;
+
+		for (auto block : blocks)
+			if (block.size() > 1)
+				filtered.push_back(block);
+
+		blocks = filtered;
+	}
 	vector<unsigned> getRandomJBlock()
 	{
 		vector<unsigned> p = critical(), begins, ends, block;
@@ -736,6 +796,10 @@ public:
 
 		return o;
 	}
+	vector<unsigned> getAllOperations_swapCritical()
+	{
+		return critical();
+	}
 	unsigned getOneRandomOperation_swapCriticalEdge()
 	{
 		vector<unsigned> block;
@@ -753,6 +817,22 @@ public:
 
 		return o;
 	}
+	vector<unsigned> getAllOperations_swapCriticalEdge()
+	{
+		vector<unsigned> ops, p = critical();
+
+		vector<vector<unsigned>> jB = getCriticalJBlocks(), mB = getCriticalMBlocks();
+		filterNonTrivialBlocks(jB);
+		filterNonTrivialBlocks(mB);
+
+		for (auto bs : {jB, mB})
+			for (auto b : bs)
+				ops.push_back(b[b.size() - 1]);
+		if (ops.size() > 0)
+			ops.pop_back();
+
+		return ops;
+	}
 	unsigned getOneRandomOperation_shiftWhole()
 	{
 		unsigned o = 0;
@@ -762,6 +842,16 @@ public:
 		while (o == first);
 
 		return o;
+	}
+	vector<unsigned> getAllOperations_shiftWhole()
+	{
+		vector<unsigned> operations;
+
+		for (unsigned i = 1; i < nO; i++)
+			if (i != first)
+				operations.push_back(i);
+
+		return operations;
 	}
 	unsigned getOneRandomOperation_shiftCritical()
 	{
@@ -783,6 +873,54 @@ public:
 
 		return o;
 	}
+	void filterN7Blocks(vector<vector<unsigned>> &criticalBlocks)
+	{
+		vector<vector<unsigned>> n7Blocks;
+		vector<unsigned> block;
+		unsigned startIndex = 0, endIndex = criticalBlocks.size() - 1;
+
+		if (criticalBlocks[0][0] == first)
+		{
+			startIndex++;
+			if (criticalBlocks[0].size() > 2)
+				for (unsigned i = 2; i < criticalBlocks[0].size(); i++)
+					block.push_back(criticalBlocks[0][i]);
+			n7Blocks.push_back(block);
+		}
+
+		if (criticalBlocks[endIndex][criticalBlocks[endIndex].size() - 1] == last)
+		{
+			endIndex--;
+			block.clear();
+			if (criticalBlocks[endIndex].size() > 2)
+				for (unsigned i = 2; i < criticalBlocks[endIndex].size(); i++)
+					block.push_back(criticalBlocks[endIndex][i]);
+			n7Blocks.push_back(block);
+		}
+
+		for (auto index = startIndex; index <= endIndex; index++)
+			n7Blocks.push_back(criticalBlocks[index]);
+
+		criticalBlocks = n7Blocks;
+	}
+	vector<unsigned> getAllOperations_shiftCritical()
+	{
+		vector<unsigned> ops;
+
+		auto jobBlocks = getCriticalJBlocks(), machBlocks = getCriticalMBlocks();
+		filterNonTrivialBlocks(jobBlocks);
+		filterNonTrivialBlocks(machBlocks);
+
+		filterN7Blocks(jobBlocks);
+		filterN7Blocks(machBlocks);
+
+		for (auto cluster : {jobBlocks, machBlocks})
+			for (auto c : cluster)
+				for (auto o : c)
+					ops.push_back(o);
+
+		return ops;
+	}
 
 	unsigned getOneRandomOperation(unsigned neighborType)
 	{
@@ -798,6 +936,20 @@ public:
 			return getOneRandomOperation_shiftCritical();
 		default:
 			return UMAX;
+		}
+	}
+	vector<unsigned> getAllOperations(unsigned neighborType)
+	{
+		switch (neighborType)
+		{
+		case SWAP_CRITICAL:
+			return getAllOperations_swapCritical();
+		case SWAP_CRITICAL_EDGE:
+			return getAllOperations_swapCriticalEdge();
+		case SHIFT_WHOLE:
+			return getAllOperations_shiftWhole();
+		case SHIFT_CRITICAL:
+			return getAllOperations_shiftCritical();
 		}
 	}
 	vector<Mutation> listPossibleMutations_swapCritical(unsigned o)
@@ -863,11 +1015,23 @@ public:
 	vector<Mutation> listPossibleMutations_shiftWhole(unsigned o)
 	{
 		vector<Mutation> possibleMutations;
+		Mutation m;
+		unsigned pred = pJ[o], factor = 1;
 
-		vector<unsigned> jobBlock = getOperationsJBlock(o), machBlock = getOperationsMBlock(o);
-
-		addPossibleMutationsOnJobBlock(possibleMutations, jobBlock, o);
-		addPossibleMutationsOnMachBlock(possibleMutations, machBlock, o);
+		while (pred != 0)
+		{
+			m = {o, SHIFT_WHOLE, BLOCK_J, factor++};
+			possibleMutations.push_back(m);
+			pred = pJ[pred];
+		}
+		pred = pM[o];
+		factor = 1;
+		while (pred != 0)
+		{
+			m = {o, SHIFT_WHOLE, BLOCK_M, factor++};
+			possibleMutations.push_back(m);
+			pred = pM[pred];
+		}
 
 		return possibleMutations;
 	}
@@ -948,14 +1112,12 @@ public:
 		vector<unsigned> queue(nO),
 			deg(nO + 1, 0),
 			heads = getHeads(deg, queue, pushed);
-		//printv(heads, 0, "heads"); printl("size:",heads.size());
 
 		if (heads.size() == 0)
-			return 0;
+			return UMAX;
 
-		vector<unsigned> latePred = getLatestPred(heads); // latest predecessors AKA prev
+		vector<unsigned> latePred = getLatestPred(heads);
 
-		//printv(deg, 0, "deg"); printv(heads,1,"heads"); printv(latePred,1,"prev");
 		while (lookat < pushed)
 		{
 			op = queue[lookat++];
