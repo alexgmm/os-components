@@ -4,14 +4,14 @@
 #include "src/solution.hpp"
 #include "src/tester.hpp"
 #include "src/heuristics.hpp"
-#include "src/greedy_iterator.hpp"
+#include "src/iterated_local_searcher.hpp"
 
 using namespace std;
 
 string t = "tests/test2";
 string g = "inst/gueret-prins/GP03-02.txt";
 string g7 = "inst/gueret-prins/GP07-09.txt";
-string t4 = "inst/taillard/tai04_04_01.txt";
+string t4 = "inst/taillard/tai04_04_02.txt";
 string t5 = "inst/taillard/tai05_05_01.txt";
 string t20 = "inst/taillard/tai20_20_01.txt";
 
@@ -50,10 +50,10 @@ int main(int argc, char **argv)
 
 		Instance i(t4);
 		Solution s(i, RANDOM);
+		unsigned initial = s.computeMakespan();
 		s.printJobCluster();
-		cout << s.computeMakespan() << br;
-		GreedyIterator g(s, 5, SWAP_CRITICAL);
-		cout << g.solve() << br;
+		IteratedLocalSearcher g(s, 1, SHIFT_CRITICAL);
+		cout << g.solve() << sp << initial << br;
 		//g.test();
 	}
 

@@ -1196,7 +1196,7 @@ public:
 	friend class Heuristics;
 	friend class Neighbor;
 	friend class Neighborhood;
-	friend class GreedyIterator;
+	friend class IteratedLocalSearcher;
 };
 
 #endif

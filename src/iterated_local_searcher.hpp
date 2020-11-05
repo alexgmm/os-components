@@ -6,7 +6,7 @@
 
 using namespace std;
 
-class GreedyIterator
+class IteratedLocalSearcher
 {
     Solution s, globalBestSolution;
     unsigned perturbationNumber, oper;
@@ -27,7 +27,7 @@ class GreedyIterator
         for (Mutation m : mutations)
         {
             value = n.applyMutation(m);
-
+            //cout << " " << value;
             if (value < globalBestValue)
             {
                 globalBestValue = value;
@@ -62,6 +62,8 @@ class GreedyIterator
         }
 
         auto randomIndex = mutations.size() == 1 ? 0 : randint(0, mutations.size() - 1);
+
+        return mutations[randomIndex];
     }
 
     void improve()
@@ -88,10 +90,12 @@ class GreedyIterator
         do
         {
             n.restore();
+            m = getOneMutation();
+            //printMutation(m);
             n.applyMutation(m);
             value = n.getSolution().computeMakespan();
         } while (value == UMAX);
-
+        //cout << br << "perturbation " << value << br;
         s = n.getSolution();
     }
 
@@ -103,8 +107,8 @@ class GreedyIterator
     }
 
 public:
-    GreedyIterator() {}
-    GreedyIterator(Solution solution, unsigned number, unsigned o)
+    IteratedLocalSearcher() {}
+    IteratedLocalSearcher(Solution solution, unsigned number, unsigned o)
     {
         s = solution;
         globalBestSolution = solution.copySolution();
