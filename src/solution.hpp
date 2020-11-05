@@ -4,7 +4,7 @@
 #include "utilities.hpp"
 #include "instance.hpp"
 #include "printer.hpp"
-#include "mutation.hpp"
+#include "perturbation.hpp"
 
 using namespace std;
 
@@ -952,70 +952,70 @@ public:
 			return getAllOperations_shiftCritical();
 		}
 	}
-	vector<Mutation> listPossibleMutations_swapCritical(unsigned o)
+	vector<Perturbation> listPossibleMutations_swapCritical(unsigned o)
 	{
-		vector<Mutation> possibleMutations;
+		vector<Perturbation> possibleMutations;
 		vector<bool> isCriticalOperation = getCriticalOperationsList();
-		Mutation mutation = {0, 0, 0, 0};
+		Perturbation perturbation = {0, 0, 0, 0};
 
 		if (isCriticalOperation[pM[o]] && pM[o] != first)
 		{
-			mutation = {o, SWAP_PRED, BLOCK_M, 0};
-			possibleMutations.push_back(mutation);
+			perturbation = {o, SWAP_PRED, BLOCK_M, 0};
+			possibleMutations.push_back(perturbation);
 		}
 
 		if (isCriticalOperation[sM[o]])
 		{
-			mutation = {o, SWAP_SUCC, BLOCK_M, 0};
-			possibleMutations.push_back(mutation);
+			perturbation = {o, SWAP_SUCC, BLOCK_M, 0};
+			possibleMutations.push_back(perturbation);
 		}
 
 		if (isCriticalOperation[pJ[o]] && pJ[o] != first)
 		{
-			mutation = {o, SWAP_PRED, BLOCK_J, 0};
-			possibleMutations.push_back(mutation);
+			perturbation = {o, SWAP_PRED, BLOCK_J, 0};
+			possibleMutations.push_back(perturbation);
 		}
 
 		if (isCriticalOperation[sJ[o]])
 		{
-			mutation = {o, SWAP_SUCC, BLOCK_J, 0};
-			possibleMutations.push_back(mutation);
+			perturbation = {o, SWAP_SUCC, BLOCK_J, 0};
+			possibleMutations.push_back(perturbation);
 		}
 
 		return possibleMutations;
 	}
-	void addPossibleMutationsOnJobBlock(vector<Mutation> &possibleMutations, vector<unsigned> &block, unsigned o)
+	void addPossibleMutationsOnJobBlock(vector<Perturbation> &possibleMutations, vector<unsigned> &block, unsigned o)
 	{
 		if (block[0] == o || (block[o] == first && block[1] == o))
 			return;
 
 		unsigned index = 0;
-		Mutation mutation = {0, 0, 0, 0};
+		Perturbation perturbation = {0, 0, 0, 0};
 		while (block[index] != o)
 		{
-			mutation = {o, SHIFT_WHOLE, BLOCK_J, index + 1};
-			possibleMutations.push_back(mutation);
+			perturbation = {o, SHIFT_WHOLE, BLOCK_J, index + 1};
+			possibleMutations.push_back(perturbation);
 			index++;
 		}
 	}
-	void addPossibleMutationsOnMachBlock(vector<Mutation> &possibleMutations, vector<unsigned> &block, unsigned o)
+	void addPossibleMutationsOnMachBlock(vector<Perturbation> &possibleMutations, vector<unsigned> &block, unsigned o)
 	{
 		if (block[0] == o || (block[o] == first && block[1] == o))
 			return;
 
 		unsigned index = 0;
-		Mutation mutation = {0, 0, 0, 0};
+		Perturbation perturbation = {0, 0, 0, 0};
 		while (block[index] != o)
 		{
-			mutation = {o, SHIFT_WHOLE, BLOCK_M, index + 1};
-			possibleMutations.push_back(mutation);
+			perturbation = {o, SHIFT_WHOLE, BLOCK_M, index + 1};
+			possibleMutations.push_back(perturbation);
 			index++;
 		}
 	}
-	vector<Mutation> listPossibleMutations_shiftWhole(unsigned o)
+	vector<Perturbation> listPossibleMutations_shiftWhole(unsigned o)
 	{
-		vector<Mutation> possibleMutations;
-		Mutation m;
+		vector<Perturbation> possibleMutations;
+		Perturbation m;
 		unsigned pred = pJ[o], factor = 1;
 
 		while (pred != 0)
@@ -1035,9 +1035,9 @@ public:
 
 		return possibleMutations;
 	}
-	vector<Mutation> listPossibleMutations_shiftCritical(unsigned o)
+	vector<Perturbation> listPossibleMutations_shiftCritical(unsigned o)
 	{
-		vector<Mutation> possibleMutations;
+		vector<Perturbation> possibleMutations;
 
 		vector<unsigned> jobBlock = getOperationsCriticalJBlock(o), machBlock = getOperationsCriticalMBlock(o);
 		//printv(jobBlock, 0, "j-block");
@@ -1171,9 +1171,9 @@ public:
 		string costStr = getVectorString(instance.cost, "cost");
 		return pJStr + sJStr + pMStr + sMStr + costStr;
 	}
-	vector<Mutation> listPossibleMutations(unsigned o, unsigned neighborType)
+	vector<Perturbation> listPossibleMutations(unsigned o, unsigned neighborType)
 	{
-		vector<Mutation> possibleMutations;
+		vector<Perturbation> possibleMutations;
 
 		switch (neighborType)
 		{
@@ -1195,7 +1195,7 @@ public:
 	}
 	friend class Heuristics;
 	friend class Neighbor;
-	friend class Neighborhood;
+	friend class NeighborGenerator;
 	friend class IteratedLocalSearcher;
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "neighborhood.hpp"
-#include "mutation.hpp"
+#include "neighbor_generator.hpp"
+#include "perturbation.hpp"
 #include "time.hpp"
 
 using namespace std;
@@ -14,17 +14,17 @@ class IteratedLocalSearcher
     bool applyMutationGreedly(unsigned o)
     {
         bool improved = false;
-        vector<Mutation> mutations = s.listPossibleMutations(o, oper);
+        vector<Perturbation> perturbations = s.listPossibleMutations(o, oper);
 
-        if (mutations.size() == 0)
+        if (perturbations.size() == 0)
             return false;
 
-        Neighborhood n(s);
+        NeighborGenerator n(s);
 
         unsigned bestValue = s.computeMakespan(), value, globalBestValue = globalBestSolution.computeMakespan();
-        Mutation bestMutation = {0, 0, 0, 0};
+        Perturbation bestMutation = {0, 0, 0, 0};
 
-        for (Mutation m : mutations)
+        for (Perturbation m : perturbations)
         {
             value = n.applyMutation(m);
             //cout << " " << value;
@@ -50,20 +50,20 @@ class IteratedLocalSearcher
         return improved;
     }
 
-    Mutation getOneMutation()
+    Perturbation getOneMutation()
     {
-        vector<Mutation> mutations;
+        vector<Perturbation> perturbations;
         unsigned o;
 
-        while (mutations.size() == 0)
+        while (perturbations.size() == 0)
         {
             o = s.getOneRandomOperation_shiftWhole();
-            mutations = s.listPossibleMutations_shiftWhole(o);
+            perturbations = s.listPossibleMutations_shiftWhole(o);
         }
 
-        auto randomIndex = mutations.size() == 1 ? 0 : randint(0, mutations.size() - 1);
+        auto randomIndex = perturbations.size() == 1 ? 0 : randint(0, perturbations.size() - 1);
 
-        return mutations[randomIndex];
+        return perturbations[randomIndex];
     }
 
     void improve()
@@ -84,8 +84,8 @@ class IteratedLocalSearcher
     void perturbation()
     {
         unsigned value;
-        Neighborhood n(s);
-        Mutation m;
+        NeighborGenerator n(s);
+        Perturbation m;
 
         do
         {
@@ -119,16 +119,16 @@ public:
     void test()
     {
         vector<unsigned> ops = s.getAllOperations_shiftCritical();
-        vector<Mutation> mutations;
+        vector<Perturbation> perturbations;
         for (unsigned o : ops)
         {
-            vector<Mutation> ms = s.listPossibleMutations(o, oper);
-            for (Mutation m : ms)
-                mutations.push_back(m);
+            vector<Perturbation> ms = s.listPossibleMutations(o, oper);
+            for (Perturbation m : ms)
+                perturbations.push_back(m);
         }
 
-        Neighborhood n(s);
-        for (Mutation m : mutations)
+        NeighborGenerator n(s);
+        for (Perturbation m : perturbations)
         {
             printMutation(m);
             n.applyMutation(m);

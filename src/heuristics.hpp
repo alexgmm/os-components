@@ -3,7 +3,7 @@
 
 unsigned N_ITER = 20;
 
-#include "neighborhood.hpp"
+#include "neighbor_generator.hpp"
 #include "utilities.hpp"
 #include "time.hpp"
 #include <math.h>
@@ -42,7 +42,7 @@ class Heuristics
                 tempMakespan = -1;
                 while (tempMakespan <= 0)
                 {
-                    tempS = Neighborhood::getNeighbor(oper, solution);
+                    tempS = NeighborGenerator::getNeighbor(oper, solution);
                     tempMakespan = tempS.computeMakespan();
                 }
                 if (tempMakespan < makespan || accept(t, tempMakespan, makespan))
@@ -63,7 +63,7 @@ class Heuristics
     unsigned ts(unsigned oper)
     {
         startTimeCounting();
-        Neighborhood n(solution);
+        NeighborGenerator n(solution);
         Solution incumbent = solution.copySolution();
         vector<Neighbor> neighbors;
 
@@ -154,7 +154,7 @@ public:
         for (unsigned i = 0; i < N_ITER; i++)
         {
             mlocal = UMAX;
-            Neighborhood n(local);
+            NeighborGenerator n(local);
             vector<Neighbor> vi = n.getNeighborhood(SWAP_CRITICAL_EDGE);
             for (Neighbor v : vi)
             {

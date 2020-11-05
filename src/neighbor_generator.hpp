@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include "solution.hpp"
-#include "mutation.hpp"
+#include "perturbation.hpp"
 
 using namespace std;
 
@@ -34,7 +34,7 @@ public:
 	unsigned getValue() { return value; }
 	bool isLegal() { return legal; }
 };
-class Neighborhood
+class NeighborGenerator
 {
 	Solution sol;
 	Solution previous;
@@ -544,8 +544,8 @@ class Neighborhood
 	}
 
 public:
-	Neighborhood() {}
-	Neighborhood(Solution s)
+	NeighborGenerator() {}
+	NeighborGenerator(Solution s)
 	{
 		setSolution(s);
 		tabu.resize(s.nO + 1);
@@ -559,34 +559,34 @@ public:
 		previous = s.copySolution();
 	}
 
-	unsigned applyMutation(Mutation m)
+	unsigned applyMutation(Perturbation m)
 	{
 		unsigned o = m.operation;
-		if (m.blockType == BLOCK_J && m.mutationType == SWAP_PRED)
+		if (m.blockType == BLOCK_J && m.perturbationType == SWAP_PRED)
 		{
 			swapJ(o, sol.pJ[o]);
 			return sol.computeMakespan();
 		}
 
-		if (m.blockType == BLOCK_J && m.mutationType == SWAP_SUCC)
+		if (m.blockType == BLOCK_J && m.perturbationType == SWAP_SUCC)
 		{
 			swapJ(o, sol.sJ[o]);
 			return sol.computeMakespan();
 		}
 
-		if (m.blockType == BLOCK_M && m.mutationType == SWAP_PRED)
+		if (m.blockType == BLOCK_M && m.perturbationType == SWAP_PRED)
 		{
 			swapM(o, sol.pM[o]);
 			return sol.computeMakespan();
 		}
 
-		if (m.blockType == BLOCK_M && m.mutationType == SWAP_SUCC)
+		if (m.blockType == BLOCK_M && m.perturbationType == SWAP_SUCC)
 		{
 			swapM(o, sol.sM[o]);
 			return sol.computeMakespan();
 		}
 
-		if (m.blockType == BLOCK_J && m.mutationType == SHIFT_WHOLE)
+		if (m.blockType == BLOCK_J && m.perturbationType == SHIFT_WHOLE)
 		{
 			vector<unsigned> block = sol.getOperationsJBlock(o);
 			unsigned opIndex = findIndex(block, o);
@@ -594,7 +594,7 @@ public:
 			return sol.computeMakespan();
 		}
 
-		if (m.blockType == BLOCK_M && m.mutationType == SHIFT_WHOLE)
+		if (m.blockType == BLOCK_M && m.perturbationType == SHIFT_WHOLE)
 		{
 			vector<unsigned> block = sol.getOperationsMBlock(o);
 			unsigned opIndex = findIndex(block, o);
@@ -633,7 +633,7 @@ public:
 	static Solution getNeighbor(unsigned oper, Solution &s)
 	{
 		Solution copied = s.copySolution(), selected;
-		Neighborhood n = Neighborhood(copied);
+		NeighborGenerator n = NeighborGenerator(copied);
 		unsigned tries = 1000;
 
 		bool invalid = true;
