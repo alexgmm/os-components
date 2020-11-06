@@ -2,6 +2,9 @@
 #define TESTS_HPP
 #define NLOOPS 20
 
+#include "tabu_searcher.hpp"
+#include "annealing_simulator.hpp"
+#include "iterated_local_searcher.hpp"
 #include "heuristics.hpp"
 #include "utilities.hpp"
 #include "time.hpp"
@@ -20,6 +23,8 @@ class Tester
 	vector<string> nameHeur = {"SA", "IG", "TS"};
 	vector<string> nameOper = {"swAll", "swCritical", "swEdges", "shWhole"};
 
+	unsigned oper;
+
 	bool isTransposed = false;
 
 	vector<string> fileNames()
@@ -32,21 +37,41 @@ class Tester
 		return f;
 	}
 
+	unsigned runSA(Solution s)
+	{
+		AnnealingSimulator a(oper);
+		a.setSolution(s.copySolution());
+
+		return a.solve();
+	}
+
+	unsigned runTS(Solution s)
+	{
+		TabuSearcher t(oper);
+		t.setSolution(s.copySolution());
+
+		return t.solve();
+	}
+
+	unsigned runILS(Solution s)
+	{
+		/*  t(oper);
+		t.setSolution(s.copySolution());
+
+		return t.solve(); */
+		return 0;
+	}
+
 public:
 	Tester() {}
 
-	unsigned testHeuristicOnce(string instance, unsigned oper, unsigned heuristic){
-		Instance i(instance);
-		Solution s(i, RANDOM);
-		Heuristics h(s);
-		return h.solve(heuristic, oper);
+	void setNeighborType(unsigned neighborType)
+	{
+		oper = neighborType;
 	}
 
-	void testHeuristic(string instance, unsigned oper, unsigned heuristic, unsigned loops){
-		unsigned sum = 0;
-		for(int i=0; i<loops; i++)
-			sum += testHeuristicOnce(instance, oper, heuristic);
-		cout << sum / loops << br;
+	unsigned runHeuristic(unsigned heuristic)
+	{
 	}
 
 	void printAverageExecutionTime(int heuristic, int op)

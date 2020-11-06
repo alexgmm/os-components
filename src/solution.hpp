@@ -873,53 +873,9 @@ public:
 
 		return o;
 	}
-	void filterN7Blocks(vector<vector<unsigned>> &criticalBlocks)
-	{
-		vector<vector<unsigned>> n7Blocks;
-		vector<unsigned> block;
-		unsigned startIndex = 0, endIndex = criticalBlocks.size() - 1;
-
-		if (criticalBlocks[0][0] == first)
-		{
-			startIndex++;
-			if (criticalBlocks[0].size() > 2)
-				for (unsigned i = 2; i < criticalBlocks[0].size(); i++)
-					block.push_back(criticalBlocks[0][i]);
-			n7Blocks.push_back(block);
-		}
-
-		if (criticalBlocks[endIndex][criticalBlocks[endIndex].size() - 1] == last)
-		{
-			endIndex--;
-			block.clear();
-			if (criticalBlocks[endIndex].size() > 2)
-				for (unsigned i = 2; i < criticalBlocks[endIndex].size(); i++)
-					block.push_back(criticalBlocks[endIndex][i]);
-			n7Blocks.push_back(block);
-		}
-
-		for (auto index = startIndex; index <= endIndex; index++)
-			n7Blocks.push_back(criticalBlocks[index]);
-
-		criticalBlocks = n7Blocks;
-	}
 	vector<unsigned> getAllOperations_shiftCritical()
 	{
-		vector<unsigned> ops;
-
-		auto jobBlocks = getCriticalJBlocks(), machBlocks = getCriticalMBlocks();
-		filterNonTrivialBlocks(jobBlocks);
-		filterNonTrivialBlocks(machBlocks);
-
-		filterN7Blocks(jobBlocks);
-		filterN7Blocks(machBlocks);
-
-		for (auto cluster : {jobBlocks, machBlocks})
-			for (auto c : cluster)
-				for (auto o : c)
-					ops.push_back(o);
-
-		return ops;
+		return critical();
 	}
 
 	unsigned getOneRandomOperation(unsigned neighborType)
@@ -952,39 +908,39 @@ public:
 			return getAllOperations_shiftCritical();
 		}
 	}
-	vector<Perturbation> listPossibleMutations_swapCritical(unsigned o)
+	vector<Perturbation> listPossiblePerturbations_swapCritical(unsigned o)
 	{
-		vector<Perturbation> possibleMutations;
+		vector<Perturbation> possiblePerturbations;
 		vector<bool> isCriticalOperation = getCriticalOperationsList();
 		Perturbation perturbation = {0, 0, 0, 0};
 
 		if (isCriticalOperation[pM[o]] && pM[o] != first)
 		{
 			perturbation = {o, SWAP_PRED, BLOCK_M, 0};
-			possibleMutations.push_back(perturbation);
+			possiblePerturbations.push_back(perturbation);
 		}
 
 		if (isCriticalOperation[sM[o]])
 		{
 			perturbation = {o, SWAP_SUCC, BLOCK_M, 0};
-			possibleMutations.push_back(perturbation);
+			possiblePerturbations.push_back(perturbation);
 		}
 
 		if (isCriticalOperation[pJ[o]] && pJ[o] != first)
 		{
 			perturbation = {o, SWAP_PRED, BLOCK_J, 0};
-			possibleMutations.push_back(perturbation);
+			possiblePerturbations.push_back(perturbation);
 		}
 
 		if (isCriticalOperation[sJ[o]])
 		{
 			perturbation = {o, SWAP_SUCC, BLOCK_J, 0};
-			possibleMutations.push_back(perturbation);
+			possiblePerturbations.push_back(perturbation);
 		}
 
-		return possibleMutations;
+		return possiblePerturbations;
 	}
-	void addPossibleMutationsOnJobBlock(vector<Perturbation> &possibleMutations, vector<unsigned> &block, unsigned o)
+	void addPossiblePerturbationsOnJobBlock(vector<Perturbation> &possiblePerturbations, vector<unsigned> &block, unsigned o)
 	{
 		if (block[0] == o || (block[o] == first && block[1] == o))
 			return;
@@ -994,11 +950,11 @@ public:
 		while (block[index] != o)
 		{
 			perturbation = {o, SHIFT_WHOLE, BLOCK_J, index + 1};
-			possibleMutations.push_back(perturbation);
+			possiblePerturbations.push_back(perturbation);
 			index++;
 		}
 	}
-	void addPossibleMutationsOnMachBlock(vector<Perturbation> &possibleMutations, vector<unsigned> &block, unsigned o)
+	void addPossiblePerturbationsOnMachBlock(vector<Perturbation> &possiblePerturbations, vector<unsigned> &block, unsigned o)
 	{
 		if (block[0] == o || (block[o] == first && block[1] == o))
 			return;
@@ -1008,20 +964,20 @@ public:
 		while (block[index] != o)
 		{
 			perturbation = {o, SHIFT_WHOLE, BLOCK_M, index + 1};
-			possibleMutations.push_back(perturbation);
+			possiblePerturbations.push_back(perturbation);
 			index++;
 		}
 	}
-	vector<Perturbation> listPossibleMutations_shiftWhole(unsigned o)
+	vector<Perturbation> listPossiblePerturbations_shiftWhole(unsigned o)
 	{
-		vector<Perturbation> possibleMutations;
+		vector<Perturbation> possiblePerturbations;
 		Perturbation m;
 		unsigned pred = pJ[o], factor = 1;
 
 		while (pred != 0)
 		{
 			m = {o, SHIFT_WHOLE, BLOCK_J, factor++};
-			possibleMutations.push_back(m);
+			possiblePerturbations.push_back(m);
 			pred = pJ[pred];
 		}
 		pred = pM[o];
@@ -1029,25 +985,25 @@ public:
 		while (pred != 0)
 		{
 			m = {o, SHIFT_WHOLE, BLOCK_M, factor++};
-			possibleMutations.push_back(m);
+			possiblePerturbations.push_back(m);
 			pred = pM[pred];
 		}
 
-		return possibleMutations;
+		return possiblePerturbations;
 	}
-	vector<Perturbation> listPossibleMutations_shiftCritical(unsigned o)
+	vector<Perturbation> listPossiblePerturbations_shiftCritical(unsigned o)
 	{
-		vector<Perturbation> possibleMutations;
+		vector<Perturbation> possiblePerturbations;
 
 		vector<unsigned> jobBlock = getOperationsCriticalJBlock(o), machBlock = getOperationsCriticalMBlock(o);
 		//printv(jobBlock, 0, "j-block");
 		//printv(machBlock, 0, "m-block");
 		if (jobBlock.size() > 1)
-			addPossibleMutationsOnJobBlock(possibleMutations, jobBlock, o);
+			addPossiblePerturbationsOnJobBlock(possiblePerturbations, jobBlock, o);
 		if (machBlock.size() > 1)
-			addPossibleMutationsOnMachBlock(possibleMutations, machBlock, o);
+			addPossiblePerturbationsOnMachBlock(possiblePerturbations, machBlock, o);
 
-		return possibleMutations;
+		return possiblePerturbations;
 	}
 
 	/////////////////////////////////////////////////////////////////////////
@@ -1171,27 +1127,27 @@ public:
 		string costStr = getVectorString(instance.cost, "cost");
 		return pJStr + sJStr + pMStr + sMStr + costStr;
 	}
-	vector<Perturbation> listPossibleMutations(unsigned o, unsigned neighborType)
+	vector<Perturbation> listPossiblePerturbations(unsigned o, unsigned neighborType)
 	{
-		vector<Perturbation> possibleMutations;
+		vector<Perturbation> possiblePerturbations;
 
 		switch (neighborType)
 		{
 		case SWAP_CRITICAL:
-			possibleMutations = listPossibleMutations_swapCritical(o);
+			possiblePerturbations = listPossiblePerturbations_swapCritical(o);
 			break;
 		case SWAP_CRITICAL_EDGE:
-			possibleMutations = listPossibleMutations_swapCritical(o);
+			possiblePerturbations = listPossiblePerturbations_swapCritical(o);
 			break;
 		case SHIFT_WHOLE:
-			possibleMutations = listPossibleMutations_shiftWhole(o);
+			possiblePerturbations = listPossiblePerturbations_shiftWhole(o);
 			break;
 		case SHIFT_CRITICAL:
-			possibleMutations = listPossibleMutations_shiftCritical(o);
+			possiblePerturbations = listPossiblePerturbations_shiftCritical(o);
 			break;
 		}
 
-		return possibleMutations;
+		return possiblePerturbations;
 	}
 	friend class Heuristics;
 	friend class Neighbor;

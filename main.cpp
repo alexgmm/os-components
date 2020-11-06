@@ -4,6 +4,8 @@
 #include "src/solution.hpp"
 #include "src/tester.hpp"
 #include "src/heuristics.hpp"
+#include "src/tabu_searcher.hpp"
+#include "src/annealing_simulator.hpp"
 #include "src/iterated_local_searcher.hpp"
 
 using namespace std;
@@ -13,6 +15,7 @@ string g = "inst/gueret-prins/GP03-02.txt";
 string g7 = "inst/gueret-prins/GP07-09.txt";
 string t4 = "inst/taillard/tai04_04_02.txt";
 string t5 = "inst/taillard/tai05_05_01.txt";
+string t7 = "inst/taillard/tai07_07_08.txt";
 string t20 = "inst/taillard/tai20_20_01.txt";
 
 void test();
@@ -30,14 +33,19 @@ int main(int argc, char **argv)
 		h.setSimulatedAnnealingParams(stod(alpha), stod(temperature), stoi(iterationsNumber));
 		unsigned r = h.solve(SA, SHIFT_CRITICAL); */
 
-		string instanceFileName(argv[2]), duration(argv[4]);
+		/* string instanceFileName(argv[2]), duration(argv[4]);
 		Instance i(instanceFileName);
 		Solution s(i, RANDOM);
 		Heuristics h(s);
 		h.setTabuSearchParams(stoi(duration));
-		unsigned r = h.solve(TS, SHIFT_WHOLE);
+		unsigned r = h.solve(TS, SHIFT_WHOLE); */
 
-		cout << r;
+		string instanceFileName(argv[2]), perturbationNumber(argv[4]);
+		Instance i(instanceFileName);
+		Solution s(i, RANDOM);
+		IteratedLocalSearcher g(stoi(perturbationNumber), SWAP_CRITICAL);
+		g.setSolution(s);
+		cout << g.solve();
 	}
 	else
 	{
@@ -48,12 +56,13 @@ int main(int argc, char **argv)
 		TRACK_SHIFT_OPERATIONS = false;
 		SAVE_GRAPHS_ON_SHIFT = false;
 
-		Instance i(t4);
+		Instance i(t7);
 		Solution s(i, RANDOM);
-		unsigned initial = s.computeMakespan();
 		s.printJobCluster();
-		IteratedLocalSearcher g(s, 1, SHIFT_CRITICAL);
-		cout << g.solve() << sp << initial << br;
+		/* unsigned initial = s.computeMakespan();
+		//s.printJobCluster();
+		IteratedLocalSearcher g(s, 8, SWAP_CRITICAL);
+		cout << g.solve() << sp << initial << br; */
 		//g.test();
 	}
 

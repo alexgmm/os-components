@@ -4,6 +4,7 @@
 unsigned N_ITER = 20;
 
 #include "neighbor_generator.hpp"
+#include "tabu_searcher.hpp"
 #include "utilities.hpp"
 #include "time.hpp"
 #include <math.h>

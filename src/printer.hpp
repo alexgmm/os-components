@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "solution.hpp"
+#include "perturbation.hpp"
 
 bool SAVE_GRAPHS_ON_SWAP = false;
 bool SAVE_GRAPHS_ON_SHIFT = false;
@@ -196,5 +197,21 @@ public:
         cout << endl
              << "saving gantt chart number " << CURRENT_CHART_NUMBER << endl;
         saveGantt();
+    }
+    static void printBlockSet(vector<vector<unsigned>> &set, string label)
+    {
+        cout << br << label << br;
+        for (auto block : set)
+        {
+            for (auto o : block)
+                cout << o << sp;
+            cout << br;
+        }
+    }
+    static void appendToFile(string data, string filename)
+    {
+        fstream out(filename, ios_base::app);
+        out << data;
+        out.close();
     }
 };

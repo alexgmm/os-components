@@ -36,7 +36,6 @@
 
 #define SWAP 0
 #define SHIFT 1
-unsigned TABU_DURATION = 5;
 
 #define BEST_IMPROVEMENT 0
 #define FIRST_IMPROVEMENT 1

@@ -2,32 +2,34 @@
 
 #include "neighbor_generator.hpp"
 #include "perturbation.hpp"
+#include "printer.hpp"
 #include "time.hpp"
 
 using namespace std;
 
 class IteratedLocalSearcher
 {
-    Solution s, globalBestSolution;
+    Solution solution, globalBestSolution;
     unsigned perturbationNumber, oper;
-
-    bool applyMutationGreedly(unsigned o)
+    //string outfile = "/home/hal/running_report.txt";
+    bool applyPerturbationGreedly(unsigned o)
     {
+        //Printer::appendToFile(s.getSolutionString(), outfile);
         bool improved = false;
-        vector<Perturbation> perturbations = s.listPossibleMutations(o, oper);
+        vector<Perturbation> perturbations = solution.listPossiblePerturbations(o, oper);
 
         if (perturbations.size() == 0)
             return false;
 
-        NeighborGenerator n(s);
+        NeighborGenerator n(solution);
 
-        unsigned bestValue = s.computeMakespan(), value, globalBestValue = globalBestSolution.computeMakespan();
-        Perturbation bestMutation = {0, 0, 0, 0};
+        unsigned bestValue = solution.computeMakespan(), value, globalBestValue = globalBestSolution.computeMakespan();
+        Perturbation bestPerturbation = {0, 0, 0, 0};
 
         for (Perturbation m : perturbations)
         {
-            value = n.applyMutation(m);
-            //cout << " " << value;
+            //Printer::appendToFile(getPerturbationString(m), outfile);
+            value = n.applyPerturbation(m);
             if (value < globalBestValue)
             {
                 globalBestValue = value;
@@ -40,25 +42,25 @@ class IteratedLocalSearcher
             {
                 improved = true;
                 bestValue = value;
-                bestMutation = m;
+                bestPerturbation = m;
             }
         }
 
-        n.applyMutation(bestMutation);
+        n.applyPerturbation(bestPerturbation);
 
-        s = n.getSolution();
+        solution = n.getSolution();
         return improved;
     }
 
-    Perturbation getOneMutation()
+    Perturbation getOnePerturbation()
     {
         vector<Perturbation> perturbations;
         unsigned o;
 
         while (perturbations.size() == 0)
         {
-            o = s.getOneRandomOperation_shiftWhole();
-            perturbations = s.listPossibleMutations_shiftWhole(o);
+            o = solution.getOneRandomOperation_shiftWhole();
+            perturbations = solution.listPossiblePerturbations_shiftWhole(o);
         }
 
         auto randomIndex = perturbations.size() == 1 ? 0 : randint(0, perturbations.size() - 1);
@@ -73,10 +75,10 @@ class IteratedLocalSearcher
         do
         {
             isImproving = false;
-            vector<unsigned> operations = s.getAllOperations(oper);
+            vector<unsigned> operations = solution.getAllOperations(oper);
             //printv(operations, 0, "all ops");
             for (auto o : operations)
-                isImproving = isImproving || applyMutationGreedly(o);
+                isImproving = isImproving || applyPerturbationGreedly(o);
 
         } while (isImproving && !isTimeOver());
     }
@@ -84,19 +86,19 @@ class IteratedLocalSearcher
     void perturbation()
     {
         unsigned value;
-        NeighborGenerator n(s);
+        NeighborGenerator n(solution);
         Perturbation m;
 
         do
         {
             n.restore();
-            m = getOneMutation();
-            //printMutation(m);
-            n.applyMutation(m);
+            m = getOnePerturbation();
+            //printPerturbation(m);
+            n.applyPerturbation(m);
             value = n.getSolution().computeMakespan();
         } while (value == UMAX);
         //cout << br << "perturbation " << value << br;
-        s = n.getSolution();
+        solution = n.getSolution();
     }
 
     void iterate()
@@ -108,30 +110,34 @@ class IteratedLocalSearcher
 
 public:
     IteratedLocalSearcher() {}
-    IteratedLocalSearcher(Solution solution, unsigned number, unsigned o)
+    IteratedLocalSearcher(unsigned number, unsigned o)
     {
-        s = solution;
-        globalBestSolution = solution.copySolution();
         oper = o;
         perturbationNumber = number;
     }
 
+    void setSolution(Solution s)
+    {
+        solution = s;
+        globalBestSolution = s.copySolution();
+    }
+
     void test()
     {
-        vector<unsigned> ops = s.getAllOperations_shiftCritical();
+        vector<unsigned> ops = solution.getAllOperations_shiftCritical();
         vector<Perturbation> perturbations;
         for (unsigned o : ops)
         {
-            vector<Perturbation> ms = s.listPossibleMutations(o, oper);
+            vector<Perturbation> ms = solution.listPossiblePerturbations(o, oper);
             for (Perturbation m : ms)
                 perturbations.push_back(m);
         }
 
-        NeighborGenerator n(s);
+        NeighborGenerator n(solution);
         for (Perturbation m : perturbations)
         {
-            printMutation(m);
-            n.applyMutation(m);
+            printPerturbation(m);
+            n.applyPerturbation(m);
             n.getSolution().printJobCluster();
             n.restore();
         }
@@ -149,6 +155,6 @@ public:
 
     Solution getSolution()
     {
-        return s;
+        return solution;
     }
 };

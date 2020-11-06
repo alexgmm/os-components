@@ -559,7 +559,7 @@ public:
 		previous = s.copySolution();
 	}
 
-	unsigned applyMutation(Perturbation m)
+	unsigned applyPerturbation(Perturbation m)
 	{
 		unsigned o = m.operation;
 		if (m.blockType == BLOCK_J && m.perturbationType == SWAP_PRED)

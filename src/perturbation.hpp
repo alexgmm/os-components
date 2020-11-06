@@ -11,11 +11,11 @@ struct Perturbation
     unsigned operation, perturbationType, blockType, factor;
 };
 
-void printMutation(Perturbation m)
+string getPerturbationString(Perturbation p)
 {
     string perturbationTypeLabel, blockTypeLabel;
 
-    switch (m.perturbationType)
+    switch (p.perturbationType)
     {
     case SWAP_PRED:
         perturbationTypeLabel = "swap_predecessor";
@@ -24,14 +24,14 @@ void printMutation(Perturbation m)
         perturbationTypeLabel = "swap_successor";
         break;
     case SHIFT_WHOLE:
-        perturbationTypeLabel = "shift " + to_string(m.factor) + " units";
+        perturbationTypeLabel = "shift " + to_string(p.factor) + " units";
         break;
     default:
         perturbationTypeLabel = "shift";
         break;
     }
 
-    switch (m.blockType)
+    switch (p.blockType)
     {
     case BLOCK_J:
         blockTypeLabel = "job block";
@@ -44,5 +44,10 @@ void printMutation(Perturbation m)
         break;
     }
 
-    cout << perturbationTypeLabel << "(" << m.operation << ") on " << blockTypeLabel << endl;
+    return perturbationTypeLabel + "(" + to_string(p.operation) + ") on " + blockTypeLabel + br;
+}
+
+void printPerturbation(Perturbation p)
+{
+    cout << getPerturbationString(p);
 }
