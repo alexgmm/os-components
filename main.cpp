@@ -55,14 +55,26 @@ int main(int argc, char **argv)
 		TRACK_SHIFT_OPERATIONS = true;
 		SAVE_GRAPHS_ON_SHIFT = false;
 
-		Instance i(t4);
+		/* Instance i(t4);
 		Solution s(i, RANDOM);
-		s.printJobCluster();
-		auto je = s.getJEdgesN5(), me = s.getMEdgesN5();
-		for (auto e : je)
-			cout << e.first << sp << e.second << br;
-		for (auto e : me)
-			cout << e.first << sp << e.second << br;
+		s.printJobCluster(); */
+
+		ScheduleChange s1 = {0, 1, 3}, s2 = {0, 2, 3}, s3 = {0, 1, 2};
+
+		TabuList t(4, 5, 0);
+		t.insertTabuMovement(s1);
+		t.printCurrentTabu();
+		t.iterate();
+		t.printCurrentTabu();
+		t.insertTabuMovement(s2);
+		t.insertTabuMovement(s3);
+		t.iterate();
+		t.iterate();
+		t.printCurrentTabu();
+		t.iterate();
+		t.iterate();
+		t.printCurrentTabu();
+
 		/* unsigned initial = s.computeMakespan();
 		//s.printJobCluster();
 		IteratedLocalSearcher g(s, 8, SWAP_CRITICAL);

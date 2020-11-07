@@ -4,6 +4,7 @@ unsigned TABU_DURATION = 5;
 
 #include <deque>
 #include "time.hpp"
+#include "tabu_list.hpp"
 #include "neighbor_generator.hpp"
 
 using namespace std;
@@ -54,12 +55,6 @@ public:
 
         while (!isTimeOver())
         {
-            neighbors = n.getNeighborhood(oper);
-
-            for (Neighbor neighbor : neighbors)
-                if (neighbor.getValue() < incumbent.getMakespan() && neighbor.isLegal())
-                    incumbent = neighbor.getSolution().copySolution();
-            n.setSolution(incumbent);
         }
         solution = incumbent.copySolution();
 
