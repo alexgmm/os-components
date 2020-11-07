@@ -7,6 +7,23 @@
 
 using namespace std;
 
+struct ScheduleChange
+{
+	unsigned type, o1, o2;
+};
+
+void printScheduleChange(ScheduleChange sc)
+{
+	string t = sc.type == SWAP ? "swap" : "shift";
+
+	cout << t << "(" << sc.o1 << "," << sc.o2 << ")" << br;
+}
+
+bool areEqual(ScheduleChange sc1, ScheduleChange sc2)
+{
+	return sc1.type == sc2.type && sc1.o1 == sc2.o1 && sc1.o2 == sc2.o2;
+}
+
 class Neighbor
 {
 	Solution neighbor;
@@ -138,138 +155,21 @@ class NeighborGenerator
 	//////// GERAÇÃO DE VIZINHO /////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 
-	void swapRandomSucc()
+	Solution getRandomNeighbor_swapCritical()
 	{
-		unsigned randOp = randint(1, sol.nO);
-
-		while (!sol.sJ[randOp] && !sol.sM[randOp])
-			randOp = randint(1, sol.nO);
-
-		if (!sol.sJ[randOp])
-			swapM(randOp, sol.sM[randOp]);
-		else if (!sol.sM[randOp])
-			swapJ(randOp, sol.sJ[randOp]);
-		else
-		{
-			if (randint(0, 1) == SWAP_J)
-				swapJ(randOp, sol.sJ[randOp]);
-			else
-				swapM(randOp, sol.sM[randOp]);
-		}
-	}
-	void swapRandomPred()
-	{
-		unsigned randOp = randint(1, sol.nO);
-
-		while (!sol.pJ[randOp] && !sol.pM[randOp])
-			randOp = randint(1, sol.nO);
-
-		if (!sol.pJ[randOp])
-			swapM(randOp, sol.pM[randOp]);
-		else if (!sol.pM[randOp])
-			swapJ(randOp, sol.pJ[randOp]);
-		else
-		{
-			if (randint(0, 1) == SWAP_J)
-				swapJ(randOp, sol.pJ[randOp]);
-			else
-				swapM(randOp, sol.pM[randOp]);
-		}
-	}
-	Solution swapAllOne()
-	{
-		if (randint(0, 1) == SWAP_PRED)
-			swapRandomPred();
-		else
-			swapRandomSucc();
-		return sol;
-	}
-	Solution swapCriticalOne()
-	{
-		vector<unsigned> b, e, p = sol.critical(), succ, pred;
-		unsigned idxEnd = 0, idxBegin = 0, chosenBlock, op;
-		int chosenOperator = randint(0, 1);
-
-		if (chosenOperator == SWAP_J)
-		{
-			succ = sol.sJ;
-			pred = sol.pJ;
-			sol.blocks(b, e, BLOCK_J);
-		}
-		else
-		{
-			succ = sol.sM;
-			pred = sol.pM;
-			sol.blocks(b, e, BLOCK_M);
-		}
-
-		chosenBlock = (b.size() == 1) ? 0 : randint(0, b.size() - 1);
-		idxBegin = b[chosenBlock];
-		idxEnd = e[chosenBlock];
-		idxEnd = (idxEnd - idxBegin > 1 ? randint(idxBegin + 1, idxEnd) : idxEnd);
-		op = p[randint(idxBegin, idxEnd)];
-
-		if (chosenOperator == SWAP_J)
-		{
-			if (!pred[op])
-				swapJ(op, succ[op]);
-			else if (!succ[op])
-				swapJ(op, pred[op]);
-			else
-			{
-				if (randint(0, 1) == SWAP_PRED)
-					swapJ(op, pred[op]);
-				else
-					swapJ(op, succ[op]);
-			}
-		}
-		else
-		{
-			if (!pred[op])
-				swapM(op, succ[op]);
-			else if (!succ[op])
-				swapM(op, pred[op]);
-			else
-			{
-				if (randint(0, 1) == SWAP_PRED)
-					swapM(op, pred[op]);
-				else
-					swapM(op, succ[op]);
-			}
-		}
+		auto o = sol.getOneRandomOperation_swapCritical();
+		auto p = sol.listPossiblePerturbations_swapCritical(o);
+		auto i = p.size() == 1 ? 0 : randint(0, p.size() - 1);
+		applyPerturbation(p[i]);
 
 		return sol;
 	}
-	Solution swapCriticalEdgeOne()
+	Solution getRandomNeighbor_swapCriticalEdge()
 	{
-		vector<unsigned> b, e, p = sol.critical();
-
-		if (randint(0, 1) == SWAP_J)
-		{
-			sol.blocks(b, e, BLOCK_J);
-
-			unsigned chosenBlock = (b.size() == 1) ? 0 : randint(0, b.size() - 1);
-			unsigned idxBegin = b[chosenBlock], idxEnd = e[chosenBlock];
-			if (idxBegin != idxEnd - 1)
-				idxEnd = (idxEnd - idxBegin > 1 ? randint(idxBegin + 1, idxEnd) : idxEnd);
-			if (randint(0, 1) == BLOCK_START)
-				swapJ(p[idxBegin], p[idxBegin + 1]);
-			else
-				swapJ(p[idxEnd], p[idxEnd - 1]);
-		}
-		else
-		{
-			sol.blocks(b, e, BLOCK_M);
-
-			unsigned chosenBlock = (b.size() == 1) ? 0 : randint(0, b.size() - 1);
-			unsigned idxBegin = b[chosenBlock], idxEnd = e[chosenBlock];
-			if (idxBegin != idxEnd - 1)
-				idxEnd = (idxEnd - idxBegin > 1 ? randint(idxBegin + 1, idxEnd) : idxEnd);
-			if (randint(0, 1) == BLOCK_START)
-				swapM(p[idxBegin], p[idxBegin + 1]);
-			else
-				swapM(p[idxEnd], p[idxEnd - 1]);
-		}
+		auto o = sol.getOneRandomOperation_swapCriticalEdge();
+		auto p = sol.listPossiblePerturbations_swapCritical(o);
+		auto i = p.size() == 1 ? 0 : randint(0, p.size() - 1);
+		applyPerturbation(p[i]);
 
 		return sol;
 	}
@@ -297,26 +197,16 @@ class NeighborGenerator
 		saveDataShift();
 		return legal;
 	}
-	Solution shiftCriticalOne()
+	Solution getRandomNeighbor_shiftCritical()
 	{
-		vector<unsigned> b, e, p = sol.critical();
-		unsigned typeChoice = randint(2, 3);
-		sol.blocks(b, e, typeChoice);
-		/* string s = typeChoice == BLOCK_J ? "BJ" : "MJ";
-		cout << br << s << br;
-		printv(p, 0, "path");
-		printv(b, 0, "begins");
-		printv(e, 0, "ends"); */
-		unsigned index = b.size() == 1 ? 0 : randint(0, b.size() - 1);
-
-		if (typeChoice == SHIFT_J)
-			shiftJ(p, b[index], e[index]);
-		else
-			shiftM(p, b[index], e[index]);
+		auto o = sol.getOneRandomOperation_shiftCritical();
+		auto p = sol.listPossiblePerturbations_shiftCritical(o);
+		auto i = p.size() == 1 ? 0 : randint(0, p.size() - 1);
+		applyPerturbation(p[i]);
 
 		return sol;
 	}
-	Solution shiftWholeOne()
+	Solution getRandomNeighbor_shiftWhole()
 	{
 
 		if (randint(2, 3) == SHIFT_J)
@@ -434,57 +324,6 @@ class NeighborGenerator
 			return true;
 		return false;
 	}
-	void traverseSwapJ(vector<Neighbor> &neighborhood, unsigned op, vector<bool> &visited)
-	{
-		//cout << br << "traverseSwapJ(" << op << ")" << br;
-		//sol.print();
-		bool l = swapJ(op, sol.sJ[op]);
-		//sol.print();
-
-		Neighbor n(sol, sol.computeMakespan(), l);
-		neighborhood.push_back(n);
-		restore();
-
-		visited[op] = true;
-
-		if (!visited[sol.sJ[op]] && !isLast(sol.sJ[op]) && sol.sJ[sol.sJ[op]])
-			traverseSwapJ(neighborhood, sol.sJ[op], visited);
-		if (!visited[sol.sM[op]] && !isLast(sol.sM[op]) && sol.sJ[sol.sM[op]])
-			traverseSwapJ(neighborhood, sol.sM[op], visited);
-	}
-	void traverseSwapM(vector<Neighbor> &neighborhood, unsigned op, vector<bool> &visited)
-	{
-		if (op != sol.first)
-		{
-			//cout << br << "traverseSwapJ(" << op << ")" << br;
-			//sol.print();
-			bool l = swapM(op, sol.sM[op]);
-			//sol.print();
-			Neighbor n(sol, sol.computeMakespan(), l);
-			neighborhood.push_back(n);
-
-			restore();
-
-			visited[op] = true;
-		}
-
-		if (!visited[sol.sJ[op]] && !isLast(sol.sJ[op]) && sol.sM[sol.sJ[op]])
-			traverseSwapM(neighborhood, sol.sJ[op], visited);
-		if (!visited[sol.sM[op]] && !isLast(sol.sM[op]) && sol.sM[sol.sM[op]])
-			traverseSwapM(neighborhood, sol.sM[op], visited);
-	}
-	vector<Neighbor> swapAllNeighbors()
-	{
-		vector<Neighbor> neighborhood;
-		vector<bool> visited(sol.nO + 1, false), visited2(sol.nO + 1, false);
-		visited[0] = true;
-		visited2[0] = true;
-
-		traverseSwapJ(neighborhood, sol.first, visited);
-		traverseSwapM(neighborhood, sol.first, visited2);
-
-		return neighborhood;
-	}
 	void swapJAdd(unsigned op1, unsigned op2, vector<Neighbor> &neighborhood)
 	{
 		bool l = swapJ(op1, op2);
@@ -543,6 +382,52 @@ class NeighborGenerator
 			sol.printGantt();
 	}
 
+	void applyPerturbations(vector<Perturbation> &perturbations, vector<Solution> &neighbors)
+	{
+		for (auto p : perturbations)
+		{
+			applyPerturbation(p);
+			neighbors.push_back(sol.copySolution());
+			restore();
+		}
+	}
+	vector<Solution> getNeighbors_swapCritical()
+	{
+		vector<Solution> neighbors;
+
+		auto perturbations = sol.listAllPerturbations(SWAP_CRITICAL);
+		applyPerturbations(perturbations, neighbors);
+
+		return neighbors;
+	}
+	vector<Solution> getNeighbors_swapCriticalEdge()
+	{
+		vector<Solution> neighbors;
+
+		auto perturbations = sol.listAllPerturbations(SWAP_CRITICAL_EDGE);
+		applyPerturbations(perturbations, neighbors);
+
+		return neighbors;
+	}
+	vector<Solution> getNeighbors_shiftCritical()
+	{
+		vector<Solution> neighbors;
+
+		auto perturbations = sol.listAllPerturbations(SHIFT_CRITICAL);
+		applyPerturbations(perturbations, neighbors);
+
+		return neighbors;
+	}
+	vector<Solution> getNeighbors_shiftWhole()
+	{
+		vector<Solution> neighbors;
+
+		auto perturbations = sol.listAllPerturbations(SHIFT_WHOLE);
+		applyPerturbations(perturbations, neighbors);
+
+		return neighbors;
+	}
+
 public:
 	NeighborGenerator() {}
 	NeighborGenerator(Solution s)
@@ -559,31 +444,41 @@ public:
 		previous = s.copySolution();
 	}
 
-	unsigned applyPerturbation(Perturbation m)
+	ScheduleChange applyPerturbation(Perturbation m)
 	{
+		ScheduleChange change = {0, 0, 0};
+
 		unsigned o = m.operation;
 		if (m.blockType == BLOCK_J && m.perturbationType == SWAP_PRED)
 		{
 			swapJ(o, sol.pJ[o]);
-			return sol.computeMakespan();
+			change = {SWAP,
+					  o,
+					  sol.pJ[o]};
 		}
 
 		if (m.blockType == BLOCK_J && m.perturbationType == SWAP_SUCC)
 		{
 			swapJ(o, sol.sJ[o]);
-			return sol.computeMakespan();
+			change = {SWAP,
+					  o,
+					  sol.sJ[o]};
 		}
 
 		if (m.blockType == BLOCK_M && m.perturbationType == SWAP_PRED)
 		{
 			swapM(o, sol.pM[o]);
-			return sol.computeMakespan();
+			change = {SWAP,
+					  o,
+					  sol.pM[o]};
 		}
 
 		if (m.blockType == BLOCK_M && m.perturbationType == SWAP_SUCC)
 		{
 			swapM(o, sol.sM[o]);
-			return sol.computeMakespan();
+			change = {SWAP,
+					  o,
+					  sol.sM[o]};
 		}
 
 		if (m.blockType == BLOCK_J && m.perturbationType == SHIFT_WHOLE)
@@ -591,7 +486,9 @@ public:
 			vector<unsigned> block = sol.getOperationsJBlock(o);
 			unsigned opIndex = findIndex(block, o);
 			shiftJ(block, opIndex - m.factor, opIndex);
-			return sol.computeMakespan();
+			change = {SHIFT,
+					  block[opIndex - m.factor],
+					  block[opIndex]};
 		}
 
 		if (m.blockType == BLOCK_M && m.perturbationType == SHIFT_WHOLE)
@@ -599,8 +496,12 @@ public:
 			vector<unsigned> block = sol.getOperationsMBlock(o);
 			unsigned opIndex = findIndex(block, o);
 			shiftM(block, opIndex - m.factor, findIndex(block, o));
-			return sol.computeMakespan();
+			change = {SHIFT,
+					  block[opIndex - m.factor],
+					  block[findIndex(block, o)]};
 		}
+
+		return change;
 	}
 
 	/////////////////////////////////////////////////////////////////////////
@@ -612,9 +513,6 @@ public:
 	{
 		switch (oper)
 		{
-		case SWAP_ALL:
-			return swapAllNeighbors();
-			break;
 		case SWAP_CRITICAL:
 			return swapCriticalNeighbors();
 			break;
@@ -630,47 +528,34 @@ public:
 			break;
 		}
 	}
-	static Solution getNeighbor(unsigned oper, Solution &s)
+	static Solution getRandomNeighbor(unsigned oper, Solution &s)
 	{
-		Solution copied = s.copySolution(), selected;
+		Solution copied = s.copySolution();
 		NeighborGenerator n = NeighborGenerator(copied);
-		unsigned tries = 1000;
 
-		bool invalid = true;
-		while (invalid && tries > 0)
+		switch (oper)
 		{
-			switch (oper)
-			{
-			case SWAP_ALL:
-				selected = n.swapAllOne();
-				n.restore();
-				break;
-			case SWAP_CRITICAL:
-				selected = n.swapCriticalOne();
-				n.restore();
-				break;
-			case SWAP_CRITICAL_EDGE:
-				selected = n.swapCriticalEdgeOne();
-				n.restore();
-				break;
-			case SHIFT_CRITICAL:
-				selected = n.shiftCriticalOne();
-				n.restore();
-				break;
-			case SHIFT_WHOLE:
-				selected = n.shiftWholeOne();
-				n.restore();
-				break;
-			default:
-				break;
-			}
-			//selected.print();
-			invalid = (selected.getMakespan() == 0);
-			tries--;
+		case SWAP_CRITICAL:
+			return n.getRandomNeighbor_swapCritical();
+		case SWAP_CRITICAL_EDGE:
+			return n.getRandomNeighbor_swapCriticalEdge();
+		case SHIFT_CRITICAL:
+			return n.getRandomNeighbor_shiftCritical();
+		case SHIFT_WHOLE:
+			return n.getRandomNeighbor_shiftWhole();
+		default:
+			break;
 		}
-		if (invalid)
-			return n.getSolution();
-		return selected;
+	}
+	vector<Solution> getNeighbors(int oper)
+	{
+		switch (oper)
+		{
+		case SHIFT_CRITICAL:
+			return getNeighbors_shiftCritical();
+		default:
+			break;
+		}
 	}
 	Solution getSolution() { return sol; }
 };

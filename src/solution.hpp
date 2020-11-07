@@ -398,13 +398,19 @@ public:
 	}
 	bool isJEdgeN5(unsigned i1, unsigned i2, vector<unsigned> &p)
 	{
-		if (sameJob(p[i1], p[i2]) && (!sameJob(p[i2], p[i2 + 1]) || !sameJob(p[i1 - 1], p[i1])))
+		unsigned o1 = p[i1], o2 = p[i2];
+		if (o1 == first || o2 == last || !sameJob(o1, o2))
+			return false;
+		if (!sameJob(o1, p[i1 - 1]) || !sameJob(o2, p[i2 + 1]))
 			return true;
 		return false;
 	}
 	bool isMEdgeN5(unsigned i1, unsigned i2, vector<unsigned> &p)
 	{
-		if (sameMach(p[i1], p[i2]) && (!sameMach(p[i2], p[i2 + 1]) || !sameMach(p[i1 - 1], p[i1])))
+		unsigned o1 = p[i1], o2 = p[i2];
+		if (o1 == first || o2 == last || !sameMach(o1, o2))
+			return false;
+		if (!sameMach(o1, p[i1 - 1]) || !sameMach(o2, p[i2 + 1]))
 			return true;
 		return false;
 	}
@@ -877,7 +883,6 @@ public:
 	{
 		return critical();
 	}
-
 	unsigned getOneRandomOperation(unsigned neighborType)
 	{
 		switch (neighborType)
@@ -912,7 +917,7 @@ public:
 	{
 		vector<Perturbation> possiblePerturbations;
 		vector<bool> isCriticalOperation = getCriticalOperationsList();
-		Perturbation perturbation = {0, 0, 0, 0};
+		Perturbation perturbation;
 
 		if (isCriticalOperation[pM[o]] && pM[o] != first)
 		{
@@ -940,33 +945,27 @@ public:
 
 		return possiblePerturbations;
 	}
-	void addPossiblePerturbationsOnJobBlock(vector<Perturbation> &possiblePerturbations, vector<unsigned> &block, unsigned o)
+	vector<Perturbation> listPossiblePerturbations_swapCriticalEdge(unsigned o)
 	{
-		if (block[0] == o || (block[o] == first && block[1] == o))
-			return;
+		vector<Perturbation> possiblePerturbations;
+		Perturbation p;
+		unsigned pType;
 
-		unsigned index = 0;
-		Perturbation perturbation = {0, 0, 0, 0};
-		while (block[index] != o)
-		{
-			perturbation = {o, SHIFT_WHOLE, BLOCK_J, index + 1};
-			possiblePerturbations.push_back(perturbation);
-			index++;
-		}
-	}
-	void addPossiblePerturbationsOnMachBlock(vector<Perturbation> &possiblePerturbations, vector<unsigned> &block, unsigned o)
-	{
-		if (block[0] == o || (block[o] == first && block[1] == o))
-			return;
+		auto jEdges = getJEdgesN5(), mEdges = getMEdgesN5();
 
-		unsigned index = 0;
-		Perturbation perturbation = {0, 0, 0, 0};
-		while (block[index] != o)
+		for (auto e : jEdges)
 		{
-			perturbation = {o, SHIFT_WHOLE, BLOCK_M, index + 1};
-			possiblePerturbations.push_back(perturbation);
-			index++;
+			p = {e.first, SWAP_SUCC, BLOCK_J, 0};
+			possiblePerturbations.push_back(p);
 		}
+
+		for (auto e : mEdges)
+		{
+			p = {e.first, SWAP_SUCC, BLOCK_M, 0};
+			possiblePerturbations.push_back(p);
+		}
+
+		return possiblePerturbations;
 	}
 	vector<Perturbation> listPossiblePerturbations_shiftWhole(unsigned o)
 	{
@@ -991,6 +990,34 @@ public:
 
 		return possiblePerturbations;
 	}
+	void addJBlockPerturbations(vector<Perturbation> &possiblePerturbations, vector<unsigned> &block, unsigned o)
+	{
+		if (block[0] == o || (block[o] == first && block[1] == o))
+			return;
+
+		unsigned index = 0;
+		Perturbation perturbation;
+		while (block[index] != o)
+		{
+			perturbation = {o, SHIFT_WHOLE, BLOCK_J, index + 1};
+			possiblePerturbations.push_back(perturbation);
+			index++;
+		}
+	}
+	void addMBlockPerturbations(vector<Perturbation> &possiblePerturbations, vector<unsigned> &block, unsigned o)
+	{
+		if (block[0] == o)
+			return;
+
+		unsigned index = 0;
+		Perturbation perturbation;
+		while (block[index] != o)
+		{
+			perturbation = {o, SHIFT_WHOLE, BLOCK_M, index + 1};
+			possiblePerturbations.push_back(perturbation);
+			index++;
+		}
+	}
 	vector<Perturbation> listPossiblePerturbations_shiftCritical(unsigned o)
 	{
 		vector<Perturbation> possiblePerturbations;
@@ -999,9 +1026,9 @@ public:
 		//printv(jobBlock, 0, "j-block");
 		//printv(machBlock, 0, "m-block");
 		if (jobBlock.size() > 1)
-			addPossiblePerturbationsOnJobBlock(possiblePerturbations, jobBlock, o);
+			addJBlockPerturbations(possiblePerturbations, jobBlock, o);
 		if (machBlock.size() > 1)
-			addPossiblePerturbationsOnMachBlock(possiblePerturbations, machBlock, o);
+			addMBlockPerturbations(possiblePerturbations, machBlock, o);
 
 		return possiblePerturbations;
 	}
@@ -1137,7 +1164,7 @@ public:
 			possiblePerturbations = listPossiblePerturbations_swapCritical(o);
 			break;
 		case SWAP_CRITICAL_EDGE:
-			possiblePerturbations = listPossiblePerturbations_swapCritical(o);
+			possiblePerturbations = listPossiblePerturbations_swapCriticalEdge(o);
 			break;
 		case SHIFT_WHOLE:
 			possiblePerturbations = listPossiblePerturbations_shiftWhole(o);
@@ -1148,6 +1175,19 @@ public:
 		}
 
 		return possiblePerturbations;
+	}
+	vector<Perturbation> listAllPerturbations(unsigned oper)
+	{
+		vector<Perturbation> perturbations, p;
+
+		auto ops = getAllOperations(oper);
+		for (auto o : ops)
+		{
+			p = listPossiblePerturbations(o, oper);
+			perturbations.insert(perturbations.end(), p.begin(), p.end());
+		}
+
+		return perturbations;
 	}
 	friend class Heuristics;
 	friend class Neighbor;

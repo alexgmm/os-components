@@ -5,7 +5,6 @@
 #include "tabu_searcher.hpp"
 #include "annealing_simulator.hpp"
 #include "iterated_local_searcher.hpp"
-#include "heuristics.hpp"
 #include "utilities.hpp"
 #include "time.hpp"
 
@@ -74,7 +73,7 @@ public:
 	{
 	}
 
-	void printAverageExecutionTime(int heuristic, int op)
+	/* void printAverageExecutionTime(int heuristic, int op)
 	{
 		float avg = 0;
 		vector<string> names = fileNames();
@@ -90,7 +89,7 @@ public:
 		}
 		avg /= 1000; // transforma a média para segundos
 		cout << avg / names.size() << br;
-	}
+	} */
 
 	string getInitResultFileName(unsigned init)
 	{

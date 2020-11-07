@@ -11,6 +11,10 @@ struct Perturbation
     unsigned operation, perturbationType, blockType, factor;
 };
 
+bool areEqual(Perturbation p1, Perturbation p2)
+{
+    return p1.operation == p2.operation && p1.perturbationType == p2.perturbationType && p1.blockType == p2.blockType && p1.factor == p2.factor;
+}
 string getPerturbationString(Perturbation p)
 {
     string perturbationTypeLabel, blockTypeLabel;

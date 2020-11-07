@@ -12,6 +12,17 @@ class IteratedLocalSearcher
     Solution solution, globalBestSolution;
     unsigned perturbationNumber, oper;
     //string outfile = "/home/hal/running_report.txt";
+
+    void setDefaultParams()
+    {
+        switch (oper)
+        {
+        case SWAP_CRITICAL:
+            perturbationNumber = 1;
+            break;
+        }
+    }
+
     bool applyPerturbationGreedly(unsigned o)
     {
         //Printer::appendToFile(s.getSolutionString(), outfile);
@@ -29,7 +40,9 @@ class IteratedLocalSearcher
         for (Perturbation m : perturbations)
         {
             //Printer::appendToFile(getPerturbationString(m), outfile);
-            value = n.applyPerturbation(m);
+            n.applyPerturbation(m);
+            value = n.getSolution().computeMakespan();
+
             if (value < globalBestValue)
             {
                 globalBestValue = value;
@@ -124,23 +137,6 @@ public:
 
     void test()
     {
-        vector<unsigned> ops = solution.getAllOperations_shiftCritical();
-        vector<Perturbation> perturbations;
-        for (unsigned o : ops)
-        {
-            vector<Perturbation> ms = solution.listPossiblePerturbations(o, oper);
-            for (Perturbation m : ms)
-                perturbations.push_back(m);
-        }
-
-        NeighborGenerator n(solution);
-        for (Perturbation m : perturbations)
-        {
-            printPerturbation(m);
-            n.applyPerturbation(m);
-            n.getSolution().printJobCluster();
-            n.restore();
-        }
     }
 
     unsigned solve()

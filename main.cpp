@@ -3,7 +3,6 @@
 #include "src/instance.hpp"
 #include "src/solution.hpp"
 #include "src/tester.hpp"
-#include "src/heuristics.hpp"
 #include "src/tabu_searcher.hpp"
 #include "src/annealing_simulator.hpp"
 #include "src/iterated_local_searcher.hpp"
@@ -43,7 +42,7 @@ int main(int argc, char **argv)
 		string instanceFileName(argv[2]), perturbationNumber(argv[4]);
 		Instance i(instanceFileName);
 		Solution s(i, RANDOM);
-		IteratedLocalSearcher g(stoi(perturbationNumber), SWAP_CRITICAL);
+		IteratedLocalSearcher g(stoi(perturbationNumber), SWAP_CRITICAL_EDGE);
 		g.setSolution(s);
 		cout << g.solve();
 	}
@@ -53,12 +52,17 @@ int main(int argc, char **argv)
 		SAVE_GRAPHS_ON_SWAP = false;
 		TRACK_SWAP_OPERATIONS = false;
 
-		TRACK_SHIFT_OPERATIONS = false;
+		TRACK_SHIFT_OPERATIONS = true;
 		SAVE_GRAPHS_ON_SHIFT = false;
 
-		Instance i(t7);
+		Instance i(t4);
 		Solution s(i, RANDOM);
 		s.printJobCluster();
+		auto je = s.getJEdgesN5(), me = s.getMEdgesN5();
+		for (auto e : je)
+			cout << e.first << sp << e.second << br;
+		for (auto e : me)
+			cout << e.first << sp << e.second << br;
 		/* unsigned initial = s.computeMakespan();
 		//s.printJobCluster();
 		IteratedLocalSearcher g(s, 8, SWAP_CRITICAL);
