@@ -4,10 +4,10 @@ unsigned TABU_DURATION = 5;
 
 #include <map>
 #include <deque>
-#include "time.hpp"
+#include "../time.hpp"
 #include "tabu_list.hpp"
-#include "solution_tester.hpp"
-#include "neighbor_generator.hpp"
+#include "../solution_tester.hpp"
+#include "../neighbor_generator.hpp"
 
 using namespace std;
 

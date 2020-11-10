@@ -2,9 +2,9 @@
 #define TESTS_HPP
 #define NLOOPS 20
 
-#include "tabu_searcher.hpp"
-#include "annealing_simulator.hpp"
-#include "iterated_local_searcher.hpp"
+#include "heuristics/tabu_searcher.hpp"
+#include "heuristics/annealing_simulator.hpp"
+#include "heuristics/iterated_local_searcher.hpp"
 #include "utilities.hpp"
 #include "time.hpp"
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "neighbor_generator.hpp"
-#include "perturbation.hpp"
-#include "printer.hpp"
-#include "time.hpp"
+#include "../neighbor_generator.hpp"
+#include "../perturbation.hpp"
+#include "../printer.hpp"
+#include "../time.hpp"
 
 using namespace std;
 

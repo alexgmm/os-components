@@ -3,10 +3,10 @@
 #include "src/instance.hpp"
 #include "src/solution.hpp"
 #include "src/tester.hpp"
-#include "src/tabu_searcher.hpp"
+#include "src/heuristics/tabu_searcher.hpp"
 #include "src/solution_tester.hpp"
-#include "src/annealing_simulator.hpp"
-#include "src/iterated_local_searcher.hpp"
+#include "src/heuristics/annealing_simulator.hpp"
+#include "src/heuristics/iterated_local_searcher.hpp"
 
 using namespace std;
 

@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <iostream>
 #include "solution.hpp"
-#include "tabu_list.hpp"
+#include "heuristics/tabu_list.hpp"
 #include "perturbation.hpp"
 
 class NeighborGenerator
