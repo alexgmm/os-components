@@ -61,7 +61,7 @@ void printv(vector<unsigned> &v, int ini, string name)
 	cout << "\n";
 }
 
-void printl(string s, unsigned v) { cout << br << s << " " << v << br; }
+void printl(string s, unsigned v) { cout << s << " " << v << br; }
 
 unsigned findIndex(vector<unsigned> &v, unsigned value)
 {
@@ -69,6 +69,26 @@ unsigned findIndex(vector<unsigned> &v, unsigned value)
 		if (v[i] == value)
 			return i;
 	return UMAX;
+}
+
+bool isShift(unsigned m)
+{
+	return m == SHIFT_CRITICAL || m == SHIFT_WHOLE;
+}
+
+bool isSwap(unsigned m)
+{
+	return m == SWAP_SUCC || m == SWAP_PRED;
+}
+
+string wrapStringInLabel(string s)
+{
+	string layer = "+";
+	for (int i = 0; i < s.size(); i++)
+		layer += "-";
+	layer += "+\n";
+	s = "|" + s + "|\n";
+	return layer + s + layer;
 }
 
 #endif

@@ -1,50 +1,23 @@
 #ifndef NEIGHBORHOOD_HPP
 #define NEIGHBORHOOD_HPP
 
+#include <assert.h>
 #include <iostream>
 #include "solution.hpp"
 #include "tabu_list.hpp"
 #include "perturbation.hpp"
 
-using namespace std;
-
-class Neighbor
-{
-	Solution neighbor;
-	unsigned value;
-	bool legal;
-
-public:
-	Neighbor() {}
-	Neighbor(Solution n, unsigned v, bool l)
-	{
-		if (v == 0)
-		{
-			neighbor.makespan = UMAX;
-			value = UMAX;
-		}
-		else
-		{
-			value = v;
-			neighbor.makespan = v;
-		}
-		neighbor = n;
-		legal = l;
-	}
-	Solution getSolution() { return neighbor; }
-	unsigned getValue() { return value; }
-	bool isLegal() { return legal; }
-};
 class NeighborGenerator
 {
 	Solution sol;
 	Solution previous;
 	vector<vector<unsigned>> tabu;
+
 	void swapJ(unsigned op1, unsigned op2)
 	{
 		if (TRACK_SWAP_OPERATIONS)
-			cout << br << "swapJ(" << op1 << "," << op2 << ")" << br;
-		//assert(op1 > 0 && op2 > 0);
+			cout << "swapJ(" << op1 << "," << op2 << ")" << br;
+		assert(op1 > 0 && op2 > 0);
 		assert(op1 != op2);
 		assert(sol.adjJob(op1, op2));
 
@@ -79,8 +52,8 @@ class NeighborGenerator
 	void swapM(unsigned op1, unsigned op2)
 	{
 		if (TRACK_SWAP_OPERATIONS)
-			cout << br << "swapM(" << op1 << "," << op2 << ")" << br;
-		//assert(op1 > 0 && op2 > 0);
+			cout << "swapM(" << op1 << "," << op2 << ")" << br;
+		assert(op1 > 0 && op2 > 0);
 		assert(op1 != op2);
 		assert(sol.adjMach(op1, op2));
 
@@ -167,20 +140,10 @@ class NeighborGenerator
 	Solution getRandomNeighbor_shiftWhole()
 	{
 
-		if (randint(2, 3) == SHIFT_J)
-		{
-			vector<vector<unsigned>> jobs = sol.wholeJobs();
-			vector<unsigned> job = jobs[randint(0, jobs.size() - 1)];
-			unsigned i = randint(1, job.size() - 1);
-			shiftJ(job, 0, i);
-		}
-		else
-		{
-			vector<vector<unsigned>> machs = sol.wholeMachines();
-			vector<unsigned> mach = machs[randint(0, machs.size() - 1)];
-			unsigned i = randint(1, mach.size() - 1);
-			shiftM(mach, 0, i);
-		}
+		auto o = sol.getOneRandomOperation_shiftWhole();
+		auto p = sol.listPossiblePerturbations_shiftWhole(o);
+		auto i = p.size() == 1 ? 0 : randint(0, p.size() - 1);
+		applyPerturbation(p[i]);
 
 		return sol;
 	}
@@ -265,72 +228,86 @@ public:
 		sol = s.copySolution();
 		previous = s.copySolution();
 	}
-
-	ScheduleChange applyPerturbation(Perturbation m)
+	ScheduleChange applySwap(Perturbation p)
 	{
 		ScheduleChange change = {0, 0, 0};
+		unsigned o = p.operation, o2;
 
-		unsigned o = m.operation;
-		if (m.blockType == BLOCK_J && m.perturbationType == SWAP_PRED)
+		if (p.blockType == BLOCK_J)
 		{
-			swapJ(o, sol.pJ[o]);
-			change = {SWAP,
-					  o,
-					  sol.pJ[o]};
-		}
+			if (p.perturbationType == SWAP_PRED)
+				o2 = sol.pJ[o];
+			else
+				o2 = sol.sJ[o];
 
-		if (m.blockType == BLOCK_J && m.perturbationType == SWAP_SUCC)
-		{
-			swapJ(o, sol.sJ[o]);
-			change = {SWAP,
-					  o,
-					  sol.sJ[o]};
+			swapJ(o, o2);
 		}
+		else
+		{
+			if (p.perturbationType == SWAP_PRED)
+				o2 = sol.pM[o];
+			else
+				o2 = sol.sM[o];
 
-		if (m.blockType == BLOCK_M && m.perturbationType == SWAP_PRED)
-		{
-			swapM(o, sol.pM[o]);
-			change = {SWAP,
-					  o,
-					  sol.pM[o]};
+			swapM(o, o2);
 		}
-
-		if (m.blockType == BLOCK_M && m.perturbationType == SWAP_SUCC)
-		{
-			swapM(o, sol.sM[o]);
-			change = {SWAP,
-					  o,
-					  sol.sM[o]};
-		}
-
-		if (m.blockType == BLOCK_J && m.perturbationType == SHIFT_WHOLE)
-		{
-			vector<unsigned> block = sol.getOperationsJBlock(o);
-			unsigned opIndex = findIndex(block, o);
-			shiftJ(block, opIndex - m.factor, opIndex);
-			change = {SHIFT,
-					  block[opIndex - m.factor],
-					  block[opIndex]};
-		}
-
-		if (m.blockType == BLOCK_M && m.perturbationType == SHIFT_WHOLE)
-		{
-			vector<unsigned> block = sol.getOperationsMBlock(o);
-			unsigned opIndex = findIndex(block, o);
-			shiftM(block, opIndex - m.factor, findIndex(block, o));
-			change = {SHIFT,
-					  block[opIndex - m.factor],
-					  block[findIndex(block, o)]};
-		}
+		change = {SWAP, o, o2};
 
 		return change;
 	}
 
+	ScheduleChange applyShift(Perturbation p)
+	{
+		ScheduleChange change = {0, 0, 0};
+		vector<unsigned> block;
+		unsigned o = p.operation;
+
+		if (p.blockType == BLOCK_J)
+		{
+			if (p.perturbationType == SHIFT_WHOLE)
+				block = sol.getOperationsJBlock(o);
+			else if (p.perturbationType == SHIFT_CRITICAL)
+				block = sol.getOperationsCriticalJBlock(o);
+		}
+		else
+		{
+			if (p.perturbationType == SHIFT_WHOLE)
+				block = sol.getOperationsMBlock(o);
+			else if (p.perturbationType == SHIFT_CRITICAL)
+				block = sol.getOperationsCriticalMBlock(o);
+		}
+
+		unsigned o1Index = block.size() - 1;
+		unsigned o2Index = o1Index - p.factor;
+		change = {SHIFT,
+				  block[o2Index],
+				  block[o1Index]};
+
+		if (p.blockType == BLOCK_J)
+			shiftJ(block, o2Index, o1Index);
+		else
+			shiftM(block, o2Index, o1Index);
+
+		return change;
+	}
+
+	ScheduleChange applyPerturbation(Perturbation p)
+	{
+		/* cout << "on apply:\n";
+		printPerturbation(p);
+		cout << "+++++++++\n"; */
+		sol.assertValidSwapPerturbation(p);
+		if (isShift(p.perturbationType))
+			return applyShift(p);
+		else
+			return applySwap(p);
+	}
 	/////////////////////////////////////////////////////////////////////////
 	//////// OPERADORES DE VIZINHANÇA ///////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 
-	static Solution getRandomNeighbor(unsigned oper, Solution &s)
+	static Solution
+	getRandomNeighbor(unsigned oper, Solution &s)
 	{
 		Solution copied = s.copySolution();
 		NeighborGenerator n = NeighborGenerator(copied);

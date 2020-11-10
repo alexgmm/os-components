@@ -1,6 +1,6 @@
 #pragma once
 
-#define MAX_GRAPH_NUMBER 10
+#define MAX_GRAPH_NUMBER 600
 
 #include <bits/stdc++.h>
 #include <string.h>
@@ -151,6 +151,10 @@ class Printer
         //cout << command << br;
         system(command.c_str());
     }
+    string getSaveLabel()
+    {
+        return wrapStringInLabel("saving graph number " + to_string(CURRENT_GRAPH_NUMBER));
+    }
 
 public:
     Printer() {}
@@ -178,8 +182,7 @@ public:
     {
         if (CURRENT_GRAPH_NUMBER == MAX_GRAPH_NUMBER)
             return;
-        cout << endl
-             << "saving m-graph number " << CURRENT_GRAPH_NUMBER << endl;
+        cout << getSaveLabel() << endl;
         string graph = printClusterGraph(false, true);
         saveGraph(graph);
     }
@@ -187,8 +190,7 @@ public:
     {
         if (CURRENT_GRAPH_NUMBER == MAX_GRAPH_NUMBER)
             return;
-        cout << endl
-             << "saving j-graph number " << CURRENT_GRAPH_NUMBER << endl;
+        cout << getSaveLabel() << endl;
         string graph = printClusterGraph(true, false);
         saveGraph(graph);
     }

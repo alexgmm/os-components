@@ -237,14 +237,12 @@ public:
 		vector<unsigned> block;
 
 		unsigned operation = getJobAncestor(o);
-		if (operation == first)
-			operation = sJ[operation];
 
 		do
 		{
 			block.push_back(operation);
 			operation = sJ[operation];
-		} while (operation != 0);
+		} while (operation != sJ[o]);
 
 		return block;
 	}
@@ -253,14 +251,12 @@ public:
 		vector<unsigned> block;
 
 		unsigned operation = getMachAncestor(o);
-		if (operation == first)
-			operation = sM[operation];
 
 		do
 		{
 			block.push_back(operation);
 			operation = sM[operation];
-		} while (operation != 0);
+		} while (operation != sM[o]);
 
 		return block;
 	}
@@ -274,7 +270,7 @@ public:
 		while (index <= nO)
 		{
 			operation = p[index];
-			if (!sameJob(o, operation) || operation == first)
+			if (!sameJob(o, operation))
 				break;
 			block.push_back(operation);
 			index--;
@@ -294,7 +290,7 @@ public:
 		while (index <= nO)
 		{
 			operation = p[index];
-			if (!sameMach(o, operation) || operation == first)
+			if (!sameMach(o, operation))
 				break;
 			block.push_back(operation);
 			index--;
@@ -304,13 +300,13 @@ public:
 
 		return block;
 	}
-	vector<bool> getCriticalOperationsList()
+	vector<unsigned> getCriticalOperationsList()
 	{
-		vector<bool> list(nO + 1, false);
+		vector<unsigned> list(nO + 1, 0);
 		vector<unsigned> p = critical();
 
 		for (unsigned o : p)
-			list[o] = true;
+			list[o] = 1;
 
 		return list;
 	}
@@ -589,17 +585,15 @@ public:
 		nJ = 4;
 		nM = 4;
 
-		pJ = {0, 0, 1, 2, 3, 7, 8, 6, 0, 11, 0, 12, 10, 16, 13, 0, 15};
-		sJ = {0, 2, 3, 4, 0, 0, 7, 5, 6, 0, 12, 9, 11, 14, 0, 16, 13};
-		pM = {0, 0, 10, 15, 12, 9, 2, 11, 0, 13, 0, 3, 16, 1, 6, 0, 8};
-		sM = {0, 13, 6, 11, 0, 0, 14, 0, 16, 5, 2, 7, 4, 9, 0, 3, 12};
-		instance.cost = {0, 34, 15, 38, 95, 2, 89, 19, 7, 54, 70, 28, 34, 61, 9, 87, 29};
+		pJ = {0, 3, 1, 0, 2, 7, 5, 0, 6, 11, 9, 0, 10, 15, 13, 0, 14};
 
-		/* pJ = {0, 0, 1, 2, 0, 4, 5, 0, 7, 8};
-		sJ = {0, 2, 3, 0, 5, 6, 0, 8, 9, 0};
-		pM = {0, 0, 0, 0, 1, 2, 3, 4, 5, 6};
-		sM = {0, 4, 5, 6, 7, 8, 9, 0, 0, 0};
-		instance.cost = {0, 1, 2, 3, 8, 5, 3, 1, 7, 2}; */
+		sJ = {0, 2, 4, 1, 0, 6, 8, 5, 0, 10, 12, 9, 0, 14, 16, 13, 0};
+
+		pM = {0, 13, 14, 15, 16, 1, 2, 3, 4, 5, 6, 7, 8, 0, 0, 0, 0};
+
+		sM = {0, 5, 6, 7, 8, 9, 10, 11, 12, 0, 0, 0, 0, 1, 2, 3, 4};
+
+		instance.cost = {0, 45, 80, 29, 74, 83, 45, 56, 45, 70, 58, 29, 64, 5, 24, 61, 43};
 	}
 	void fillOrd(vector<unsigned> &oJ, vector<unsigned> &oM)
 	{
@@ -778,6 +772,11 @@ public:
 	}
 	vector<unsigned> getLatestPred(vector<unsigned> &heads)
 	{
+		if (heads.size() == 0)
+		{
+			cout << "(!) Invalid heads (probable cicle)\n";
+			exit(1);
+		}
 		vector<unsigned> late_pred(nO + 1, 0);
 		for (int i = 1; i <= nO; i++)
 		{
@@ -913,13 +912,33 @@ public:
 			return getAllOperations_shiftCritical();
 		}
 	}
+	unsigned getSwapOperationFromPerturbation(Perturbation p)
+	{
+		vector<unsigned> block;
+		if (p.blockType == BLOCK_J)
+			block = p.perturbationType == SWAP_PRED ? pJ : sJ;
+		else
+			block = p.perturbationType == SWAP_PRED ? pM : sM;
+		return block[p.operation];
+	}
+	void assertValidSwapPerturbation(Perturbation p)
+	{
+		auto o1 = p.operation;
+		auto o2 = getSwapOperationFromPerturbation(p);
+		auto isCriticalOperation = getCriticalOperationsList();
+		if (o1 == 0 || o2 == 0 || isCriticalOperation[o1] == 0 || isCriticalOperation[o2] == 0)
+		{
+			cout << "(!) Invalid perturbation: " << getPerturbationString(p);
+			exit(1);
+		}
+	}
 	vector<Perturbation> listPossiblePerturbations_swapCritical(unsigned o)
 	{
 		vector<Perturbation> possiblePerturbations;
-		vector<bool> isCriticalOperation = getCriticalOperationsList();
+		auto isCriticalOperation = getCriticalOperationsList();
 		Perturbation perturbation;
 
-		if (isCriticalOperation[pM[o]] && pM[o] != first)
+		if (isCriticalOperation[pM[o]])
 		{
 			perturbation = {o, SWAP_PRED, BLOCK_M, 0};
 			possiblePerturbations.push_back(perturbation);
@@ -931,7 +950,7 @@ public:
 			possiblePerturbations.push_back(perturbation);
 		}
 
-		if (isCriticalOperation[pJ[o]] && pJ[o] != first)
+		if (isCriticalOperation[pJ[o]])
 		{
 			perturbation = {o, SWAP_PRED, BLOCK_J, 0};
 			possiblePerturbations.push_back(perturbation);
@@ -990,45 +1009,71 @@ public:
 
 		return possiblePerturbations;
 	}
-	void addJBlockPerturbations(vector<Perturbation> &possiblePerturbations, vector<unsigned> &block, unsigned o)
+	bool isN7ShiftAllowed(unsigned o1, unsigned o2)
 	{
-		if (block[0] == o || (block[o] == first && block[1] == o))
-			return;
-
-		unsigned index = 0;
-		Perturbation perturbation;
-		while (block[index] != o)
-		{
-			perturbation = {o, SHIFT_WHOLE, BLOCK_J, index + 1};
-			possiblePerturbations.push_back(perturbation);
-			index++;
-		}
+		bool areAdjacent = adjJob(o1, o2) || adjMach(o1, o2);
+		bool isFirstEdge = areAdjacent && (o1 == first || o2 == first);
+		bool isLastEdge = areAdjacent && (o1 == last || o2 == last);
+		return !isFirstEdge && !isLastEdge;
 	}
-	void addMBlockPerturbations(vector<Perturbation> &possiblePerturbations, vector<unsigned> &block, unsigned o)
+	vector<Perturbation> getJBlockShifts(vector<unsigned> &block, unsigned o)
 	{
-		if (block[0] == o)
-			return;
+		vector<Perturbation> possiblePerturbations;
 
-		unsigned index = 0;
+		int factorIndex = block.size() - 2;
+		unsigned opIndex = factorIndex + 1;
 		Perturbation perturbation;
-		while (block[index] != o)
+
+		while (factorIndex != -1)
 		{
-			perturbation = {o, SHIFT_WHOLE, BLOCK_M, index + 1};
-			possiblePerturbations.push_back(perturbation);
-			index++;
+			if (isN7ShiftAllowed(o, block[factorIndex]))
+			{
+				perturbation = {o, SHIFT_CRITICAL, BLOCK_J, opIndex - factorIndex};
+				possiblePerturbations.push_back(perturbation);
+			}
+			factorIndex--;
 		}
+
+		return possiblePerturbations;
 	}
+	vector<Perturbation> getMBlockShifts(vector<unsigned> &block, unsigned o)
+	{
+		vector<Perturbation> possiblePerturbations;
+
+		int factorIndex = block.size() - 2;
+		unsigned opIndex = factorIndex + 1;
+		Perturbation perturbation;
+
+		while (factorIndex != -1)
+		{
+			if (isN7ShiftAllowed(o, block[factorIndex]))
+			{
+				perturbation = {o, SHIFT_CRITICAL, BLOCK_M, opIndex - factorIndex};
+				possiblePerturbations.push_back(perturbation);
+			}
+			factorIndex--;
+		}
+
+		return possiblePerturbations;
+	}
+
 	vector<Perturbation> listPossiblePerturbations_shiftCritical(unsigned o)
 	{
 		vector<Perturbation> possiblePerturbations;
 
-		vector<unsigned> jobBlock = getOperationsCriticalJBlock(o), machBlock = getOperationsCriticalMBlock(o);
-		//printv(jobBlock, 0, "j-block");
-		//printv(machBlock, 0, "m-block");
-		if (jobBlock.size() > 1)
-			addJBlockPerturbations(possiblePerturbations, jobBlock, o);
-		if (machBlock.size() > 1)
-			addMBlockPerturbations(possiblePerturbations, machBlock, o);
+		auto j = getOperationsCriticalJBlock(o);
+		if (j.size() > 1)
+		{
+			auto p = getJBlockShifts(j, o);
+			possiblePerturbations.insert(possiblePerturbations.end(), p.begin(), p.end());
+		}
+
+		auto m = getOperationsCriticalMBlock(o);
+		if (m.size() > 1)
+		{
+			auto p = getMBlockShifts(m, o);
+			possiblePerturbations.insert(possiblePerturbations.end(), p.begin(), p.end());
+		}
 
 		return possiblePerturbations;
 	}
@@ -1147,12 +1192,16 @@ public:
 	int getMakespan() { return partial ? computePartialMakespan() : computeMakespan(); }
 	string getSolutionString()
 	{
+		string info = "first = " + to_string(first) + ";" + br;
+		info += "nO = " + to_string(nO) + ";" + br;
+		info += "nJ = " + to_string(nJ) + ";" + br;
+		info += "nM = " + to_string(nM) + ";" + br + br;
 		string pJStr = getVectorString(pJ, "pJ");
 		string sJStr = getVectorString(sJ, "sJ");
 		string pMStr = getVectorString(pM, "pM");
 		string sMStr = getVectorString(sM, "sM");
-		string costStr = getVectorString(instance.cost, "cost");
-		return pJStr + sJStr + pMStr + sMStr + costStr;
+		string costStr = getVectorString(instance.cost, "instance.cost");
+		return info + pJStr + sJStr + pMStr + sMStr + costStr;
 	}
 	vector<Perturbation> listPossiblePerturbations(unsigned o, unsigned neighborType)
 	{
@@ -1190,7 +1239,6 @@ public:
 		return perturbations;
 	}
 	friend class Heuristics;
-	friend class Neighbor;
 	friend class NeighborGenerator;
 	friend class IteratedLocalSearcher;
 };

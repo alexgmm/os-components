@@ -4,6 +4,7 @@
 #include "src/solution.hpp"
 #include "src/tester.hpp"
 #include "src/tabu_searcher.hpp"
+#include "src/solution_tester.hpp"
 #include "src/annealing_simulator.hpp"
 #include "src/iterated_local_searcher.hpp"
 
@@ -42,7 +43,7 @@ int main(int argc, char **argv)
 		string instanceFileName(argv[2]), perturbationNumber(argv[4]);
 		Instance i(instanceFileName);
 		Solution s(i, RANDOM);
-		IteratedLocalSearcher g(stoi(perturbationNumber), SWAP_CRITICAL_EDGE);
+		IteratedLocalSearcher g(stoi(perturbationNumber), SHIFT_CRITICAL);
 		g.setSolution(s);
 		cout << g.solve();
 	}
@@ -52,34 +53,23 @@ int main(int argc, char **argv)
 		SAVE_GRAPHS_ON_SWAP = false;
 		TRACK_SWAP_OPERATIONS = false;
 
-		TRACK_SHIFT_OPERATIONS = true;
+		TRACK_SHIFT_OPERATIONS = false;
 		SAVE_GRAPHS_ON_SHIFT = false;
 
-		/* Instance i(t4);
-		Solution s(i, RANDOM);
-		s.printJobCluster(); */
-
-		ScheduleChange s1 = {0, 1, 3}, s2 = {0, 2, 3}, s3 = {0, 1, 2};
-
-		TabuList t(4, 5, 0);
-		t.insertTabuMovement(s1);
-		t.printCurrentTabu();
-		t.iterate();
-		t.printCurrentTabu();
-		t.insertTabuMovement(s2);
-		t.insertTabuMovement(s3);
-		t.iterate();
-		t.iterate();
-		t.printCurrentTabu();
-		t.iterate();
-		t.iterate();
-		t.printCurrentTabu();
-
-		/* unsigned initial = s.computeMakespan();
+		Instance i(t4);
+		Solution s(i, TEST);
 		//s.printJobCluster();
-		IteratedLocalSearcher g(s, 8, SWAP_CRITICAL);
-		cout << g.solve() << sp << initial << br; */
-		//g.test();
+		unsigned initial = s.computeMakespan();
+		AnnealingSimulator a;
+		a.setSolution(s);
+		a.setOper(SHIFT_CRITICAL);
+		a.setParams(0.2232, 0.0006, 7631);
+		unsigned end = a.solve();
+		cout << initial << sp << end << br;
+		exit(0);
+
+		/* SolutionTester t(s);
+		t.printPossibleMovements(SWAP_CRITICAL); */
 	}
 
 	return 0;
@@ -89,7 +79,7 @@ void test()
 {
 	//printAverageExecutionTime(SA, SWAP_CRITICAL_EDGE);
 	Instance i(t20);
-	Solution s(i, RANDOM);
+	Solution s(i, TEST);
 	s.printJobCluster();
 	cout << s.getHighestCostFromMachine() << br;
 	/* Heuristics h(s);

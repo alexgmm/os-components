@@ -44,6 +44,11 @@ public:
         solution = s;
     }
 
+    void setOper(unsigned o)
+    {
+        oper = o;
+    }
+
     AnnealingSimulator() {}
     AnnealingSimulator(unsigned o)
     {

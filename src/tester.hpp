@@ -44,13 +44,13 @@ class Tester
 		return a.solve();
 	}
 
-	unsigned runTS(Solution s)
+	/* unsigned runTS(Solution s)
 	{
 		TabuSearcher t(oper);
 		t.setSolution(s.copySolution());
 
 		return t.solve();
-	}
+	} */
 
 	unsigned runILS(Solution s)
 	{
@@ -154,83 +154,5 @@ public:
 		return values;
 	}
 };
-
-/* void testSA()
-{
-	fstream out("/home/hal/os-components/results/sa.csv");
-
-	for (string i : nameInitializators)
-		for (string o : nameOper)
-			out << i + " x " + o << ",";
-	out << br;
-
-	unsigned media;
-
-	vector<string> names = fileNames();
-
-	for (string n : names)
-	{
-		out << n + ",";
-		for (int i = 0; i < nameInitializators.size(); i++)
-		{
-			for (int j = 0; j < nameOper.size(); j++)
-			{
-				cout << n + " x " + nameInit[i] + " x " + nameOper[j] << br;
-				media = 0;
-				for (int loop = 0; loop < NLOOPS; loop++)
-				{
-					Instance instance(n);
-					Solution s(instance, i);
-					Heuristics h(s);
-					media += h.solve(SA, j);
-				}
-				media /= NLOOPS;
-				out << media << ",";
-			}
-		}
-		out << br;
-	}
-
-	out.close();
-}
-
-void testTS()
-{
-	fstream out("/home/hal/os-components/results/ts.csv");
-
-	for (string i : nameInit)
-		for (string o : nameOper)
-			out << i + " x " + o << ",";
-	out << br;
-
-	unsigned media;
-
-	vector<string> names = fileNames();
-
-	for (string n : names)
-	{
-		out << n + ",";
-		for (int i = 0; i < nameInit.size(); i++)
-		{
-			for (int j = 0; j < nameOper.size(); j++)
-			{
-				cout << n + " x " + nameInit[i] + " x " + nameOper[j] << br;
-				media = 0;
-				for (int loop = 0; loop < 1; loop++)
-				{
-					Instance instance(n);
-					Solution s(instance, i);
-					Heuristics h(s);
-					media += h.solve(TS, j);
-				}
-				media /= NLOOPS;
-				out << media << ",";
-			}
-		}
-		out << br;
-	}
-
-	out.close();
-} */
 
 #endif

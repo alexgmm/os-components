@@ -19,6 +19,8 @@ class IteratedLocalSearcher
         {
         case SWAP_CRITICAL:
             perturbationNumber = 1;
+        case SWAP_CRITICAL_EDGE:
+            perturbationNumber = 1;
             break;
         }
     }

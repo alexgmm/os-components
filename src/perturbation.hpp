@@ -27,11 +27,8 @@ string getPerturbationString(Perturbation p)
     case SWAP_SUCC:
         perturbationTypeLabel = "swap_successor";
         break;
-    case SHIFT_WHOLE:
-        perturbationTypeLabel = "shift " + to_string(p.factor) + " units";
-        break;
     default:
-        perturbationTypeLabel = "shift";
+        perturbationTypeLabel = "shift " + to_string(p.factor) + " units";
         break;
     }
 

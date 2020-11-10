@@ -13,11 +13,34 @@ struct ScheduleChange
     unsigned type, o1, o2;
 };
 
-void printScheduleChange(ScheduleChange sc)
+bool isChangeInitialized(ScheduleChange sc)
+{
+    return sc.o1 != 0;
+}
+
+string getScheduleChangeString(ScheduleChange sc)
 {
     string t = sc.type == SWAP ? "swap" : "shift";
+    return t + "(" + to_string(sc.o1) + "," + to_string(sc.o2) + ")";
+}
 
-    cout << t << "(" << sc.o1 << "," << sc.o2 << ")" << br;
+void printScheduleChange(ScheduleChange sc)
+{
+    cout << getScheduleChangeString(sc);
+}
+
+bool isScheduleChangeEmpty(ScheduleChange sc)
+{
+    return sc.o1 == 0 && sc.o2 == 0;
+}
+
+void assertNonNullScheduleChange(ScheduleChange sc)
+{
+    if (isScheduleChangeEmpty(sc))
+    {
+        cout << "(!) Invalid schedule change: " << getScheduleChangeString(sc) << br;
+        //assert(sc.o2);
+    }
 }
 
 bool areEqual(ScheduleChange sc1, ScheduleChange sc2)
@@ -57,6 +80,12 @@ public:
     {
         list[sc.o1][sc.o2] = duration;
         activeTabu.push_back(sc);
+
+        list[sc.o2][sc.o1] = duration;
+        unsigned aux = sc.o1;
+        sc.o1 = sc.o2;
+        sc.o2 = aux;
+        activeTabu.push_back(sc);
     }
 
     bool isTabu(ScheduleChange sc)
@@ -76,7 +105,7 @@ public:
         }
     }
 
-    //void printCurrentTabu()
+    void printCurrentTabu()
     {
         cout << br << "current tabu ops " << br;
         for (auto m : activeTabu)
@@ -85,4 +114,6 @@ public:
             printScheduleChange(m);
         }
     }
+
+    friend class TabuSearcher;
 };
