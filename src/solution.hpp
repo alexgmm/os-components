@@ -17,12 +17,71 @@ public:
 	Instance instance;
 	bool partial = false;
 
-	void error(string e)
+	void swapJ(unsigned op1, unsigned op2)
 	{
-		cout << br << "ERRO: " << e << br;
-		print();
-		exit(0);
+		if (TRACK_SWAP_OPERATIONS)
+			cout << "swapJ(" << op1 << "," << op2 << ")" << br;
+		assert(op1 > 0 && op2 > 0);
+		assert(op1 != op2);
+		assert(adjJob(op1, op2));
+
+		if (op1 == first)
+			first = op2;
+
+		if (sJ[op2] == op1)
+		{
+			unsigned o = op1;
+			op1 = op2;
+			op2 = o;
+		}
+
+		unsigned jp = pJ[op1], js = sJ[op2];
+
+		if (jp)
+			sJ[jp] = op2;
+		if (js)
+			pJ[js] = op1;
+
+		sJ[op1] = js;
+		pJ[op1] = op2;
+		pJ[op2] = jp;
+		sJ[op2] = op1;
+
+		computeMakespan();
 	}
+	void swapM(unsigned op1, unsigned op2)
+	{
+		if (TRACK_SWAP_OPERATIONS)
+			cout << "swapM(" << op1 << "," << op2 << ")" << br;
+		assert(op1 > 0 && op2 > 0);
+		assert(op1 != op2);
+		assert(adjMach(op1, op2));
+
+		if (op1 == first)
+			first = op2;
+
+		if (sM[op2] == op1)
+		{
+			unsigned o = op1;
+			op1 = op2;
+			op2 = o;
+		}
+
+		unsigned mp = pM[op1], ms = sM[op2];
+
+		if (mp)
+			sM[mp] = op2;
+		if (ms)
+			pM[ms] = op1;
+
+		sM[op1] = ms;
+		pM[op1] = op2;
+		pM[op2] = mp;
+		sM[op2] = op1;
+
+		computeMakespan();
+	}
+
 	unsigned lowerBound()
 	{
 		unsigned lower = makespan;

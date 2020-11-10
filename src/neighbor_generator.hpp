@@ -13,79 +13,6 @@ class NeighborGenerator
 	Solution previous;
 	vector<vector<unsigned>> tabu;
 
-	void swapJ(unsigned op1, unsigned op2)
-	{
-		if (TRACK_SWAP_OPERATIONS)
-			cout << "swapJ(" << op1 << "," << op2 << ")" << br;
-		assert(op1 > 0 && op2 > 0);
-		assert(op1 != op2);
-		assert(sol.adjJob(op1, op2));
-
-		if (op1 == sol.first)
-			sol.first = op2;
-
-		if (sol.sJ[op2] == op1)
-		{
-			unsigned o = op1;
-			op1 = op2;
-			op2 = o;
-		}
-
-		unsigned jp = sol.pJ[op1], js = sol.sJ[op2];
-
-		if (jp)
-			sol.sJ[jp] = op2;
-		if (js)
-			sol.pJ[js] = op1;
-
-		sol.sJ[op1] = js;
-		sol.pJ[op1] = op2;
-		sol.pJ[op2] = jp;
-		sol.sJ[op2] = op1;
-
-		//sol.validSchedule();
-		sol.computeMakespan();
-		if (VERBOSE)
-			sol.print();
-		saveDataSwap();
-	}
-	void swapM(unsigned op1, unsigned op2)
-	{
-		if (TRACK_SWAP_OPERATIONS)
-			cout << "swapM(" << op1 << "," << op2 << ")" << br;
-		assert(op1 > 0 && op2 > 0);
-		assert(op1 != op2);
-		assert(sol.adjMach(op1, op2));
-
-		if (op1 == sol.first)
-			sol.first = op2;
-
-		if (sol.sM[op2] == op1)
-		{
-			unsigned o = op1;
-			op1 = op2;
-			op2 = o;
-		}
-
-		unsigned mp = sol.pM[op1], ms = sol.sM[op2];
-
-		if (mp)
-			sol.sM[mp] = op2;
-		if (ms)
-			sol.pM[ms] = op1;
-
-		sol.sM[op1] = ms;
-		sol.pM[op1] = op2;
-		sol.pM[op2] = mp;
-		sol.sM[op2] = op1;
-
-		//sol.validSchedule();
-		sol.computeMakespan();
-		if (VERBOSE)
-			sol.print();
-		saveDataSwap();
-	}
-
 	/////////////////////////////////////////////////////////////////////////
 	//////// GERAÇÃO DE VIZINHO /////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
@@ -115,7 +42,7 @@ class NeighborGenerator
 			cout << br << "shiftJ(" << p[idxBegin] << "," << p[idxEnd] << ")" << br;
 		unsigned lastOp = p[idxEnd];
 		for (unsigned i = idxEnd; i > idxBegin; i--)
-			swapJ(lastOp, p[i - 1]);
+			sol.swapJ(lastOp, p[i - 1]);
 		saveDataShift();
 	}
 	void shiftM(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd)
@@ -125,7 +52,7 @@ class NeighborGenerator
 			cout << br << "shiftM(" << p[idxBegin] << "," << p[idxEnd] << ")" << br;
 		unsigned lastOp = p[idxEnd];
 		for (unsigned i = idxEnd; i > idxBegin; i--)
-			swapM(lastOp, p[i - 1]);
+			sol.swapM(lastOp, p[i - 1]);
 		saveDataShift();
 	}
 	Solution getRandomNeighbor_shiftCritical()
@@ -240,7 +167,7 @@ public:
 			else
 				o2 = sol.sJ[o];
 
-			swapJ(o, o2);
+			sol.swapJ(o, o2);
 		}
 		else
 		{
@@ -249,7 +176,7 @@ public:
 			else
 				o2 = sol.sM[o];
 
-			swapM(o, o2);
+			sol.swapM(o, o2);
 		}
 		change = {SWAP, o, o2};
 
