@@ -72,6 +72,9 @@ public:
 	}
 
 	friend class Solution;
+	friend class SolutionOperator;
+	friend class SolutionBlockBuilder;
+	friend class SolutionPerturbator;
 	friend class Heuristics;
 	friend class NeighborGenerator;
 	friend class Printer;

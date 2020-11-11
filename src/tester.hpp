@@ -36,60 +36,8 @@ class Tester
 		return f;
 	}
 
-	unsigned runSA(Solution s)
-	{
-		AnnealingSimulator a(oper);
-		a.setSolution(s.copySolution());
-
-		return a.solve();
-	}
-
-	/* unsigned runTS(Solution s)
-	{
-		TabuSearcher t(oper);
-		t.setSolution(s.copySolution());
-
-		return t.solve();
-	} */
-
-	unsigned runILS(Solution s)
-	{
-		/*  t(oper);
-		t.setSolution(s.copySolution());
-
-		return t.solve(); */
-		return 0;
-	}
-
 public:
 	Tester() {}
-
-	void setNeighborType(unsigned neighborType)
-	{
-		oper = neighborType;
-	}
-
-	unsigned runHeuristic(unsigned heuristic)
-	{
-	}
-
-	/* void printAverageExecutionTime(int heuristic, int op)
-	{
-		float avg = 0;
-		vector<string> names = fileNames();
-
-		for (string name : names)
-		{
-			startTimeCounting();
-			Instance i(name);
-			Solution s(i, GREEDY_JOBS);
-			Heuristics h(s);
-			h.solve(heuristic, op);
-			avg += getElapsedTime();
-		}
-		avg /= 1000; // transforma a média para segundos
-		cout << avg / names.size() << br;
-	} */
 
 	string getInitResultFileName(unsigned init)
 	{

@@ -9,7 +9,7 @@ class AnnealingSimulator
 {
 public:
     unsigned alpha, minTemperature, iterations, oper;
-    Solution solution;
+    SolutionPerturbator solution;
 
     unsigned absol(unsigned n1)
     {
@@ -39,7 +39,7 @@ public:
         }
     }
 
-    void setSolution(Solution s)
+    void setSolution(SolutionPerturbator s)
     {
         solution = s;
     }
@@ -64,7 +64,7 @@ public:
         assert(makespan > 0);
         double t = 1;
         bool shouldStop = false;
-        Solution tempS;
+        SolutionPerturbator tempS;
         while (t > minTemperature && !shouldStop)
         {
             for (unsigned i = 0; i < iterations && !shouldStop; i++)
@@ -77,7 +77,7 @@ public:
                 }
                 if (tempMakespan < makespan || accept(t, tempMakespan, makespan))
                 {
-                    solution = tempS.copySolution();
+                    solution = tempS.getCopy();
                     makespan = tempMakespan;
                 }
 

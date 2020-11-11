@@ -9,7 +9,7 @@ using namespace std;
 
 class IteratedLocalSearcher
 {
-    Solution solution, globalBestSolution;
+    SolutionPerturbator solution, globalBestSolution;
     unsigned perturbationNumber, oper;
     //string outfile = "/home/hal/running_report.txt";
 
@@ -48,7 +48,7 @@ class IteratedLocalSearcher
             if (value < globalBestValue)
             {
                 globalBestValue = value;
-                globalBestSolution = n.getSolution().copySolution();
+                globalBestSolution = n.getSolution().getCopy();
             }
 
             n.restore();
@@ -131,10 +131,10 @@ public:
         perturbationNumber = number;
     }
 
-    void setSolution(Solution s)
+    void setSolution(SolutionPerturbator s)
     {
         solution = s;
-        globalBestSolution = s.copySolution();
+        globalBestSolution = s.getCopy();
     }
 
     void test()

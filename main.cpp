@@ -4,7 +4,6 @@
 #include "src/solution.hpp"
 #include "src/tester.hpp"
 #include "src/heuristics/tabu_searcher.hpp"
-#include "src/solution_tester.hpp"
 #include "src/heuristics/annealing_simulator.hpp"
 #include "src/heuristics/iterated_local_searcher.hpp"
 
@@ -18,7 +17,6 @@ string t5 = "inst/taillard/tai05_05_01.txt";
 string t7 = "inst/taillard/tai07_07_08.txt";
 string t20 = "inst/taillard/tai20_20_01.txt";
 
-void test();
 int main(int argc, char **argv)
 {
 	if (argc > 1)
@@ -42,7 +40,7 @@ int main(int argc, char **argv)
 
 		string instanceFileName(argv[2]), perturbationNumber(argv[4]);
 		Instance i(instanceFileName);
-		Solution s(i, RANDOM);
+		SolutionPerturbator s(i, RANDOM);
 		IteratedLocalSearcher g(stoi(perturbationNumber), SHIFT_CRITICAL);
 		g.setSolution(s);
 		cout << g.solve();
@@ -57,7 +55,7 @@ int main(int argc, char **argv)
 		SAVE_GRAPHS_ON_SHIFT = false;
 
 		Instance i(t4);
-		Solution s(i, TEST);
+		SolutionPerturbator s(i, TEST);
 		//s.printJobCluster();
 		unsigned initial = s.computeMakespan();
 		AnnealingSimulator a;
@@ -67,21 +65,7 @@ int main(int argc, char **argv)
 		unsigned end = a.solve();
 		cout << initial << sp << end << br;
 		exit(0);
-
-		/* SolutionTester t(s);
-		t.printPossibleMovements(SWAP_CRITICAL); */
 	}
 
 	return 0;
-}
-
-void test()
-{
-	//printAverageExecutionTime(SA, SWAP_CRITICAL_EDGE);
-	Instance i(t20);
-	Solution s(i, TEST);
-	s.printJobCluster();
-	cout << s.getHighestCostFromMachine() << br;
-	/* Heuristics h(s);
-	h.solve(SA, SHIFT_CRITICAL); */
 }

@@ -9,15 +9,15 @@
 
 class NeighborGenerator
 {
-	Solution sol;
-	Solution previous;
+	SolutionPerturbator sol;
+	SolutionPerturbator previous;
 	vector<vector<unsigned>> tabu;
 
 	/////////////////////////////////////////////////////////////////////////
 	//////// GERAÇÃO DE VIZINHO /////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 
-	Solution getRandomNeighbor_swapCritical()
+	SolutionPerturbator getRandomNeighbor_swapCritical()
 	{
 		auto o = sol.getOneRandomOperation_swapCritical();
 		auto p = sol.listPossiblePerturbations_swapCritical(o);
@@ -26,7 +26,7 @@ class NeighborGenerator
 
 		return sol;
 	}
-	Solution getRandomNeighbor_swapCriticalEdge()
+	SolutionPerturbator getRandomNeighbor_swapCriticalEdge()
 	{
 		auto o = sol.getOneRandomOperation_swapCriticalEdge();
 		auto p = sol.listPossiblePerturbations_swapCritical(o);
@@ -35,27 +35,7 @@ class NeighborGenerator
 
 		return sol;
 	}
-	void shiftJ(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd)
-	{
-		assert(idxBegin != idxEnd);
-		if (TRACK_SHIFT_OPERATIONS)
-			cout << br << "shiftJ(" << p[idxBegin] << "," << p[idxEnd] << ")" << br;
-		unsigned lastOp = p[idxEnd];
-		for (unsigned i = idxEnd; i > idxBegin; i--)
-			sol.swapJ(lastOp, p[i - 1]);
-		saveDataShift();
-	}
-	void shiftM(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd)
-	{
-		assert(idxBegin != idxEnd);
-		if (TRACK_SHIFT_OPERATIONS)
-			cout << br << "shiftM(" << p[idxBegin] << "," << p[idxEnd] << ")" << br;
-		unsigned lastOp = p[idxEnd];
-		for (unsigned i = idxEnd; i > idxBegin; i--)
-			sol.swapM(lastOp, p[i - 1]);
-		saveDataShift();
-	}
-	Solution getRandomNeighbor_shiftCritical()
+	SolutionPerturbator getRandomNeighbor_shiftCritical()
 	{
 		auto o = sol.getOneRandomOperation_shiftCritical();
 		auto p = sol.listPossiblePerturbations_shiftCritical(o);
@@ -64,7 +44,7 @@ class NeighborGenerator
 
 		return sol;
 	}
-	Solution getRandomNeighbor_shiftWhole()
+	SolutionPerturbator getRandomNeighbor_shiftWhole()
 	{
 
 		auto o = sol.getOneRandomOperation_shiftWhole();
@@ -79,60 +59,45 @@ class NeighborGenerator
 	//////// GERAÇÃO DE VIZINHANÇA COMPLETA /////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 
-	void saveDataShift()
-	{
-		if (SAVE_GRAPHS_ON_SHIFT)
-			sol.printJobCluster();
-		if (SAVE_CHARTS_ON_SHIFT)
-			sol.printGantt();
-	}
-	void saveDataSwap()
-	{
-		if (SAVE_GRAPHS_ON_SWAP)
-			sol.printJobCluster();
-		if (SAVE_CHARTS_ON_SWAP)
-			sol.printGantt();
-	}
-
-	void applyPerturbations(vector<Perturbation> &perturbations, vector<Solution> &neighbors)
+	void applyPerturbations(vector<Perturbation> &perturbations, vector<SolutionPerturbator> &neighbors)
 	{
 		for (auto p : perturbations)
 		{
 			applyPerturbation(p);
-			neighbors.push_back(sol.copySolution());
+			neighbors.push_back(sol.getCopy());
 			restore();
 		}
 	}
-	vector<Solution> getNeighbors_swapCritical()
+	vector<SolutionPerturbator> getNeighbors_swapCritical()
 	{
-		vector<Solution> neighbors;
+		vector<SolutionPerturbator> neighbors;
 
 		auto perturbations = sol.listAllPerturbations(SWAP_CRITICAL);
 		applyPerturbations(perturbations, neighbors);
 
 		return neighbors;
 	}
-	vector<Solution> getNeighbors_swapCriticalEdge()
+	vector<SolutionPerturbator> getNeighbors_swapCriticalEdge()
 	{
-		vector<Solution> neighbors;
+		vector<SolutionPerturbator> neighbors;
 
 		auto perturbations = sol.listAllPerturbations(SWAP_CRITICAL_EDGE);
 		applyPerturbations(perturbations, neighbors);
 
 		return neighbors;
 	}
-	vector<Solution> getNeighbors_shiftCritical()
+	vector<SolutionPerturbator> getNeighbors_shiftCritical()
 	{
-		vector<Solution> neighbors;
+		vector<SolutionPerturbator> neighbors;
 
 		auto perturbations = sol.listAllPerturbations(SHIFT_CRITICAL);
 		applyPerturbations(perturbations, neighbors);
 
 		return neighbors;
 	}
-	vector<Solution> getNeighbors_shiftWhole()
+	vector<SolutionPerturbator> getNeighbors_shiftWhole()
 	{
-		vector<Solution> neighbors;
+		vector<SolutionPerturbator> neighbors;
 
 		auto perturbations = sol.listAllPerturbations(SHIFT_WHOLE);
 		applyPerturbations(perturbations, neighbors);
@@ -142,18 +107,18 @@ class NeighborGenerator
 
 public:
 	NeighborGenerator() {}
-	NeighborGenerator(Solution s)
+	NeighborGenerator(SolutionPerturbator s)
 	{
 		setSolution(s);
 		tabu.resize(s.nO + 1);
 		for (unsigned i = 0; i <= s.nO; i++)
 			tabu[i].resize(s.nO + 1, 0);
 	}
-	void restore() { sol = previous.copySolution(); }
-	void setSolution(Solution s)
+	void restore() { sol = previous.getCopy(); }
+	void setSolution(SolutionPerturbator s)
 	{
-		sol = s.copySolution();
-		previous = s.copySolution();
+		sol = s.getCopy();
+		previous = s.getCopy();
 	}
 	ScheduleChange applySwap(Perturbation p)
 	{
@@ -211,9 +176,9 @@ public:
 				  block[o1Index]};
 
 		if (p.blockType == BLOCK_J)
-			shiftJ(block, o2Index, o1Index);
+			sol.shiftJ(block, o2Index, o1Index);
 		else
-			shiftM(block, o2Index, o1Index);
+			sol.shiftM(block, o2Index, o1Index);
 
 		return change;
 	}
@@ -233,10 +198,10 @@ public:
 	//////// OPERADORES DE VIZINHANÇA ///////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////
 
-	static Solution
-	getRandomNeighbor(unsigned oper, Solution &s)
+	static SolutionPerturbator
+	getRandomNeighbor(unsigned oper, SolutionPerturbator &s)
 	{
-		Solution copied = s.copySolution();
+		SolutionPerturbator copied = s.getCopy();
 		NeighborGenerator n = NeighborGenerator(copied);
 
 		switch (oper)
@@ -253,7 +218,7 @@ public:
 			break;
 		}
 	}
-	vector<Solution> getNeighbors(int oper)
+	vector<SolutionPerturbator> getNeighbors(int oper)
 	{
 		switch (oper)
 		{
@@ -263,7 +228,7 @@ public:
 			break;
 		}
 	}
-	Solution getSolution() { return sol; }
+	SolutionPerturbator getSolution() { return sol; }
 };
 
 #endif

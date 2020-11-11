@@ -6,7 +6,6 @@ unsigned TABU_DURATION = 5;
 #include <deque>
 #include "../time.hpp"
 #include "tabu_list.hpp"
-#include "../solution_tester.hpp"
 #include "../neighbor_generator.hpp"
 
 using namespace std;
@@ -15,7 +14,7 @@ class TabuSearcher
 {
 public:
     unsigned duration, oper;
-    Solution solution, incumbent;
+    SolutionPerturbator solution, incumbent;
     TabuList tabuList;
 
     void setParam(unsigned d)
@@ -77,7 +76,7 @@ public:
         }
 
         if (incumbent.computeMakespan() < solution.computeMakespan())
-            solution = incumbent.copySolution();
+            solution = incumbent.getCopy();
     }
 
     void setDefaultParams()
@@ -89,10 +88,10 @@ public:
         }
     }
 
-    void setSolution(Solution s)
+    void setSolution(SolutionPerturbator s)
     {
         solution = s;
-        incumbent = solution.copySolution();
+        incumbent = solution.getCopy();
     }
 
     TabuSearcher() {}
