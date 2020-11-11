@@ -32,8 +32,8 @@ public:
     void selectAndApplyBestMovement()
     {
         NeighborGenerator n(incumbent);
-        ScheduleChange sc, bestAllowedChange = {0, 0, 0}, bestTabuChange = {0, 0, 0}; //, bestTabuChange = {0, 0, 0};
-        Perturbation bestAllowedPerturbation, bestTabuPerturbation;                   //, bestTabuPerturbation = {0, 0, 0, 0};
+        Movement sc, bestAllowedChange = {0, 0, 0}, bestTabuChange = {0, 0, 0}; //, bestTabuChange = {0, 0, 0};
+        Perturbation bestAllowedPerturbation, bestTabuPerturbation;             //, bestTabuPerturbation = {0, 0, 0, 0};
         unsigned incumbentValue = incumbent.computeMakespan(), value;
         unsigned bestValue = incumbentValue * 100;
 

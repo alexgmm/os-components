@@ -1,65 +1,24 @@
 #pragma once
 
-#include "../constants.h"
-#include <iostream>
+#include "movement.hpp"
 #include <vector>
 #include <deque>
 #include <utility>
 
 using namespace std;
 
-struct ScheduleChange
-{
-    unsigned type, o1, o2;
-};
-
-bool isChangeInitialized(ScheduleChange sc)
-{
-    return sc.o1 != 0;
-}
-
-string getScheduleChangeString(ScheduleChange sc)
-{
-    string t = sc.type == SWAP ? "swap" : "shift";
-    return t + "(" + to_string(sc.o1) + "," + to_string(sc.o2) + ")";
-}
-
-void printScheduleChange(ScheduleChange sc)
-{
-    cout << getScheduleChangeString(sc);
-}
-
-bool isScheduleChangeEmpty(ScheduleChange sc)
-{
-    return sc.o1 == 0 && sc.o2 == 0;
-}
-
-void assertNonNullScheduleChange(ScheduleChange sc)
-{
-    if (isScheduleChangeEmpty(sc))
-    {
-        cout << "(!) Invalid schedule change: " << getScheduleChangeString(sc) << br;
-        //assert(sc.o2);
-    }
-}
-
-bool areEqual(ScheduleChange sc1, ScheduleChange sc2)
-{
-    return sc1.type == sc2.type && sc1.o1 == sc2.o1 && sc1.o2 == sc2.o2;
-}
-
 class TabuList
 {
     vector<vector<unsigned>> list;
-    deque<ScheduleChange> activeTabu;
+    deque<Movement> activeTabu;
     unsigned duration, type;
 
-    unsigned remainingLoops(ScheduleChange &m)
+    unsigned remainingLoops(Movement &m)
     {
         return list[m.o1][m.o2];
     }
 
-    void decreaseRemainingLoops(ScheduleChange &m)
+    void decreaseRemainingLoops(Movement &m)
     {
         list[m.o1][m.o2] -= 1;
     }
@@ -76,7 +35,7 @@ public:
         duration = d;
     }
 
-    void insertTabuMovement(ScheduleChange sc)
+    void insertTabuMovement(Movement sc)
     {
         list[sc.o1][sc.o2] = duration;
         activeTabu.push_back(sc);
@@ -88,7 +47,7 @@ public:
         activeTabu.push_back(sc);
     }
 
-    bool isTabu(ScheduleChange sc)
+    bool isTabu(Movement sc)
     {
         return list[sc.o1][sc.o2] > 0 || list[sc.o2][sc.o1] > 0;
     }

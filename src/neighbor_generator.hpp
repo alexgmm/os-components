@@ -120,9 +120,9 @@ public:
 		sol = s.getCopy();
 		previous = s.getCopy();
 	}
-	ScheduleChange applySwap(Perturbation p)
+	Movement applySwap(Perturbation p)
 	{
-		ScheduleChange change = {0, 0, 0};
+		Movement change = {0, 0, 0};
 		unsigned o = p.operation, o2;
 
 		if (p.blockType == BLOCK_J)
@@ -148,9 +148,9 @@ public:
 		return change;
 	}
 
-	ScheduleChange applyShift(Perturbation p)
+	Movement applyShift(Perturbation p)
 	{
-		ScheduleChange change = {0, 0, 0};
+		Movement change = {0, 0, 0};
 		vector<unsigned> block;
 		unsigned o = p.operation;
 
@@ -183,7 +183,7 @@ public:
 		return change;
 	}
 
-	ScheduleChange applyPerturbation(Perturbation p)
+	Movement applyPerturbation(Perturbation p)
 	{
 		/* cout << "on apply:\n";
 		printPerturbation(p);
