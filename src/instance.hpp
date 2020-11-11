@@ -71,8 +71,7 @@ public:
 		cout << "\n";
 	}
 
-	friend class Solution;
-	friend class SolutionOperator;
+	friend class Schedule;
 	friend class SolutionBlockBuilder;
 	friend class SolutionPerturbator;
 	friend class Heuristics;

@@ -151,7 +151,7 @@ public:
         return globalBestSolution.computeMakespan();
     }
 
-    Solution getSolution()
+    Schedule getSolution()
     {
         return solution;
     }

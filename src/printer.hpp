@@ -5,7 +5,7 @@
 #include <bits/stdc++.h>
 #include <string.h>
 
-#include "solution.hpp"
+#include "schedule.hpp"
 #include "perturbation.hpp"
 
 bool SAVE_GRAPHS_ON_SWAP = false;

@@ -50,7 +50,7 @@ public:
 		Instance i(file);
 		for (int loop = 1; loop <= NLOOPS; loop++)
 		{
-			Solution s(i, init);
+			Schedule s(i, init);
 			out << s.computeMakespan();
 			if (loop != NLOOPS)
 				out << ",";
@@ -96,7 +96,7 @@ public:
 		{
 			//cout << n << br;
 			Instance i(n);
-			Solution s(i, init);
+			Schedule s(i, init);
 			values.push_back(s.computeMakespan());
 		}
 		return values;

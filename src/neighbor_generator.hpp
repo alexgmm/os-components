@@ -3,7 +3,7 @@
 
 #include <assert.h>
 #include <iostream>
-#include "solution.hpp"
+#include "schedule.hpp"
 #include "heuristics/tabu_list.hpp"
 #include "perturbation.hpp"
 

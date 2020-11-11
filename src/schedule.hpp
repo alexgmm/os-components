@@ -8,7 +8,7 @@
 
 using namespace std;
 
-class Solution
+class Schedule
 {
 protected:
 	vector<unsigned> sJ, pJ, sM, pM;
@@ -31,6 +31,98 @@ protected:
 			assert(op <= nJ * nJ && op <= nM * nM);
 		assert(op > 0);
 	}
+
+	/////////////////////////////////////////////////////////////////////////
+	/////////////////////////// MOVEMENT APPLIERS ///////////////////////////
+	/////////////////////////////////////////////////////////////////////////
+
+	void swapJ(unsigned op1, unsigned op2)
+	{
+		if (TRACK_SWAP_OPERATIONS)
+			cout << "swapJ(" << op1 << "," << op2 << ")" << br;
+		assert(op1 > 0 && op2 > 0);
+		assert(op1 != op2);
+		assert(adjJob(op1, op2));
+
+		if (op1 == first)
+			first = op2;
+
+		if (sJ[op2] == op1)
+		{
+			unsigned o = op1;
+			op1 = op2;
+			op2 = o;
+		}
+
+		unsigned jp = pJ[op1], js = sJ[op2];
+
+		if (jp)
+			sJ[jp] = op2;
+		if (js)
+			pJ[js] = op1;
+
+		sJ[op1] = js;
+		pJ[op1] = op2;
+		pJ[op2] = jp;
+		sJ[op2] = op1;
+
+		computeMakespan();
+	}
+	void swapM(unsigned op1, unsigned op2)
+	{
+		if (TRACK_SWAP_OPERATIONS)
+			cout << "swapM(" << op1 << "," << op2 << ")" << br;
+		assert(op1 > 0 && op2 > 0);
+		assert(op1 != op2);
+		assert(adjMach(op1, op2));
+
+		if (op1 == first)
+			first = op2;
+
+		if (sM[op2] == op1)
+		{
+			unsigned o = op1;
+			op1 = op2;
+			op2 = o;
+		}
+
+		unsigned mp = pM[op1], ms = sM[op2];
+
+		if (mp)
+			sM[mp] = op2;
+		if (ms)
+			pM[ms] = op1;
+
+		sM[op1] = ms;
+		pM[op1] = op2;
+		pM[op2] = mp;
+		sM[op2] = op1;
+
+		computeMakespan();
+	}
+	void shiftJ(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd)
+	{
+		assert(idxBegin != idxEnd);
+		if (TRACK_SHIFT_OPERATIONS)
+			cout << br << "shiftJ(" << p[idxBegin] << "," << p[idxEnd] << ")" << br;
+		unsigned lastOp = p[idxEnd];
+		for (unsigned i = idxEnd; i > idxBegin; i--)
+			swapJ(lastOp, p[i - 1]);
+	}
+	void shiftM(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd)
+	{
+		assert(idxBegin != idxEnd);
+		if (TRACK_SHIFT_OPERATIONS)
+			cout << br << "shiftM(" << p[idxBegin] << "," << p[idxEnd] << ")" << br;
+		unsigned lastOp = p[idxEnd];
+		for (unsigned i = idxEnd; i > idxBegin; i--)
+			swapM(lastOp, p[i - 1]);
+	}
+
+	bool sameJob(unsigned op1, unsigned op2) { return instance.o_job[op1] == instance.o_job[op2]; }
+	bool sameMach(unsigned op1, unsigned op2) { return instance.o_machine[op1] == instance.o_machine[op2]; }
+	bool adjJob(unsigned op1, unsigned op2) { return pJ[op1] == op2 || pJ[op2] == op1; }
+	bool adjMach(unsigned op1, unsigned op2) { return pM[op1] == op2 || pM[op2] == op1; }
 
 	/////////////////////////////////////////////////////////////////////////
 	///////////////////////////// INITIALIZERS //////////////////////////////
@@ -326,8 +418,8 @@ protected:
 	}
 
 public:
-	Solution() {}
-	Solution(Instance i, int init_method)
+	Schedule() {}
+	Schedule(Instance i, int init_method)
 	{
 		instance = i;
 		last = 0;
@@ -473,100 +565,8 @@ public:
 	friend class NeighborGenerator;
 	friend class IteratedLocalSearcher;
 };
-class SolutionOperator : public Solution
-{
-public:
-	SolutionOperator() {}
-	SolutionOperator(Instance i, int method) : Solution(i, method) {}
-	void swapJ(unsigned op1, unsigned op2)
-	{
-		if (TRACK_SWAP_OPERATIONS)
-			cout << "swapJ(" << op1 << "," << op2 << ")" << br;
-		assert(op1 > 0 && op2 > 0);
-		assert(op1 != op2);
-		assert(adjJob(op1, op2));
 
-		if (op1 == first)
-			first = op2;
-
-		if (sJ[op2] == op1)
-		{
-			unsigned o = op1;
-			op1 = op2;
-			op2 = o;
-		}
-
-		unsigned jp = pJ[op1], js = sJ[op2];
-
-		if (jp)
-			sJ[jp] = op2;
-		if (js)
-			pJ[js] = op1;
-
-		sJ[op1] = js;
-		pJ[op1] = op2;
-		pJ[op2] = jp;
-		sJ[op2] = op1;
-
-		computeMakespan();
-	}
-	void swapM(unsigned op1, unsigned op2)
-	{
-		if (TRACK_SWAP_OPERATIONS)
-			cout << "swapM(" << op1 << "," << op2 << ")" << br;
-		assert(op1 > 0 && op2 > 0);
-		assert(op1 != op2);
-		assert(adjMach(op1, op2));
-
-		if (op1 == first)
-			first = op2;
-
-		if (sM[op2] == op1)
-		{
-			unsigned o = op1;
-			op1 = op2;
-			op2 = o;
-		}
-
-		unsigned mp = pM[op1], ms = sM[op2];
-
-		if (mp)
-			sM[mp] = op2;
-		if (ms)
-			pM[ms] = op1;
-
-		sM[op1] = ms;
-		pM[op1] = op2;
-		pM[op2] = mp;
-		sM[op2] = op1;
-
-		computeMakespan();
-	}
-	void shiftJ(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd)
-	{
-		assert(idxBegin != idxEnd);
-		if (TRACK_SHIFT_OPERATIONS)
-			cout << br << "shiftJ(" << p[idxBegin] << "," << p[idxEnd] << ")" << br;
-		unsigned lastOp = p[idxEnd];
-		for (unsigned i = idxEnd; i > idxBegin; i--)
-			swapJ(lastOp, p[i - 1]);
-	}
-	void shiftM(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd)
-	{
-		assert(idxBegin != idxEnd);
-		if (TRACK_SHIFT_OPERATIONS)
-			cout << br << "shiftM(" << p[idxBegin] << "," << p[idxEnd] << ")" << br;
-		unsigned lastOp = p[idxEnd];
-		for (unsigned i = idxEnd; i > idxBegin; i--)
-			swapM(lastOp, p[i - 1]);
-	}
-
-	bool sameJob(unsigned op1, unsigned op2) { return instance.o_job[op1] == instance.o_job[op2]; }
-	bool sameMach(unsigned op1, unsigned op2) { return instance.o_machine[op1] == instance.o_machine[op2]; }
-	bool adjJob(unsigned op1, unsigned op2) { return pJ[op1] == op2 || pJ[op2] == op1; }
-	bool adjMach(unsigned op1, unsigned op2) { return pM[op1] == op2 || pM[op2] == op1; }
-};
-class SolutionBlockBuilder : public SolutionOperator
+class SolutionBlockBuilder : public Schedule
 {
 protected:
 	vector<unsigned> critical()
@@ -929,7 +929,7 @@ protected:
 
 public:
 	SolutionBlockBuilder() {}
-	SolutionBlockBuilder(Instance i, int method) : SolutionOperator(i, method) {}
+	SolutionBlockBuilder(Instance i, int method) : Schedule(i, method) {}
 
 	friend class NeighborGenerator;
 };
