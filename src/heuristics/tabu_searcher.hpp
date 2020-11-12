@@ -14,7 +14,7 @@ class TabuSearcher
 {
 public:
     unsigned duration, oper;
-    SolutionPerturbator solution, incumbent;
+    PerturbationGenerator solution, incumbent;
     TabuList tabuList;
 
     void setParam(unsigned d)
@@ -42,7 +42,7 @@ public:
         for (auto p : perts)
         {
             sc = n.applyPerturbation(p);
-            value = n.getSolution().computeMakespan();
+            value = n.getSchedule().computeMakespan();
             n.restore();
             if (value < bestValue)
             {
@@ -65,13 +65,13 @@ public:
         if (!isScheduleChangeEmpty(bestAllowedChange))
         {
             n.applyPerturbation(bestAllowedPerturbation);
-            incumbent = n.getSolution();
+            incumbent = n.getSchedule();
             tabuList.insertTabuMovement(bestAllowedChange);
         }
         else if (!isScheduleChangeEmpty(bestTabuChange))
         {
             n.applyPerturbation(bestTabuPerturbation);
-            incumbent = n.getSolution();
+            incumbent = n.getSchedule();
             tabuList.insertTabuMovement(bestTabuChange);
         }
 
@@ -88,7 +88,7 @@ public:
         }
     }
 
-    void setSolution(SolutionPerturbator s)
+    void setSolution(PerturbationGenerator s)
     {
         solution = s;
         incumbent = solution.getCopy();

@@ -28,7 +28,8 @@ string getPerturbationString(Perturbation p)
         perturbationTypeLabel = "swap_successor";
         break;
     default:
-        perturbationTypeLabel = "shift " + to_string(p.factor) + " units";
+        string sType = p.perturbationType == SHIFT_CRITICAL ? "c-" : "w-";
+        perturbationTypeLabel = sType + "shift " + to_string(p.factor) + " units";
         break;
     }
 

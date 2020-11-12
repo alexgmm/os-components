@@ -194,6 +194,19 @@ public:
         string graph = printClusterGraph(true, false);
         saveGraph(graph);
     }
+    static void printJobCluster(Schedule s)
+    {
+        ScheduleDataRetriever dr(s);
+        Printer p(dr.sJ, dr.sM);
+        p.setInstanceData(dr.nO, dr.instance.cost, dr.instance.o_job, dr.instance.o_machine);
+        p.setStarters(dr.getStarters(dr.pJ), dr.getStarters(dr.pM));
+        p.setSolutionData(dr.first, dr.computeMakespan(), dr.critical(), dr.getHeads());
+        p.printJobCluster();
+    }
+    static void printSolution(Schedule s)
+    {
+        cout << s.getSolutionString();
+    }
     void printGantt()
     {
         cout << endl

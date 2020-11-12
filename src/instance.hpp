@@ -72,8 +72,8 @@ public:
 	}
 
 	friend class Schedule;
-	friend class SolutionBlockBuilder;
-	friend class SolutionPerturbator;
+	friend class ScheduleDataRetriever;
+	friend class PerturbationGenerator;
 	friend class Heuristics;
 	friend class NeighborGenerator;
 	friend class Printer;

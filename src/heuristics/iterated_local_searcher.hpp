@@ -9,7 +9,8 @@ using namespace std;
 
 class IteratedLocalSearcher
 {
-    SolutionPerturbator solution, globalBestSolution;
+    Schedule solution, globalBest;
+    NeighborGenerator generator;
     unsigned perturbationNumber, oper;
     //string outfile = "/home/hal/running_report.txt";
 
@@ -27,70 +28,29 @@ class IteratedLocalSearcher
 
     bool applyPerturbationGreedly(unsigned o)
     {
-        //Printer::appendToFile(s.getSolutionString(), outfile);
-        bool improved = false;
-        vector<Perturbation> perturbations = solution.listPossiblePerturbations(o, oper);
+        Schedule bestNeighbor = generator.getBestNeighbor(o, oper);
 
-        if (perturbations.size() == 0)
+        if (bestNeighbor.computeMakespan() < globalBest.computeMakespan())
+        {
+            setSolution(bestNeighbor.getCopy());
+            return true;
+        }
+        else
+        {
+            generator.restore();
             return false;
-
-        NeighborGenerator n(solution);
-
-        unsigned bestValue = solution.computeMakespan(), value, globalBestValue = globalBestSolution.computeMakespan();
-        Perturbation bestPerturbation = {0, 0, 0, 0};
-
-        for (Perturbation m : perturbations)
-        {
-            //Printer::appendToFile(getPerturbationString(m), outfile);
-            n.applyPerturbation(m);
-            value = n.getSolution().computeMakespan();
-
-            if (value < globalBestValue)
-            {
-                globalBestValue = value;
-                globalBestSolution = n.getSolution().getCopy();
-            }
-
-            n.restore();
-
-            if (value < bestValue && value > 0)
-            {
-                improved = true;
-                bestValue = value;
-                bestPerturbation = m;
-            }
         }
-
-        n.applyPerturbation(bestPerturbation);
-
-        solution = n.getSolution();
-        return improved;
-    }
-
-    Perturbation getOnePerturbation()
-    {
-        vector<Perturbation> perturbations;
-        unsigned o;
-
-        while (perturbations.size() == 0)
-        {
-            o = solution.getOneRandomOperation_shiftWhole();
-            perturbations = solution.listPossiblePerturbations_shiftWhole(o);
-        }
-
-        auto randomIndex = perturbations.size() == 1 ? 0 : randint(0, perturbations.size() - 1);
-
-        return perturbations[randomIndex];
     }
 
     void improve()
     {
+        //cout << wrapStringInLabel("improving");
         bool isImproving;
-
+        PerturbationGenerator gen(solution);
         do
         {
             isImproving = false;
-            vector<unsigned> operations = solution.getAllOperations(oper);
+            vector<unsigned> operations = gen.getAllOperations(oper);
             //printv(operations, 0, "all ops");
             for (auto o : operations)
                 isImproving = isImproving || applyPerturbationGreedly(o);
@@ -100,26 +60,15 @@ class IteratedLocalSearcher
 
     void perturbation()
     {
-        unsigned value;
-        NeighborGenerator n(solution);
-        Perturbation m;
-
-        do
-        {
-            n.restore();
-            m = getOnePerturbation();
-            //printPerturbation(m);
-            n.applyPerturbation(m);
-            value = n.getSolution().computeMakespan();
-        } while (value == UMAX);
-        //cout << br << "perturbation " << value << br;
-        solution = n.getSolution();
+        //cout << wrapStringInLabel("perturbating");
+        Schedule perturbated = generator.getRandomNeighbor(SHIFT_WHOLE);
+        setSolution(perturbated);
     }
 
     void iterate()
     {
         improve();
-        for (unsigned i = 0; i < perturbationNumber; i++)
+        for (unsigned i = 0; i < perturbationNumber && !isTimeOver(); i++)
             perturbation();
     }
 
@@ -131,14 +80,11 @@ public:
         perturbationNumber = number;
     }
 
-    void setSolution(SolutionPerturbator s)
+    void setSolution(Schedule s)
     {
         solution = s;
-        globalBestSolution = s.getCopy();
-    }
-
-    void test()
-    {
+        globalBest = s.getCopy();
+        generator.setSchedule(solution);
     }
 
     unsigned solve()
@@ -148,7 +94,7 @@ public:
         while (!isTimeOver())
             iterate();
 
-        return globalBestSolution.computeMakespan();
+        return globalBest.computeMakespan();
     }
 
     Schedule getSolution()

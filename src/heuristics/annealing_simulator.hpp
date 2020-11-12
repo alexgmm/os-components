@@ -9,7 +9,9 @@ class AnnealingSimulator
 {
 public:
     unsigned alpha, minTemperature, iterations, oper;
-    SolutionPerturbator solution;
+    double T = 1;
+    Schedule solution;
+    NeighborGenerator generator;
 
     unsigned absol(unsigned n1)
     {
@@ -17,7 +19,10 @@ public:
             return -n1;
         return n1;
     }
-    bool accept(double t, unsigned v_new, unsigned v_old) { return (rand() / (double)RAND_MAX) <= exp(0 - absol(v_new - v_old) / t); }
+    bool accept(unsigned v0, unsigned v1)
+    {
+        return (v0 < v1) || (rand() / (double)RAND_MAX) <= exp(0 - absol(v0 - v1) / T);
+    }
 
     void setParams(unsigned a, unsigned t, unsigned i)
     {
@@ -31,7 +36,7 @@ public:
         switch (oper)
         {
         case SWAP_CRITICAL:
-            setParams(0.2232, 0.0006, 7631);
+            setParams(0.3277, 0.0007, 20000);
             break;
         case SWAP_CRITICAL_EDGE:
             setParams(0.3772, 0.0006, 5857);
@@ -39,9 +44,10 @@ public:
         }
     }
 
-    void setSolution(SolutionPerturbator s)
+    void setSolution(Schedule s)
     {
         solution = s;
+        generator.setSchedule(solution);
     }
 
     void setOper(unsigned o)
@@ -59,32 +65,39 @@ public:
     unsigned solve()
     {
         startTimeCounting();
+
         unsigned makespan = solution.computeMakespan();
         int tempMakespan;
         assert(makespan > 0);
-        double t = 1;
         bool shouldStop = false;
-        SolutionPerturbator tempS;
-        while (t > minTemperature && !shouldStop)
+        Schedule tempS;
+
+        for (T; T > minTemperature && !shouldStop; T *= alpha)
         {
             for (unsigned i = 0; i < iterations && !shouldStop; i++)
             {
-                tempMakespan = -1;
-                while (tempMakespan <= 0)
+                //cout << "current is:" << br;
+                //Printer::printJobCluster(solution);
+                tempS = generator.getRandomNeighbor(oper);
+                //cout << "new temp is:" << br;
+                //Printer::printJobCluster(tempS);
+                //Printer::printSolution(tempS);
+                tempMakespan = tempS.computeMakespan();
+                //printl("temp makespan found:", tempMakespan);
+                if (accept(tempMakespan, makespan))
                 {
-                    tempS = NeighborGenerator::getRandomNeighbor(oper, solution);
-                    tempMakespan = tempS.computeMakespan();
-                }
-                if (tempMakespan < makespan || accept(t, tempMakespan, makespan))
-                {
+                    //cout << "accepted" << br;
                     solution = tempS.getCopy();
+                    generator.setSchedule(tempS);
                     makespan = tempMakespan;
                 }
+                else
+                    generator.restore();
 
                 shouldStop = isTimeOver();
             }
-            t *= alpha;
         }
+
         return makespan;
     }
 };

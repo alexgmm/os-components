@@ -24,12 +24,13 @@ int main(int argc, char **argv)
 		/* for (int i = 1; i < 10; i++)
 			cout << i << " " << argv[i] << br; */
 
-		/* string iterationsNumber(argv[4]), alpha(argv[6]), temperature(argv[8]), instanceFileName(argv[2]);
+		string iterationsNumber(argv[4]), alpha(argv[6]), temperature(argv[8]), instanceFileName(argv[2]);
 		Instance i(instanceFileName);
-		Solution s(i, RANDOM);
-		Heuristics h(s);
-		h.setSimulatedAnnealingParams(stod(alpha), stod(temperature), stoi(iterationsNumber));
-		unsigned r = h.solve(SA, SHIFT_CRITICAL); */
+		Schedule s(i, RANDOM);
+		AnnealingSimulator ls(SWAP_CRITICAL_EDGE);
+		ls.setParams(stoi(alpha), stod(temperature), stoi(iterationsNumber));
+		ls.setSolution(s);
+		cout << ls.solve() << br;
 
 		/* string instanceFileName(argv[2]), duration(argv[4]);
 		Instance i(instanceFileName);
@@ -38,15 +39,16 @@ int main(int argc, char **argv)
 		h.setTabuSearchParams(stoi(duration));
 		unsigned r = h.solve(TS, SHIFT_WHOLE); */
 
-		string instanceFileName(argv[2]), perturbationNumber(argv[4]);
+		/* string instanceFileName(argv[2]), perturbationNumber(argv[4]);
 		Instance i(instanceFileName);
-		SolutionPerturbator s(i, RANDOM);
+		PerturbationGenerator s(i, RANDOM);
 		IteratedLocalSearcher g(stoi(perturbationNumber), SHIFT_CRITICAL);
 		g.setSolution(s);
-		cout << g.solve();
+		cout << g.solve(); */
 	}
 	else
 	{
+		int fim;
 		VERBOSE = false;
 		SAVE_GRAPHS_ON_SWAP = false;
 		TRACK_SWAP_OPERATIONS = false;
@@ -55,16 +57,29 @@ int main(int argc, char **argv)
 		SAVE_GRAPHS_ON_SHIFT = false;
 
 		Instance i(t4);
-		SolutionPerturbator s(i, TEST);
-		//s.printJobCluster();
-		unsigned initial = s.computeMakespan();
-		AnnealingSimulator a;
-		a.setSolution(s);
-		a.setOper(SHIFT_CRITICAL);
-		a.setParams(0.2232, 0.0006, 7631);
-		unsigned end = a.solve();
-		cout << initial << sp << end << br;
-		exit(0);
+		Schedule s(i, TEST);
+		auto ini = s.getMakespan();
+		//cout << s.getSolutionString();
+		//Printer::printJobCluster(s);
+
+		IteratedLocalSearcher ils(1, SWAP_CRITICAL_EDGE);
+		ils.setSolution(s);
+		fim = ils.solve();
+
+		/* AnnealingSimulator ls(SWAP_CRITICAL_EDGE);
+		ls.setSolution(s);
+		fim = ls.solve(); */
+
+		cout << ini << sp << fim << br;
+
+		PerturbationGenerator p(s);
+		NeighborGenerator gen(s);
+
+		/* auto ps = p.listPossiblePerturbations(8, SWAP_CRITICAL_EDGE);
+		for (auto per : ps)
+		{
+			printPerturbation(per);
+		} */
 	}
 
 	return 0;
