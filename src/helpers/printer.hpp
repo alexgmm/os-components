@@ -5,8 +5,8 @@
 #include <bits/stdc++.h>
 #include <string.h>
 
-#include "schedule.hpp"
-#include "perturbation.hpp"
+#include "../schedule/schedule.hpp"
+#include "../perturbation/perturbation.hpp"
 
 bool SAVE_GRAPHS_ON_SWAP = false;
 bool SAVE_GRAPHS_ON_SHIFT = false;

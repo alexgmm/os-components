@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../neighbor_generator.hpp"
-#include "../time.hpp"
+#include "../helpers/time.hpp"
 
 using namespace std;
 

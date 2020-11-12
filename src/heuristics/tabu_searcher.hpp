@@ -4,7 +4,7 @@ unsigned TABU_DURATION = 5;
 
 #include <map>
 #include <deque>
-#include "../time.hpp"
+#include "../helpers/time.hpp"
 #include "tabu_list.hpp"
 #include "../neighbor_generator.hpp"
 

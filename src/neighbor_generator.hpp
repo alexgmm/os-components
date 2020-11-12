@@ -3,10 +3,11 @@
 
 #include <assert.h>
 #include <iostream>
-#include "schedule.hpp"
-#include "printer.hpp"
+#include "schedule/schedule.hpp"
+#include "helpers/printer.hpp"
 #include "heuristics/tabu_list.hpp"
-#include "perturbation.hpp"
+#include "perturbation/perturbation.hpp"
+#include "perturbation/perturbation_generator.hpp"
 
 class NeighborGenerator
 {
