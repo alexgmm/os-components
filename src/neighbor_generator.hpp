@@ -166,7 +166,8 @@ public:
 		for (auto p : ps)
 		{
 			mov = applyPerturbation(p);
-			mpn.push_back(make_pair(mov, current.getCopy()));
+			if (current.getMakespan() > 0)
+				mpn.push_back(make_pair(mov, current.getCopy()));
 			restore();
 		}
 

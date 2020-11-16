@@ -29,8 +29,7 @@ public:
     }
     void applyBestMovement()
     {
-        cout << wrapStringInLabel("SEARCHING BEST NEIGHBOR");
-        incumbent.assertValidSchedule();
+        //cout << wrapStringInLabel("SEARCHING BEST NEIGHBOR");
         NeighborGenerator n(incumbent);
         Movement bestMovement;
         Schedule bestSchedule;
@@ -49,24 +48,22 @@ public:
                 bestValue = value;
             }
         }
-        cout << "is there a valid movement?\n";
-        if (isMovementEmpty(bestMovement))
+        if (bestValue == UMAX)
             return;
-        cout << "yes\n";
+
         incumbent = bestSchedule;
-        //printMovement(bestMovement);
-        cout << br << "new incumbent" << br;
+        //incumbent.printSchedule();
         /* Printer::printJobCluster(incumbent);
         Printer::printSolution(incumbent); */
         tabuList.insertTabuMovement(bestMovement);
-        cout << "inserting in tabu\n";
         if (bestValue < globalBestSolution.getMakespan())
         {
             globalBestSolution = incumbent.getCopy();
-            cout << wrapStringInLabel("/\\ GLOBAL FOUND: /\\");
+            //cout << wrapStringInLabel("/\\ GLOBAL FOUND: /\\");
         }
 
         //tabuList.printCurrentTabu();
+        incumbent.assertValidSchedule();
     }
     void setDefaultParams()
     {

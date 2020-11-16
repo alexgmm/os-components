@@ -23,7 +23,8 @@ string getMovementString(Movement mv)
 
 void printMovement(Movement mv)
 {
-    cout << getMovementString(mv);
+    cout << getMovementString(mv) << br;
+    ;
 }
 
 bool isMovementEmpty(Movement mv)

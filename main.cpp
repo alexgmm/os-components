@@ -59,7 +59,7 @@ int main(int argc, char **argv)
 		Instance i(t4);
 		Schedule s(i, RANDOM);
 		auto ini = s.getMakespan();
-		Printer::printJobCluster(s);
+		//Printer::printJobCluster(s);
 		/* Printer::printJobCluster(s);
 		s.printCriticalPath(); */
 		//Printer::printSolution(s);
@@ -75,7 +75,7 @@ int main(int argc, char **argv)
 		ls.setSolution(s);
 		fim = ls.solve(); */
 
-		TabuSearcher t(SWAP_CRITICAL_EDGE, 10);
+		TabuSearcher t(SHIFT_CRITICAL, 10);
 		t.setSolution(s);
 		fim = t.solve();
 

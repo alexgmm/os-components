@@ -375,14 +375,4 @@ public:
             return listAllPerturbations_shiftCritical();
         }
     }
-
-    void printSchedule()
-    {
-        int ini = 1;
-        printv(sJ, ini, "Sucessores nos jobs:");
-        printv(pJ, ini, "Predecessores nos jobs:");
-        printv(sM, ini, "Sucessores nas maquinas:");
-        printv(pM, ini, "Predecessores nas maquinas:");
-        //printv(instance.cost, 1, "custo");
-    }
 };

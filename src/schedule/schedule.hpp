@@ -36,8 +36,9 @@ public:
 	}
 	vector<unsigned> critical()
 	{
-		assert(last <= nO);
-		vector<unsigned> heads = getHeads();
+		vector<unsigned> heads = getHeads(), cicle;
+		if (heads.size() == 0)
+			return cicle;
 		vector<unsigned> late_pred = getLatestPred(heads), p;
 		unsigned op = last;
 
@@ -52,7 +53,8 @@ public:
 	void setFirst()
 	{
 		auto p = critical();
-		first = p[0];
+		if (p.size() > 0)
+			first = p[0];
 	}
 	void assertValidSchedule()
 	{
@@ -427,12 +429,10 @@ public:
 	}
 	vector<unsigned> getLatestPred(vector<unsigned> &heads)
 	{
+		vector<unsigned> late_pred(nO + 1, 0), cicle;
 		if (heads.size() == 0)
-		{
-			cout << "(!) Invalid heads (probable cicle)\n";
-			assert(heads.size() > 0);
-		}
-		vector<unsigned> late_pred(nO + 1, 0);
+			return cicle;
+
 		for (int i = 1; i <= nO; i++)
 		{
 			if (heads[pM[i]] + instance.cost[pM[i]] > heads[pJ[i]] + instance.cost[pJ[i]])
@@ -572,6 +572,15 @@ public:
 		return lower;
 	}
 
+	void printSchedule()
+	{
+		int ini = 0;
+		printv(sJ, ini, "Sucessores nos jobs:");
+		printv(pJ, ini, "Predecessores nos jobs:");
+		printv(sM, ini, "Sucessores nas maquinas:");
+		printv(pM, ini, "Predecessores nas maquinas:");
+		//printv(instance.cost, 1, "custo");
+	}
 	string getSolutionString()
 	{
 		string info = "first = " + to_string(first) + ";" + br;
