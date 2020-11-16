@@ -8,7 +8,7 @@ makespan, machines = int(makespan), []
 for values in tail.split(','):
     machines.append([int(v) for v in values.split(' ')])
 
-colors = ['#BDE6FF','#97B6E7','#7185CF','#25239E','#7185CF','#0F4700','#44752E','#78A35B','#ACD188','#E0FFB5','#CE050F','#D82323','#E14036','#EB5D49','#F47A5C','#C99700','#D7AE27','#E4C44E','#F2DA75','#FFF09B']
+colors = ['#000000','#EB5D49','#97B6E7','#C99700','#0F4700','#78A35B','#ACD188','#E0FFB5','#CE050F','#D82323','#F47A5C','#D7AE27','#E4C44E','#F2DA75','#000000','#BDE6FF','#25239E','#7185CF','#FFF09B','#E14036']
 
 nM = max([v[-1] for v in machines])
 def printOperation(op_info):

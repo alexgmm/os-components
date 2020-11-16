@@ -100,7 +100,7 @@ class Printer
         string graph = "digraph G {\n";
 
         graph += getFirstOperationNode();
-        graph += getMakespanValueNode();
+        //graph += getMakespanValueNode();
 
         for (int i = 0; i < machStarters.size(); i++)
         {
@@ -153,7 +153,7 @@ class Printer
     }
     string getSaveLabel()
     {
-        return wrapStringInLabel("saving graph number " + to_string(CURRENT_GRAPH_NUMBER));
+        return wrapStringInLabel("saving graph " + to_string(CURRENT_GRAPH_NUMBER));
     }
 
 public:
@@ -212,6 +212,15 @@ public:
         cout << endl
              << "saving gantt chart number " << CURRENT_CHART_NUMBER << endl;
         saveGantt();
+    }
+    static void printGantt(Schedule s)
+    {
+        ScheduleDataRetriever dr(s);
+        Printer p(dr.sJ, dr.sM);
+        p.setInstanceData(dr.nO, dr.instance.cost, dr.instance.o_job, dr.instance.o_machine);
+        p.setStarters(dr.getStarters(dr.pJ), dr.getStarters(dr.pM));
+        p.setSolutionData(dr.first, dr.computeMakespan(), dr.critical(), dr.getHeads());
+        p.printGantt();
     }
     static void printBlockSet(vector<vector<unsigned>> &set, string label)
     {

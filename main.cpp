@@ -57,25 +57,31 @@ int main(int argc, char **argv)
 		SAVE_GRAPHS_ON_SHIFT = false;
 
 		Instance i(t4);
-		Schedule s(i, TEST);
+		Schedule s(i, RANDOM);
 		auto ini = s.getMakespan();
-		//cout << s.getSolutionString();
-		//Printer::printJobCluster(s);
+		Printer::printJobCluster(s);
+		/* Printer::printJobCluster(s);
+		s.printCriticalPath(); */
+		//Printer::printSolution(s);
+		//Printer::printGantt(s);
 
-		IteratedLocalSearcher ils(1, SWAP_CRITICAL_EDGE);
+		//cout << s.getSolutionString();
+
+		/* IteratedLocalSearcher ils(1, SWAP_CRITICAL_EDGE);
 		ils.setSolution(s);
-		fim = ils.solve();
+		fim = ils.solve(); */
 
 		/* AnnealingSimulator ls(SWAP_CRITICAL_EDGE);
 		ls.setSolution(s);
 		fim = ls.solve(); */
 
+		TabuSearcher t(SWAP_CRITICAL_EDGE, 10);
+		t.setSolution(s);
+		fim = t.solve();
+
 		cout << ini << sp << fim << br;
 
-		PerturbationGenerator p(s);
-		NeighborGenerator gen(s);
-
-		/* auto ps = p.listPossiblePerturbations(8, SWAP_CRITICAL_EDGE);
+		/*auto ps = p.listPossiblePerturbations(8, SWAP_CRITICAL_EDGE);
 		for (auto per : ps)
 		{
 			printPerturbation(per);

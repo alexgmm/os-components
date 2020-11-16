@@ -49,21 +49,6 @@ public:
 
         return highestCost;
     }
-    vector<unsigned> critical()
-    {
-        assert(last <= nO);
-        vector<unsigned> heads = getHeads();
-        vector<unsigned> late_pred = getLatestPred(heads), p;
-        unsigned op = last;
-
-        while (op > 0)
-        {
-            p.push_back(op);
-            op = late_pred[op];
-        }
-        reverse(p.begin(), p.end());
-        return p;
-    }
     void blocks(vector<unsigned> &begins, vector<unsigned> &ends, unsigned blockType)
     {
         vector<unsigned> p = critical(), blocksBegins, blocksEnds;

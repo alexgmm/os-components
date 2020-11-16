@@ -21,6 +21,7 @@ class TabuList
     void decreaseRemainingLoops(Movement &m)
     {
         list[m.o1][m.o2] -= 1;
+        list[m.o2][m.o1] -= 1;
     }
 
 public:
@@ -66,12 +67,14 @@ public:
 
     void printCurrentTabu()
     {
-        cout << br << "current tabu ops " << br;
+        cout << br << "# current tabu ops " << br;
         for (auto m : activeTabu)
         {
-            cout << remainingLoops(m) << sp;
-            printScheduleChange(m);
+            cout << "#\t" << remainingLoops(m) << sp;
+            printMovement(m);
+            cout << br;
         }
+        cout << br;
     }
 
     friend class TabuSearcher;

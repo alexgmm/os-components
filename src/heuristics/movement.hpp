@@ -15,27 +15,27 @@ bool isChangeInitialized(Movement mv)
     return mv.o1 != 0;
 }
 
-string getScheduleChangeString(Movement mv)
+string getMovementString(Movement mv)
 {
     string t = mv.type == SWAP ? "swap" : "shift";
     return t + "(" + to_string(mv.o1) + "," + to_string(mv.o2) + ")";
 }
 
-void printScheduleChange(Movement mv)
+void printMovement(Movement mv)
 {
-    cout << getScheduleChangeString(mv);
+    cout << getMovementString(mv);
 }
 
-bool isScheduleChangeEmpty(Movement mv)
+bool isMovementEmpty(Movement mv)
 {
     return mv.o1 == 0 && mv.o2 == 0;
 }
 
-void assertNonNullScheduleChange(Movement mv)
+void assertNonNullMovement(Movement mv)
 {
-    if (isScheduleChangeEmpty(mv))
+    if (isMovementEmpty(mv))
     {
-        cout << "(!) Invalid schedule change: " << getScheduleChangeString(mv) << br;
+        cout << "(!) Invalid schedule change: " << getMovementString(mv) << br;
         //assert(sc.o2);
     }
 }

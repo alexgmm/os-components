@@ -13,6 +13,7 @@ void printEdge(pair<unsigned, unsigned> &e)
 
 class Schedule
 {
+public:
 	vector<unsigned> sJ, pJ, sM, pM;
 	unsigned nM, nJ, nO, last, first;
 	int makespan = 0;
@@ -33,6 +34,33 @@ class Schedule
 			assert(op <= nJ * nJ && op <= nM * nM);
 		assert(op > 0);
 	}
+	vector<unsigned> critical()
+	{
+		assert(last <= nO);
+		vector<unsigned> heads = getHeads();
+		vector<unsigned> late_pred = getLatestPred(heads), p;
+		unsigned op = last;
+
+		while (op > 0)
+		{
+			p.push_back(op);
+			op = late_pred[op];
+		}
+		reverse(p.begin(), p.end());
+		return p;
+	}
+	void setFirst()
+	{
+		auto p = critical();
+		first = p[0];
+	}
+	void assertValidSchedule()
+	{
+		assert(pJ.size() == nO + 1);
+		assert(pM.size() == nO + 1);
+		assert(sJ.size() == nO + 1);
+		assert(sM.size() == nO + 1);
+	}
 
 	/////////////////////////////////////////////////////////////////////////
 	/////////////////////////// MOVEMENT APPLIERS ///////////////////////////
@@ -45,9 +73,6 @@ class Schedule
 		assert(op1 > 0 && op2 > 0);
 		assert(op1 != op2);
 		assert(adjJob(op1, op2));
-
-		if (op1 == first)
-			first = op2;
 
 		if (sJ[op2] == op1)
 		{
@@ -69,6 +94,7 @@ class Schedule
 		sJ[op2] = op1;
 
 		computeMakespan();
+		setFirst();
 	}
 	void swapM(unsigned op1, unsigned op2)
 	{
@@ -77,9 +103,6 @@ class Schedule
 		assert(op1 > 0 && op2 > 0);
 		assert(op1 != op2);
 		assert(adjMach(op1, op2));
-
-		if (op1 == first)
-			first = op2;
 
 		if (sM[op2] == op1)
 		{
@@ -101,6 +124,7 @@ class Schedule
 		sM[op2] = op1;
 
 		computeMakespan();
+		setFirst();
 	}
 	void shiftJ(vector<unsigned> &p, unsigned idxBegin, unsigned idxEnd)
 	{
@@ -264,18 +288,18 @@ class Schedule
 	}
 	void initTest()
 	{
-		first = 2;
+		first = 16;
 		nO = 16;
 		nJ = 4;
 		nM = 4;
 
-		pJ = {0, 2, 0, 1, 3, 6, 0, 5, 7, 10, 0, 9, 11, 14, 0, 13, 15};
+		pJ = {0, 2, 4, 1, 0, 7, 5, 8, 0, 0, 9, 10, 11, 15, 16, 14, 0};
 
-		sJ = {0, 3, 1, 4, 0, 7, 5, 8, 0, 11, 9, 12, 0, 15, 13, 16, 0};
+		sJ = {0, 3, 1, 0, 2, 6, 0, 5, 7, 10, 11, 12, 0, 0, 15, 13, 14};
 
-		pM = {0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+		pM = {0, 5, 14, 15, 8, 9, 2, 0, 16, 0, 0, 7, 4, 1, 10, 11, 0};
 
-		sM = {0, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 0, 0, 0, 0};
+		sM = {0, 13, 6, 0, 12, 1, 0, 11, 4, 5, 14, 15, 0, 0, 2, 3, 8};
 
 		instance.cost = {0, 45, 80, 29, 74, 83, 45, 56, 45, 70, 58, 29, 64, 5, 24, 61, 43};
 	}
@@ -419,7 +443,6 @@ class Schedule
 		return late_pred;
 	}
 
-public:
 	Schedule() {}
 	Schedule(Instance i, int init_method)
 	{
@@ -473,6 +496,7 @@ public:
 	}
 	int computeMakespan()
 	{
+		assertValidSchedule();
 		makespan = 0;
 		unsigned temp_makespan = 0, op, lookat = 0, pushed = 0;
 		vector<unsigned> queue(nO),
@@ -563,6 +587,7 @@ public:
 	}
 	void setSchedule(Schedule s)
 	{
+		s.assertValidSchedule();
 		nO = s.nO;
 		nJ = s.nJ;
 		nM = s.nM;
@@ -591,7 +616,11 @@ public:
 		s.makespan = computeMakespan();
 		return s;
 	}
-
+	void printCriticalPath()
+	{
+		auto p = critical();
+		printv(p, 0, "critical path:");
+	}
 	friend class Printer;
 	friend class Heuristics;
 	friend class TabuSearcher;

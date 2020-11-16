@@ -14,71 +14,60 @@ class TabuSearcher
 {
 public:
     unsigned duration, oper;
-    PerturbationGenerator solution, incumbent;
+    Schedule globalBestSolution, incumbent;
     TabuList tabuList;
 
     void setParam(unsigned d)
     {
         duration = d;
     }
-
     TabuList newList()
     {
         unsigned type = oper == SWAP_CRITICAL || oper == SWAP_CRITICAL_EDGE ? SWAP : SHIFT;
-        TabuList t(solution.nO, duration, type);
+        TabuList t(globalBestSolution.nO, duration, type);
         return t;
     }
-
-    void selectAndApplyBestMovement()
+    void applyBestMovement()
     {
+        cout << wrapStringInLabel("SEARCHING BEST NEIGHBOR");
+        incumbent.assertValidSchedule();
         NeighborGenerator n(incumbent);
-        Movement sc, bestAllowedChange = {0, 0, 0}, bestTabuChange = {0, 0, 0}; //, bestTabuChange = {0, 0, 0};
-        Perturbation bestAllowedPerturbation, bestTabuPerturbation;             //, bestTabuPerturbation = {0, 0, 0, 0};
-        unsigned incumbentValue = incumbent.computeMakespan(), value;
-        unsigned bestValue = incumbentValue * 100;
+        Movement bestMovement;
+        Schedule bestSchedule;
+        unsigned value, bestValue = UMAX;
+        auto mpn = n.getMovementsPerNeighbor(oper);
 
-        auto perts = incumbent.listAllPerturbations(oper);
-
-        for (auto p : perts)
+        for (auto i : mpn)
         {
-            sc = n.applyPerturbation(p);
-            value = n.getSchedule().computeMakespan();
-            n.restore();
-            if (value < bestValue)
+            //printMovement(i.first);
+            value = i.second.getMakespan();
+            //printl("found:", value);
+            if (value < bestValue && !tabuList.isTabu(i.first))
             {
+                bestMovement = i.first;
+                bestSchedule = i.second.getCopy();
                 bestValue = value;
-                if (!tabuList.isTabu(sc))
-                {
-                    printl("found tabu:", value);
-                    bestAllowedChange = sc;
-                    bestAllowedPerturbation = p;
-                }
-                else
-                {
-                    printl("found not tabu:", value);
-                    bestTabuChange = sc;
-                    bestTabuPerturbation = p;
-                }
             }
         }
-
-        if (!isScheduleChangeEmpty(bestAllowedChange))
+        cout << "is there a valid movement?\n";
+        if (isMovementEmpty(bestMovement))
+            return;
+        cout << "yes\n";
+        incumbent = bestSchedule;
+        //printMovement(bestMovement);
+        cout << br << "new incumbent" << br;
+        /* Printer::printJobCluster(incumbent);
+        Printer::printSolution(incumbent); */
+        tabuList.insertTabuMovement(bestMovement);
+        cout << "inserting in tabu\n";
+        if (bestValue < globalBestSolution.getMakespan())
         {
-            n.applyPerturbation(bestAllowedPerturbation);
-            incumbent = n.getSchedule();
-            tabuList.insertTabuMovement(bestAllowedChange);
-        }
-        else if (!isScheduleChangeEmpty(bestTabuChange))
-        {
-            n.applyPerturbation(bestTabuPerturbation);
-            incumbent = n.getSchedule();
-            tabuList.insertTabuMovement(bestTabuChange);
+            globalBestSolution = incumbent.getCopy();
+            cout << wrapStringInLabel("/\\ GLOBAL FOUND: /\\");
         }
 
-        if (incumbent.computeMakespan() < solution.computeMakespan())
-            solution = incumbent.getCopy();
+        //tabuList.printCurrentTabu();
     }
-
     void setDefaultParams()
     {
         switch (oper)
@@ -88,10 +77,11 @@ public:
         }
     }
 
-    void setSolution(PerturbationGenerator s)
+    void setSolution(Schedule s)
     {
-        solution = s;
-        incumbent = solution.getCopy();
+        globalBestSolution = s;
+        incumbent = globalBestSolution.getCopy();
+        tabuList = newList();
     }
 
     TabuSearcher() {}
@@ -99,21 +89,20 @@ public:
     {
         oper = o;
         duration = d;
-        tabuList = newList();
     }
 
     unsigned solve()
     {
         startTimeCounting();
         Perturbation p;
-        NeighborGenerator n(solution);
 
         while (!isTimeOver())
         {
-            selectAndApplyBestMovement();
+            applyBestMovement();
+            //Printer::printJobCluster(incumbent);
             tabuList.iterate();
         }
 
-        return solution.getMakespan();
+        return globalBestSolution.getMakespan();
     }
 };

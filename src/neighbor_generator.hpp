@@ -41,6 +41,7 @@ public:
 			current.swapM(o, o2);
 		}
 		change = {SWAP, o, o2};
+		current.setFirst();
 
 		return change;
 	}
@@ -78,7 +79,7 @@ public:
 		change = {SHIFT,
 				  block[o2Index],
 				  block[o1Index]};
-		assertNonNullScheduleChange(change);
+		assertNonNullMovement(change);
 
 		if (p.blockType == BLOCK_J)
 			current.shiftJ(block, o2Index, o1Index);
@@ -114,6 +115,7 @@ public:
 	void restore() { setSchedule(previous.getCopy()); }
 	void setSchedule(Schedule s)
 	{
+		s.assertValidSchedule();
 		initialized = true;
 		current = s.getCopy();
 		previous = s.getCopy();
@@ -152,6 +154,23 @@ public:
 		applyPerturbation(bestP);
 
 		return current;
+	}
+
+	vector<pair<Movement, Schedule>> getMovementsPerNeighbor(unsigned oper)
+	{
+		vector<pair<Movement, Schedule>> mpn;
+		Movement mov;
+
+		auto ps = generator.listAllPerturbations(oper);
+
+		for (auto p : ps)
+		{
+			mov = applyPerturbation(p);
+			mpn.push_back(make_pair(mov, current.getCopy()));
+			restore();
+		}
+
+		return mpn;
 	}
 
 	Schedule getRandomNeighbor(unsigned oper)
