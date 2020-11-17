@@ -24,13 +24,13 @@ int main(int argc, char **argv)
 		/* for (int i = 1; i < 10; i++)
 			cout << i << " " << argv[i] << br; */
 
-		string iterationsNumber(argv[4]), alpha(argv[6]), temperature(argv[8]), instanceFileName(argv[2]);
+		/* string iterationsNumber(argv[4]), alpha(argv[6]), temperature(argv[8]), instanceFileName(argv[2]);
 		Instance i(instanceFileName);
 		Schedule s(i, RANDOM);
 		AnnealingSimulator ls(SWAP_CRITICAL_EDGE);
 		ls.setParams(stoi(alpha), stod(temperature), stoi(iterationsNumber));
 		ls.setSolution(s);
-		cout << ls.solve() << br;
+		cout << ls.solve() << br; */
 
 		/* string instanceFileName(argv[2]), duration(argv[4]);
 		Instance i(instanceFileName);
@@ -39,16 +39,18 @@ int main(int argc, char **argv)
 		h.setTabuSearchParams(stoi(duration));
 		unsigned r = h.solve(TS, SHIFT_WHOLE); */
 
-		/* string instanceFileName(argv[2]), perturbationNumber(argv[4]);
+		string instanceFileName(argv[2]), perturbationNumber(argv[4]);
 		Instance i(instanceFileName);
-		PerturbationGenerator s(i, RANDOM);
-		IteratedLocalSearcher g(stoi(perturbationNumber), SHIFT_CRITICAL);
+		Schedule s(i, RANDOM);
+		IteratedLocalSearcher g(stoi(perturbationNumber), SHIFT_WHOLE);
 		g.setSolution(s);
-		cout << g.solve(); */
+		cout << g.solve();
 	}
 	else
 	{
 		int fim;
+		PerturbationGenerator pg;
+		NeighborGenerator n;
 		VERBOSE = false;
 		SAVE_GRAPHS_ON_SWAP = false;
 		TRACK_SWAP_OPERATIONS = false;
@@ -60,24 +62,25 @@ int main(int argc, char **argv)
 		Schedule s(i, RANDOM);
 		auto ini = s.getMakespan();
 		//Printer::printJobCluster(s);
-		/* Printer::printJobCluster(s);
-		s.printCriticalPath(); */
+		pg.setSchedule(s);
+		n.setSchedule(s);
+
 		//Printer::printSolution(s);
 		//Printer::printGantt(s);
 
 		//cout << s.getSolutionString();
 
-		/* IteratedLocalSearcher ils(1, SWAP_CRITICAL_EDGE);
+		IteratedLocalSearcher ils(1, SWAP_CRITICAL);
 		ils.setSolution(s);
-		fim = ils.solve(); */
+		fim = ils.solve();
 
 		/* AnnealingSimulator ls(SWAP_CRITICAL_EDGE);
 		ls.setSolution(s);
 		fim = ls.solve(); */
 
-		TabuSearcher t(SHIFT_CRITICAL, 10);
+		/* TabuSearcher t(SHIFT_CRITICAL, 10);
 		t.setSolution(s);
-		fim = t.solve();
+		fim = t.solve(); */
 
 		cout << ini << sp << fim << br;
 

@@ -47,11 +47,6 @@ public:
 	}
 	Movement applyShift(Perturbation p)
 	{
-		/* cout << "+++++++++\n";
-		cout << "on apply shift:\n";
-		printPerturbation(p);
-		cout << "+++++++++\n";
-		Printer::printJobCluster(current); */
 		Movement change = {0, 0, 0};
 		vector<unsigned> block;
 		unsigned o = p.operation;
@@ -88,7 +83,6 @@ public:
 
 		return change;
 	}
-
 	Movement applyPerturbation(Perturbation p)
 	{
 		if (isShift(p.perturbationType))
@@ -122,40 +116,30 @@ public:
 		generator.setSchedule(s);
 	}
 
-	Schedule getBestNeighbor(unsigned o, unsigned oper)
+	Schedule getBestNeighbor(unsigned oper)
 	{
-		assert(initialized);
-		//Printer::printJobCluster(current);
-		//printl("searching best neighbor for ", o);
-		vector<Perturbation> ps = generator.listPossiblePerturbations(o, oper);
+		//cout << wrapStringInLabel("searching for neighbor");
+		auto ns = getNeighbors(oper);
 
-		if (ps.size() == 0)
+		if (ns.size() == 0)
 			return current;
 
-		Perturbation bestP;
-
-		unsigned bestValue = UMAX, value;
-		restore();
-
-		for (auto p : ps)
+		unsigned bestValue = ns[0].getMakespan(), bestIndex = 0, found;
+		//cout << "\t" << bestValue << br;
+		for (unsigned i = 1; i < ns.size(); i++)
 		{
-			//printPerturbation(p);
-			applyPerturbation(p);
-			value = current.getMakespan();
-			restore();
+			found = ns[i].getMakespan();
 
-			if (value < bestValue && value > 0)
+			//cout << "\t" << found << br;
+			if (found < bestValue)
 			{
-				bestP = p;
-				bestValue = value;
+				bestValue = found;
+				bestIndex = i;
 			}
 		}
 
-		applyPerturbation(bestP);
-
-		return current;
+		return ns[bestIndex];
 	}
-
 	vector<pair<Movement, Schedule>> getMovementsPerNeighbor(unsigned oper)
 	{
 		vector<pair<Movement, Schedule>> mpn;
@@ -173,7 +157,6 @@ public:
 
 		return mpn;
 	}
-
 	Schedule getRandomNeighbor(unsigned oper)
 	{
 		assert(initialized);
@@ -182,10 +165,9 @@ public:
 		auto p = generator.listAllPerturbations(oper);
 		while (true)
 		{
-			/* cout << "searching..." << br; */
+			//cout << "searching..." << br;
 			//Printer::printJobCluster(current);
 			auto i = p.size() == 1 ? 0 : randint(0, p.size() - 1);
-			//printPerturbation(p[i]);
 			applyPerturbation(p[i]);
 
 			if (current.getMakespan() > 0)

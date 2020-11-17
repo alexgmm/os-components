@@ -252,30 +252,27 @@ public:
     vector<Perturbation> listPossiblePerturbations_swapCritical(unsigned o)
     {
         vector<Perturbation> possiblePerturbations;
-        auto isCriticalOperation = getCriticalOperationsList();
+        auto path = critical();
+        auto index = findIndex(path, o);
+        unsigned succ = index == path.size() - 1 ? 0 : path[index + 1],
+                 pred = index > 0 ? path[index - 1] : 0;
         Perturbation perturbation;
 
-        if (isCriticalOperation[pM[o]])
+        if (succ)
         {
-            perturbation = {o, SWAP_PRED, BLOCK_M, 0};
+            if (adjJob(o, succ))
+                perturbation = {o, SWAP_SUCC, BLOCK_J, 0};
+            else
+                perturbation = {o, SWAP_SUCC, BLOCK_M, 0};
             possiblePerturbations.push_back(perturbation);
         }
 
-        if (isCriticalOperation[sM[o]])
+        if (pred)
         {
-            perturbation = {o, SWAP_SUCC, BLOCK_M, 0};
-            possiblePerturbations.push_back(perturbation);
-        }
-
-        if (isCriticalOperation[pJ[o]])
-        {
-            perturbation = {o, SWAP_PRED, BLOCK_J, 0};
-            possiblePerturbations.push_back(perturbation);
-        }
-
-        if (isCriticalOperation[sJ[o]])
-        {
-            perturbation = {o, SWAP_SUCC, BLOCK_J, 0};
+            if (adjJob(o, pred))
+                perturbation = {o, SWAP_PRED, BLOCK_J, 0};
+            else
+                perturbation = {o, SWAP_PRED, BLOCK_M, 0};
             possiblePerturbations.push_back(perturbation);
         }
 

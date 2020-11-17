@@ -18,50 +18,47 @@ class IteratedLocalSearcher
     {
         switch (oper)
         {
-        case SWAP_CRITICAL:
-            perturbationNumber = 1;
-        case SWAP_CRITICAL_EDGE:
+        case SHIFT_WHOLE:
+            perturbationNumber = 2;
+            break;
+        default:
             perturbationNumber = 1;
             break;
         }
     }
 
-    bool applyPerturbationGreedly(unsigned o)
-    {
-        Schedule bestNeighbor = generator.getBestNeighbor(o, oper);
-
-        if (bestNeighbor.computeMakespan() < globalBest.computeMakespan())
-        {
-            setSolution(bestNeighbor.getCopy());
-            return true;
-        }
-        else
-        {
-            generator.restore();
-            return false;
-        }
-    }
-
     void improve()
     {
-        //cout << wrapStringInLabel("improving");
-        bool isImproving;
-        PerturbationGenerator gen(solution);
+        //cout << wrapStringInLabel("\\/ IMPROVING \\/");
+        bool isImproving = false;
+
         do
         {
-            isImproving = false;
-            vector<unsigned> operations = gen.getAllOperations(oper);
-            //printv(operations, 0, "all ops");
-            for (auto o : operations)
-                isImproving = isImproving || applyPerturbationGreedly(o);
+            auto best = generator.getBestNeighbor(oper);
+
+            unsigned found = best.getMakespan(),
+                     current = solution.getMakespan(),
+                     global = globalBest.getMakespan();
+
+            if (found < current)
+            {
+                setSolution(best);
+                isImproving = true;
+
+                if (found < global)
+                    globalBest = best.getCopy();
+            }
+            else
+                isImproving = false;
 
         } while (isImproving && !isTimeOver());
     }
 
     void perturbation()
     {
-        //cout << wrapStringInLabel("perturbating");
+        //cout << wrapStringInLabel("\\/ PERTURBATING \\/");
         Schedule perturbated = generator.getRandomNeighbor(SHIFT_WHOLE);
+        //cout << perturbated.getMakespan() << br;
         setSolution(perturbated);
     }
 
@@ -83,13 +80,13 @@ public:
     void setSolution(Schedule s)
     {
         solution = s;
-        globalBest = s.getCopy();
         generator.setSchedule(solution);
     }
 
     unsigned solve()
     {
         startTimeCounting();
+        globalBest = solution.getCopy();
 
         while (!isTimeOver())
             iterate();
