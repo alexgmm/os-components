@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../neighbor_generator.hpp"
+#include "neighbor_generator.hpp"
 #include "../perturbation/perturbation.hpp"
 #include "../helpers/printer.hpp"
 #include "../helpers/time.hpp"

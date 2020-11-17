@@ -1,8 +1,7 @@
 #include <cstdlib>
 #include <fstream>
-#include "src/instance.hpp"
+#include "src/instance/instance.hpp"
 #include "src/schedule/schedule.hpp"
-#include "src/tester.hpp"
 #include "src/heuristics/tabu_searcher.hpp"
 #include "src/heuristics/annealing_simulator.hpp"
 #include "src/heuristics/iterated_local_searcher.hpp"

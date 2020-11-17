@@ -6,7 +6,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <assert.h>
-#include "helpers/utilities.hpp"
+#include "../helpers/utilities.hpp"
 
 using namespace std;
 

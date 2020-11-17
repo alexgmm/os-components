@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../helpers/utilities.hpp"
-#include "../instance.hpp"
+#include "../instance/instance.hpp"
 #include "../perturbation/perturbation.hpp"
 
 using namespace std;

@@ -6,7 +6,7 @@ unsigned TABU_DURATION = 5;
 #include <deque>
 #include "../helpers/time.hpp"
 #include "tabu_list.hpp"
-#include "../neighbor_generator.hpp"
+#include "neighbor_generator.hpp"
 
 using namespace std;
 

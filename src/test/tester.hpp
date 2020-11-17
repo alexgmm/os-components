@@ -2,11 +2,11 @@
 #define TESTS_HPP
 #define NLOOPS 20
 
-#include "heuristics/tabu_searcher.hpp"
-#include "heuristics/annealing_simulator.hpp"
-#include "heuristics/iterated_local_searcher.hpp"
-#include "helpers/utilities.hpp"
-#include "helpers/time.hpp"
+#include "../heuristics/tabu_searcher.hpp"
+#include "../heuristics/annealing_simulator.hpp"
+#include "../heuristics/iterated_local_searcher.hpp"
+#include "../helpers/utilities.hpp"
+#include "../helpers/time.hpp"
 
 using namespace std;
 
