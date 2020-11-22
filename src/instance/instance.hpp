@@ -22,7 +22,7 @@ public:
 	Instance() {}
 	Instance(string filename)
 	{
-		//cout << br << "Reading " << filename << " into a new instance" << br;
+		cout << br << "Reading " << filename << " into a new instance" << br;
 		src = filename;
 		int i, j, c;
 		fstream f(filename);

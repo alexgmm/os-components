@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <fstream>
 #include "src/instance/instance.hpp"
+#include "src/instance/instance_file_reader.hpp"
 #include "src/schedule/schedule.hpp"
 #include "src/heuristics/tabu_searcher.hpp"
 #include "src/heuristics/annealing_simulator.hpp"
@@ -47,7 +48,10 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		int fim;
+		auto is = InstanceFileReader::getInstanceSets();
+		for (auto i : is)
+			i.readInstances();
+		/* int fim;
 		PerturbationGenerator pg;
 		NeighborGenerator n;
 		VERBOSE = false;
@@ -59,19 +63,19 @@ int main(int argc, char **argv)
 
 		Instance i(t4);
 		Schedule s(i, RANDOM);
-		auto ini = s.getMakespan();
+		auto ini = s.getMakespan(); */
 		//Printer::printJobCluster(s);
-		pg.setSchedule(s);
-		n.setSchedule(s);
+		/* pg.setSchedule(s);
+		n.setSchedule(s); */
 
 		//Printer::printSolution(s);
 		//Printer::printGantt(s);
 
 		//cout << s.getSolutionString();
 
-		IteratedLocalSearcher ils(1, SWAP_CRITICAL);
+		/* IteratedLocalSearcher ils(1, SWAP_CRITICAL);
 		ils.setSolution(s);
-		fim = ils.solve();
+		fim = ils.solve(); */
 
 		/* AnnealingSimulator ls(SWAP_CRITICAL_EDGE);
 		ls.setSolution(s);
@@ -81,7 +85,7 @@ int main(int argc, char **argv)
 		t.setSolution(s);
 		fim = t.solve(); */
 
-		cout << ini << sp << fim << br;
+		//cout << ini << sp << fim << br;
 
 		/*auto ps = p.listPossiblePerturbations(8, SWAP_CRITICAL_EDGE);
 		for (auto per : ps)
