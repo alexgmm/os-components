@@ -27,7 +27,7 @@ class InstanceSet
 {
     string setName;
     vector<InstanceFile> instanceFiles;
-    vector<Instance> instances;
+    vector<Instance> instances, transposedInstances;
 
     Instance readInstanceFromFile(InstanceFile file)
     {
@@ -70,6 +70,23 @@ public:
             ips[i.size].push_back(readInstanceFromFile(i));
 
         return ips;
+    }
+
+    vector<InstanceFile> getInstanceFiles()
+    {
+        return instanceFiles;
+    }
+
+    vector<Instance> getInstances()
+    {
+        if (instances.size() == 0)
+            readInstances();
+        return instances;
+    }
+
+    string getSetName()
+    {
+        return setName;
     }
 
     friend class InstanceFileReader;

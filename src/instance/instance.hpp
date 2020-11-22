@@ -27,7 +27,7 @@ public:
 		int i, j, c;
 		fstream f(filename);
 		if (f.fail())
-			cout << br << "Erro ao abrir " << filename;
+			cout << br << "Failed opening " << filename;
 
 		f >> i;
 		n_jobs = i;
