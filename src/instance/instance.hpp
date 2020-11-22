@@ -17,12 +17,13 @@ class Instance
 	vector<unsigned> o_machine;
 	string src;
 	int n_jobs, n_machines, n_ops;
+	unsigned bestKnownValue;
 
 public:
 	Instance() {}
 	Instance(string filename)
 	{
-		cout << br << "Reading " << filename << " into a new instance" << br;
+		//cout << br << "Reading " << filename << " into a new instance" << br;
 		src = filename;
 		int i, j, c;
 		fstream f(filename);
@@ -47,28 +48,31 @@ public:
 			o_machine[i] = (i - 1) % n_machines + 1;
 		}
 
+		f >> bestKnownValue;
+
 		f.close();
 	}
 
 	void print()
 	{
-		cout << "\n"
+		cout << br
 			 << "Custos"
-			 << "\n";
+			 << br;
 		for (int i = 1; i <= n_ops; i++)
-			cout << i << ": " << cost[i] << "\n";
-		cout << "\n"
+			cout << i << ": " << cost[i] << br;
+		cout << br
 			 << "O -> jobs"
-			 << "\n";
+			 << br;
 		for (int i = 1; i <= n_ops; i++)
 			cout << o_job[i] << " ";
 
-		cout << "\n"
+		cout << br
 			 << "O -> machines"
-			 << "\n";
+			 << br;
 		for (int i = 1; i <= n_ops; i++)
 			cout << o_machine[i] << " ";
-		cout << "\n";
+		cout << br;
+		cout << "BKV: " << bestKnownValue << br;
 	}
 
 	friend class Schedule;
@@ -77,6 +81,7 @@ public:
 	friend class Heuristics;
 	friend class NeighborGenerator;
 	friend class Printer;
+	friend class InitializerResultGenerator;
 };
 
 #endif

@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <fstream>
+#include "src/result_generators/initializer_rg.hpp"
 #include "src/instance/instance.hpp"
 #include "src/instance/instance_file_reader.hpp"
 #include "src/schedule/schedule.hpp"
@@ -48,9 +49,8 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		auto is = InstanceFileReader::getInstanceSets();
-		for (auto i : is)
-			i.readInstances();
+		InitializerResultGenerator i;
+		i.generateResults();
 		/* int fim;
 		PerturbationGenerator pg;
 		NeighborGenerator n;

@@ -8,6 +8,8 @@
 #include <random>
 #include <iterator>
 #include <functional>
+#include <iostream>
+#include <assert.h>
 
 #include "../constants.h"
 
