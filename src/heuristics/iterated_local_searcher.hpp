@@ -71,10 +71,10 @@ class IteratedLocalSearcher
 
 public:
     IteratedLocalSearcher() {}
-    IteratedLocalSearcher(unsigned number, unsigned o)
+    IteratedLocalSearcher(unsigned o)
     {
         oper = o;
-        perturbationNumber = number;
+        setDefaultParams();
     }
 
     void setSolution(Schedule s)

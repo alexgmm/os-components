@@ -8,10 +8,16 @@ using namespace std;
 
 class InitializerResultGenerator
 {
-    unsigned loopsNumber = 25;
+    unsigned loopsNumber = 20;
     string resultsFolderPath = "/home/hal/os-components/results/initializers/";
     fstream fout;
     vector<unsigned> results;
+
+    unsigned getMedian()
+    {
+        mergeSort(results);
+        return results[results.size() / 2];
+    }
 
     unsigned getInitializedMakespan(Instance &i, unsigned method)
     {
@@ -28,7 +34,7 @@ class InitializerResultGenerator
         for (unsigned i = 0; i < loopsNumber; i++)
         {
             auto m = getInitializedMakespan(instance, method);
-            results[i] = m;
+            results.push_back(m);
             auto v = m / bkv;
             deviance += v;
         }
@@ -54,7 +60,11 @@ class InitializerResultGenerator
         fout << size << ",";
 
         for (auto method : {RANDOM, GREEDY_MACHINES, GREEDY_JOBS})
+        {
+            results.resize(0);
             fout << getDevianceForMethodOnInstances(instances, method) << ",";
+            fout << getMedian() << ",";
+        }
 
         fout << br;
     }
@@ -65,7 +75,7 @@ class InitializerResultGenerator
 
         fout.open(out.c_str());
 
-        fout << "size,random,GM,GJ," << br;
+        fout << "size,random.dev,random.med,GM.dev,GM.med,GJ.dev,GJ.med," << br;
 
         auto instancesPerSize = set.getInstancesPerSize();
         map<string, vector<Instance>>::iterator ips;
@@ -77,10 +87,7 @@ class InitializerResultGenerator
     }
 
 public:
-    InitializerResultGenerator()
-    {
-        results.resize(loopsNumber);
-    }
+    InitializerResultGenerator() {}
 
     void generateResults()
     {

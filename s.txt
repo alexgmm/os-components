@@ -1,6 +1,7 @@
-+---------------+
-|\/ IMPROVING \/|
-+---------------+
+1 -i
+2 /home/hal/tuning/Instances/GP06-01.txt
+3 14
+4 
 +----------------------+
 |searching for neighbor|
 +----------------------+

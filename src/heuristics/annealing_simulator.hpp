@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include "neighbor_generator.hpp"
 #include "../helpers/time.hpp"
 
@@ -10,18 +11,14 @@ class AnnealingSimulator
 public:
     unsigned alpha, minTemperature, iterations, oper;
     double T = 1;
-    Schedule solution;
+    const double e = 2.718281828;
+    Schedule solution, globalBest;
     NeighborGenerator generator;
 
-    unsigned absol(unsigned n1)
-    {
-        if (n1 < 0)
-            return -n1;
-        return n1;
-    }
     bool accept(unsigned v0, unsigned v1)
     {
-        return (v0 < v1) || (rand() / (double)RAND_MAX) <= exp(0 - absol(v0 - v1) / T);
+        return (v0 < v1) ||
+               (rand() / (double)RAND_MAX) <= pow(e, -1 * (v0 - v1) / T);
     }
 
     void setParams(unsigned a, unsigned t, unsigned i)
@@ -36,9 +33,13 @@ public:
         switch (oper)
         {
         case SWAP_CRITICAL:
-            setParams(0.3277, 0.0007, 20000);
+            setParams(0.3277, 0.0007, 6200);
             break;
         case SWAP_CRITICAL_EDGE:
+            setParams(0.3772, 0.0006, 5857);
+        case SHIFT_CRITICAL:
+            setParams(0.3772, 0.0006, 5857);
+        case SHIFT_WHOLE:
             setParams(0.3772, 0.0006, 5857);
             break;
         }
@@ -67,8 +68,7 @@ public:
         startTimeCounting();
 
         unsigned makespan = solution.computeMakespan();
-        int tempMakespan;
-        assert(makespan > 0);
+        unsigned tempMakespan, globalBestMakespan = makespan;
         bool shouldStop = false;
         Schedule tempS;
 
@@ -76,20 +76,19 @@ public:
         {
             for (unsigned i = 0; i < iterations && !shouldStop; i++)
             {
-                //cout << "current is:" << br;
-                //Printer::printJobCluster(solution);
                 tempS = generator.getRandomNeighbor(oper);
-                //cout << "new temp is:" << br;
-                //Printer::printJobCluster(tempS);
-                //Printer::printSolution(tempS);
                 tempMakespan = tempS.computeMakespan();
-                //printl("temp makespan found:", tempMakespan);
+
                 if (accept(tempMakespan, makespan))
                 {
-                    //cout << "accepted" << br;
                     solution = tempS.getCopy();
                     generator.setSchedule(tempS);
                     makespan = tempMakespan;
+                    if (tempMakespan < globalBestMakespan)
+                    {
+                        globalBestMakespan = tempMakespan;
+                        globalBest = solution.getCopy();
+                    }
                 }
                 else
                     generator.restore();
@@ -98,6 +97,6 @@ public:
             }
         }
 
-        return makespan;
+        return globalBestMakespan;
     }
 };

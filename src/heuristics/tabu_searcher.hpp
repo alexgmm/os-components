@@ -57,18 +57,19 @@ public:
         Printer::printSolution(incumbent); */
         tabuList.insertTabuMovement(bestMovement);
         if (bestValue < globalBestSolution.getMakespan())
-        {
             globalBestSolution = incumbent.getCopy();
-            //cout << wrapStringInLabel("/\\ GLOBAL FOUND: /\\");
-        }
+        //cout << wrapStringInLabel("/\\ GLOBAL FOUND: /\\");
 
         //tabuList.printCurrentTabu();
-        incumbent.assertValidSchedule();
+        //incumbent.assertValidSchedule();
     }
     void setDefaultParams()
     {
         switch (oper)
         {
+        case SWAP_CRITICAL:
+            duration = 42;
+            break;
         default:
             break;
         }
