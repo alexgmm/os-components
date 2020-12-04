@@ -41,4 +41,18 @@ public:
         setsFile.close();
         return ifs;
     }
+
+    static vector<Instance> getAllInstances(){
+        vector<Instance> allInstances;
+
+        auto sets = getInstanceSets();
+
+        for(auto set: sets){
+            set.readInstances();
+            auto instances = set.getInstances();
+            allInstances.insert(allInstances.end(), instances.begin(), instances.end());
+        }
+
+        return allInstances;
+    }
 };

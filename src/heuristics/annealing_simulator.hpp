@@ -32,15 +32,15 @@ public:
     {
         switch (oper)
         {
-        case SWAP_CRITICAL:
-            setParams(0.3277, 0.0007, 6200);
+         case SWAP_CRITICAL:
+            setParams(0.0837, 0.0002, 97708);
             break;
         case SWAP_CRITICAL_EDGE:
-            setParams(0.3772, 0.0006, 5857);
+            setParams(0.249, 0.0006, 95952);
         case SHIFT_CRITICAL:
-            setParams(0.3772, 0.0006, 5857);
+            setParams(0.5645, 0.0008, 71323);
         case SHIFT_WHOLE:
-            setParams(0.3772, 0.0006, 5857);
+            setParams(0.3443, 0.0006, 67573);
             break;
         }
     }

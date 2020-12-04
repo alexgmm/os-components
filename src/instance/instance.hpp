@@ -82,6 +82,7 @@ public:
 	friend class NeighborGenerator;
 	friend class Printer;
 	friend class InitializerResultGenerator;
+	friend class HeuristicResultGenerator;
 };
 
 #endif

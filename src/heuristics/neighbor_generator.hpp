@@ -166,7 +166,7 @@ public:
 		while (true)
 		{
 			//cout << "searching..." << br;
-			//Printer::printJobCluster(current);
+			if(p.size() == 0) return current;
 			auto i = p.size() == 1 ? 0 : randint(0, p.size() - 1);
 			applyPerturbation(p[i]);
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#define INVALID 0
 #define RANDOM 0
 #define GREEDY_MACHINES 1
 #define GREEDY_JOBS 2
@@ -28,6 +27,10 @@
 
 #define SWAP 0
 #define SHIFT 1
+
+#define SIMULATED_ANNEALING 0
+#define TABU_SEARCH 1
+#define ITERATED_LOCAL_SEARCH 2
 
 bool TRACK_SWAP_OPERATIONS = false;
 bool TRACK_SHIFT_OPERATIONS = false;

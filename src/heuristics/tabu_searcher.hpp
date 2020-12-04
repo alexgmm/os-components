@@ -70,6 +70,15 @@ public:
         case SWAP_CRITICAL:
             duration = 42;
             break;
+        case SWAP_CRITICAL_EDGE:
+            duration = 62;
+            break;
+        case SHIFT_CRITICAL:
+            duration = 99;
+            break;
+        case SHIFT_WHOLE:
+            duration = 76;
+            break;
         default:
             break;
         }
@@ -83,10 +92,10 @@ public:
     }
 
     TabuSearcher() {}
-    TabuSearcher(unsigned o, unsigned d)
+    TabuSearcher(unsigned o)
     {
         oper = o;
-        duration = d;
+        setDefaultParams();
     }
 
     unsigned solve()

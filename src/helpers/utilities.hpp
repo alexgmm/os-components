@@ -155,4 +155,51 @@ void mergeSort(vector<unsigned> &array)
 	mergeSort(array, 0, array.size() - 1);
 }
 
+string getInitializerName(unsigned i)
+{
+	switch (i)
+	{
+	case RANDOM:
+		return "rand";
+	case GREEDY_JOBS:
+		return "job";
+	case GREEDY_MACHINES:
+		return "mach";
+	default:
+		return "?";
+	}
+}
+
+string getHeuristicName(unsigned h)
+{
+	switch (h)
+	{
+	case SIMULATED_ANNEALING:
+		return "SA";
+	case TABU_SEARCH:
+		return "TS";
+	case ITERATED_LOCAL_SEARCH:
+		return "ILS";
+	default:
+		return "?";
+	}
+}
+
+string getNeighborhoodName(unsigned nb)
+{
+	switch (nb)
+	{
+	case SWAP_CRITICAL:
+		return "swap";
+	case SWAP_CRITICAL_EDGE:
+		return "n5";
+	case SHIFT_CRITICAL:
+		return "n7";
+	case SHIFT_WHOLE:
+		return "shift";
+	default:
+		return "?";
+	}
+}
+
 #endif

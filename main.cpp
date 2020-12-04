@@ -1,6 +1,7 @@
 #include <cstdlib>
 #include <fstream>
 #include "src/result_generators/initializer_rg.hpp"
+#include "src/result_generators/heuristic_rg.hpp"
 #include "src/instance/instance.hpp"
 #include "src/instance/instance_file_reader.hpp"
 #include "src/schedule/schedule.hpp"
@@ -10,7 +11,7 @@
 
 using namespace std;
 
-string t = "tests/test2";
+string t = "inst/brucker/j3-per20-1";
 string g = "inst/gueret-prins/GP03-02.txt";
 string g7 = "inst/gueret-prins/GP07-09.txt";
 string t4 = "inst/taillard/tai04_04_02.txt";
@@ -28,13 +29,13 @@ int main(int argc, char **argv)
 			f << i << " " << argv[i] << br;
 		f.close(); */
 
-		/* string iterationsNumber(argv[4]), alpha(argv[6]), temperature(argv[8]), instanceFileName(argv[2]);
+		string iterationsNumber(argv[4]), alpha(argv[6]), temperature(argv[8]), instanceFileName(argv[2]);
 		Instance i(instanceFileName);
 		Schedule s(i, RANDOM);
-		AnnealingSimulator ls(SWAP_CRITICAL_EDGE);
+		AnnealingSimulator ls(SHIFT_WHOLE);
 		ls.setParams(stoi(alpha), stod(temperature), stoi(iterationsNumber));
 		ls.setSolution(s);
-		cout << ls.solve() << br; */
+		cout << ls.solve() << br;
 
 		/* string instanceFileName(argv[2]), perturbationNumber(argv[4]);
 		Instance i(instanceFileName);
@@ -43,22 +44,24 @@ int main(int argc, char **argv)
 		g.setSolution(s);
 		cout << g.solve(); */
 
-		string duration(argv[3]), instanceFileName(argv[2]);
+		/* string duration(argv[3]), instanceFileName(argv[2]);
 		Instance i(instanceFileName);
 		Schedule s(i, RANDOM);
-		TabuSearcher t(SWAP_CRITICAL_EDGE, stoi(duration));
+		TabuSearcher t(SHIFT_WHOLE, stoi(duration));
 		t.setSolution(s);
-		cout << t.solve();
+		cout << t.solve(); */
 	}
 	else
 	{
-		int fim;
+		HeuristicResultGenerator h;
+		h.generateIndividualResults();
+		/* int fim;
 		PerturbationGenerator pg;
 		NeighborGenerator n;
 
-		Instance i(t4);
+		Instance i(t);
 		Schedule s(i, RANDOM);
-		auto ini = s.getMakespan();
+		auto ini = s.getMakespan(); */
 		//Printer::printJobCluster(s);
 		/* pg.setSchedule(s);
 		n.setSchedule(s);
@@ -72,15 +75,15 @@ int main(int argc, char **argv)
 		ils.setSolution(s);
 		fim = ils.solve(); */
 
-		AnnealingSimulator ls(SHIFT_WHOLE);
+		/* AnnealingSimulator ls(SWAP_CRITICAL_EDGE);
 		ls.setSolution(s);
-		fim = ls.solve();
+		fim = ls.solve(); */
 
 		/* TabuSearcher t(SHIFT_CRITICAL, 10);
 		t.setSolution(s);
 		fim = t.solve(); */
 
-		cout << ini << sp << fim << br;
+		//cout << ini << sp << fim << br;
 
 		/*auto ps = p.listPossiblePerturbations(8, SWAP_CRITICAL_EDGE);
 		for (auto per : ps)
