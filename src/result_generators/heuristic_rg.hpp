@@ -24,7 +24,7 @@ struct Settings
 
 class HeuristicResultGenerator
 {
-    vector<unsigned> heuristics = {SIMULATED_ANNEALING, TABU_SEARCH, ITERATED_LOCAL_SEARCH};
+    vector<unsigned> heuristics = {SIMULATED_ANNEALING};
     vector<unsigned> neigborhoods = {SWAP_CRITICAL, SWAP_CRITICAL_EDGE, SHIFT_CRITICAL, SHIFT_WHOLE};
     unsigned loopsNumber = 5;
     fstream fout;
@@ -149,7 +149,7 @@ class HeuristicResultGenerator
 
         auto instances = InstanceFileReader::getAllInstances();
         unsigned s = instances.size();
-        for (unsigned i = 65; i <= s; i++)
+        for (unsigned i = 0; i <= s; i++)
         {
             cout << i << "/" << s << br;
             //fout << instances[i].src + ",";
@@ -191,7 +191,7 @@ public:
     {
         auto instances = InstanceFileReader::getAllInstances();
         unsigned s = instances.size();
-        for (unsigned i = 65; i < s; i++)
+        for (unsigned i = 59; i < s; i++)
         {
             cout << i << "/" << s << endl;
             string filename = instances[i].src;
