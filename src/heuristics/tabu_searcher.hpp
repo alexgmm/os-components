@@ -14,6 +14,7 @@ class TabuSearcher
 {
 public:
     unsigned duration, oper;
+    unsigned timesImproved = 0, solutionsReached = 0;
     Schedule globalBestSolution, incumbent;
     TabuList tabuList;
 
@@ -43,6 +44,7 @@ public:
             //printl("found:", value);
             if (value < bestValue && !tabuList.isTabu(i.first))
             {
+                solutionsReached++;
                 bestMovement = i.first;
                 bestSchedule = i.second.getCopy();
                 bestValue = value;
@@ -57,7 +59,11 @@ public:
         Printer::printSolution(incumbent); */
         tabuList.insertTabuMovement(bestMovement);
         if (bestValue < globalBestSolution.getMakespan())
+        {
+            timesImproved++;
+
             globalBestSolution = incumbent.getCopy();
+        }
         //cout << wrapStringInLabel("/\\ GLOBAL FOUND: /\\");
 
         //tabuList.printCurrentTabu();
@@ -112,4 +118,5 @@ public:
 
         return globalBestSolution.getMakespan();
     }
+    friend class HeuristicResultGenerator;
 };

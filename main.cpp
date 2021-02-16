@@ -53,8 +53,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		HeuristicResultGenerator h;
-		h.generateIndividualResults();
+		Instance i(t);
 		/* int fim;
 		PerturbationGenerator pg;
 		NeighborGenerator n;

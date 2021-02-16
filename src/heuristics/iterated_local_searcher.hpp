@@ -12,6 +12,7 @@ class IteratedLocalSearcher
     Schedule solution, globalBest;
     NeighborGenerator generator;
     unsigned perturbationNumber, oper;
+    unsigned timesImproved = 0, solutionsReached = 0, timesLocalSearch = 0;
     //string outfile = "/home/hal/running_report.txt";
 
     void setDefaultParams()
@@ -44,9 +45,13 @@ class IteratedLocalSearcher
             {
                 setSolution(best);
                 isImproving = true;
+                solutionsReached++;
 
                 if (found < global)
+                {
+                    timesImproved++;
                     globalBest = best.getCopy();
+                }
             }
             else
                 isImproving = false;
@@ -65,6 +70,7 @@ class IteratedLocalSearcher
     void iterate()
     {
         improve();
+        timesLocalSearch++;
         for (unsigned i = 0; i < perturbationNumber && !isTimeOver(); i++)
             perturbation();
     }
@@ -98,4 +104,6 @@ public:
     {
         return solution;
     }
+
+    friend class HeuristicResultGenerator;
 };

@@ -69,11 +69,33 @@ class InitializerResultGenerator
         fout << br;
     }
 
+    void printVerboseResultLine(map<string, vector<Instance>>::iterator it)
+    {
+        auto size = it->first;
+        auto instances = it->second;
+
+        fout << size << "," << br;
+
+        for (auto instance : instances)
+        {
+            fout << instance.src << ",";
+            //cout << instance.src << br;
+            for (auto method : {RANDOM, GREEDY_JOBS, GREEDY_MACHINES})
+            {
+                for (int i = 0; i < loopsNumber; i++)
+                    fout << getInitializedMakespan(instance, method) << ",";
+            }
+            fout << br;
+        }
+
+        fout << br;
+    }
+
     void generateResultsForSet(InstanceSet set)
     {
         string out = resultsFolderPath + set.getSetName() + ".csv";
 
-        fout.open(out.c_str());
+        fout.open(out.c_str(), fstream::out);
 
         fout << "size,random.dev,random.med,GM.dev,GM.med,GJ.dev,GJ.med," << br;
 
@@ -86,6 +108,25 @@ class InitializerResultGenerator
         fout.close();
     }
 
+    void printVerboseHeader()
+    {
+        for (string m : {"ran", "gj", "gm"})
+            for (int i = 0; i < loopsNumber; i++)
+                fout << m << ":" << i << ",";
+
+        fout << br;
+    }
+
+    void generateVerboseResultsForSet(InstanceSet set)
+    {
+        cout << set.getSetName() << br;
+        auto instancesPerSize = set.getInstancesPerSize();
+        map<string, vector<Instance>>::iterator ips;
+
+        for (ips = instancesPerSize.begin(); ips != instancesPerSize.end(); ips++)
+            printVerboseResultLine(ips);
+    }
+
 public:
     InitializerResultGenerator() {}
 
@@ -95,5 +136,18 @@ public:
 
         for (auto set : instanceSets)
             generateResultsForSet(set);
+    }
+
+    void generateVerboseResults()
+    {
+
+        fout.open(resultsFolderPath + "out.csv", fstream::out);
+        printVerboseHeader();
+
+        auto instanceSets = InstanceFileReader::getInstanceSets();
+
+        for (auto set : instanceSets)
+            generateVerboseResultsForSet(set);
+        fout.close();
     }
 };

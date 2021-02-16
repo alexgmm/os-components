@@ -10,6 +10,7 @@ class AnnealingSimulator
 {
 public:
     unsigned alpha, minTemperature, iterations, oper;
+    unsigned timesImproved = 0, solutionsReached = 0;
     double T = 1;
     const double e = 2.718281828;
     Schedule solution, globalBest;
@@ -32,7 +33,7 @@ public:
     {
         switch (oper)
         {
-         case SWAP_CRITICAL:
+        case SWAP_CRITICAL:
             setParams(0.0837, 0.0002, 97708);
             break;
         case SWAP_CRITICAL_EDGE:
@@ -81,11 +82,13 @@ public:
 
                 if (accept(tempMakespan, makespan))
                 {
+                    solutionsReached++;
                     solution = tempS.getCopy();
                     generator.setSchedule(tempS);
                     makespan = tempMakespan;
                     if (tempMakespan < globalBestMakespan)
                     {
+                        timesImproved++;
                         globalBestMakespan = tempMakespan;
                         globalBest = solution.getCopy();
                     }
@@ -99,4 +102,5 @@ public:
 
         return globalBestMakespan;
     }
+    friend class HeuristicResultGenerator;
 };

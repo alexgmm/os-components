@@ -24,7 +24,7 @@ struct Settings
 
 class HeuristicResultGenerator
 {
-    vector<unsigned> heuristics = {SIMULATED_ANNEALING};
+    vector<unsigned> heuristics = {ITERATED_LOCAL_SEARCH};
     vector<unsigned> neigborhoods = {SWAP_CRITICAL, SWAP_CRITICAL_EDGE, SHIFT_CRITICAL, SHIFT_WHOLE};
     unsigned loopsNumber = 5;
     fstream fout;
@@ -63,6 +63,47 @@ class HeuristicResultGenerator
         }
 
         return result;
+    }
+
+    // WARNING: UGLY CODE
+    pair<unsigned, unsigned> getMetrics(Schedule sc, Settings s)
+    {
+        unsigned timesImproved = 0, solutionsReached = 0;
+        if (s.heuristic == SIMULATED_ANNEALING)
+        {
+            for (unsigned i = 0; i < loopsNumber; i++)
+            {
+                AnnealingSimulator h(s.neighborhood);
+                h.setSolution(sc);
+                h.solve();
+                timesImproved += h.timesImproved;
+                solutionsReached += h.solutionsReached;
+            }
+        }
+        else if (s.heuristic == TABU_SEARCH)
+        {
+            for (unsigned i = 0; i < loopsNumber; i++)
+            {
+                TabuSearcher h(s.neighborhood);
+                h.setSolution(sc);
+                h.solve();
+                timesImproved += h.timesImproved;
+                solutionsReached += h.solutionsReached;
+            }
+        }
+        else if (s.heuristic == ITERATED_LOCAL_SEARCH)
+        {
+            for (unsigned i = 0; i < loopsNumber; i++)
+            {
+                IteratedLocalSearcher h(s.neighborhood);
+                h.setSolution(sc);
+                h.solve();
+                timesImproved += h.timesImproved;
+                solutionsReached += h.solutionsReached;
+            }
+        }
+
+        return make_pair(solutionsReached / loopsNumber, timesImproved / loopsNumber);
     }
 
     double getMeanExecutionValue()
@@ -104,6 +145,26 @@ class HeuristicResultGenerator
         return getOptimizedScheduleValue(sc, s);
     }
 
+    pair<unsigned, unsigned> getMetricsForInstance(Instance i, Settings s)
+    {
+        Schedule sc = getInitializedSchedule(i, s.initializeMethod);
+        return getMetrics(sc, s);
+    }
+
+    unsigned getILSMetricForInstance(Instance i, Settings s)
+    {
+        Schedule sc = getInitializedSchedule(i, s.initializeMethod);
+        unsigned localSearches = 0;
+        for (unsigned i = 0; i < loopsNumber; i++)
+        {
+            IteratedLocalSearcher h(s.neighborhood);
+            h.setSolution(sc);
+            h.solve();
+            localSearches += h.timesLocalSearch;
+        }
+        return localSearches / loopsNumber;
+    }
+
     void writeResultsForInstance(Instance i)
     {
         Settings s;
@@ -135,6 +196,38 @@ class HeuristicResultGenerator
             }
     }
 
+    void writeMetricsForInstance(Instance i)
+    {
+        Settings s;
+
+        for (unsigned h : heuristics)
+            for (unsigned nb : neigborhoods)
+            {
+                s = {RANDOM, h, nb};
+                cout << getFileName(i.src) << " ";
+                fout << getFileName(i.src) << ",";
+                printSettings(s);
+                auto values = getMetricsForInstance(i, s);
+                fout << values.first << "," << values.second << ",";
+            }
+    }
+
+    void writeILSMetricForInstance(Instance i)
+    {
+        Settings s;
+
+        for (unsigned h : heuristics)
+            for (unsigned nb : neigborhoods)
+            {
+                s = {RANDOM, h, nb};
+                cout << getFileName(i.src) << " ";
+                fout << getFileName(i.src) << ",";
+                printSettings(s);
+                auto value = getILSMetricForInstance(i, s);
+                fout << value << ",";
+            }
+    }
+
     void writeRows()
     {
         auto instances = InstanceFileReader::getAllInstances();
@@ -156,12 +249,6 @@ class HeuristicResultGenerator
             writeVerboseResultsForInstance(instances[i]);
             fout << endl;
         }
-    }
-
-    IteratedLocalSearcher getNewILS(unsigned oper)
-    {
-        IteratedLocalSearcher ils(oper);
-        return ils;
     }
 
 public:
@@ -191,7 +278,7 @@ public:
     {
         auto instances = InstanceFileReader::getAllInstances();
         unsigned s = instances.size();
-        for (unsigned i = 59; i < s; i++)
+        for (unsigned i = 0; i < s; i++)
         {
             cout << i << "/" << s << endl;
             string filename = instances[i].src;
@@ -200,6 +287,42 @@ public:
             fout.open(out, fstream::out);
 
             writeVerboseResultsForInstance(instances[i]);
+
+            fout.close();
+        }
+    }
+
+    void generateHeuristicMetrics()
+    {
+        auto instances = InstanceFileReader::getAllInstances();
+        unsigned s = instances.size();
+        for (unsigned i = 0; i < s; i++)
+        {
+            cout << i + 1 << "/" << s << endl;
+            string filename = instances[i].src;
+            string out = "/home/hal/os-components/results/heuristics/m_" + getFileName(filename) + ".csv";
+            //cout << out.substr(42) << endl;
+            fout.open(out, fstream::out);
+
+            writeMetricsForInstance(instances[i]);
+
+            fout.close();
+        }
+    }
+
+    void generateILS_SpecificMetrics()
+    {
+        auto instances = InstanceFileReader::getAllInstances();
+        unsigned s = instances.size();
+        for (unsigned i = 178; i < s; i++)
+        {
+            cout << i + 1 << "/" << s << endl;
+            string filename = instances[i].src;
+            string out = "/home/hal/os-components/results/heuristics/ils_" + getFileName(filename) + ".csv";
+            //cout << out.substr(42) << endl;
+            fout.open(out, fstream::out);
+
+            writeILSMetricForInstance(instances[i]);
 
             fout.close();
         }
