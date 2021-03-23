@@ -53,42 +53,8 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		Instance i(t);
-		/* int fim;
-		PerturbationGenerator pg;
-		NeighborGenerator n;
-
-		Instance i(t);
-		Schedule s(i, RANDOM);
-		auto ini = s.getMakespan(); */
-		//Printer::printJobCluster(s);
-		/* pg.setSchedule(s);
-		n.setSchedule(s);
-
-		//Printer::printSolution(s);
-		//Printer::printGantt(s);
-
-		//cout << s.getSolutionString();
-
-		/* IteratedLocalSearcher ils(1, SWAP_CRITICAL);
-		ils.setSolution(s);
-		fim = ils.solve(); */
-
-		/* AnnealingSimulator ls(SWAP_CRITICAL_EDGE);
-		ls.setSolution(s);
-		fim = ls.solve(); */
-
-		/* TabuSearcher t(SHIFT_CRITICAL, 10);
-		t.setSolution(s);
-		fim = t.solve(); */
-
-		//cout << ini << sp << fim << br;
-
-		/*auto ps = p.listPossiblePerturbations(8, SWAP_CRITICAL_EDGE);
-		for (auto per : ps)
-		{
-			printPerturbation(per);
-		} */
+		HeuristicResultGenerator hrg;
+		hrg.generateHeuristicMetrics();
 	}
 
 	return 0;
